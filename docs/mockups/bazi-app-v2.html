@@ -1,0 +1,929 @@
+<style>
+  #bz2 {
+    --paper: #f6f1e4;
+    --card: #fffcf4;
+    --ink: #2f251c;
+    --ink-2: #6f5d48;
+    --ink-3: #a08b6d;
+    --red: #b03a2e;
+    --red-deep: #98301f;
+    --gold: #b8904a;
+    --jade: #3f6f5c;
+    --line: #e4d8bd;
+    --wood: #3f8f5f;
+    --metal: #b08d3e;
+    --water: #3d7ab5;
+    --fire: #c8452c;
+    --earth: #8a6d3f;
+  }
+  #bz2 * { box-sizing: border-box; margin: 0; padding: 0; }
+  #bz2 .phone {
+    width: 390px;
+    margin: 0 auto;
+    border-radius: 30px;
+    overflow: hidden;
+    position: relative;
+    background:
+      radial-gradient(150% 70% at 100% 0%, rgba(184,144,74,.09), transparent 46%),
+      radial-gradient(120% 60% at 0% 100%, rgba(63,111,92,.05), transparent 42%),
+      var(--paper);
+    color: var(--ink);
+    font-family: "PingFang SC", "Hiragino Sans GB", sans-serif;
+    box-shadow: 0 24px 60px rgba(47,37,28,.30);
+  }
+  #bz2 .screen { display: none; }
+  #bz2 .screen.active { display: block; animation: bz2fade .28s ease; }
+  @media (prefers-reduced-motion: reduce) {
+    #bz2 .screen.active { animation: none; }
+  }
+  @keyframes bz2fade {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* 顶栏：左右等宽图标 + 居中标题，严格对称 */
+  #bz2 .top {
+    display: grid;
+    grid-template-columns: 40px 1fr 40px;
+    align-items: center;
+    padding: 16px 14px 10px;
+  }
+  #bz2 .top .slot { width: 36px; height: 36px; }
+  #bz2 .icon-btn {
+    width: 36px; height: 36px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    color: var(--ink);
+    display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(47,37,28,.06);
+    transition: transform .12s ease, box-shadow .12s ease;
+    cursor: pointer;
+  }
+  #bz2 .icon-btn:active { transform: scale(.94); box-shadow: 0 1px 2px rgba(47,37,28,.12); }
+  #bz2 .title {
+    font-family: "Songti SC", "STSong", serif;
+    font-size: 18px; font-weight: 700; letter-spacing: 4px; text-indent: 4px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  #bz2 .title .seal {
+    width: 22px; height: 22px; background: var(--red); color: #fff6e8;
+    font-size: 12px; border-radius: 3px 7px 3px 7px;
+    display: inline-flex; align-items: center; justify-content: center;
+    transform: rotate(-4deg);
+  }
+
+  #bz2 .card {
+    margin: 0 14px 10px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: 0 3px 10px rgba(47,37,28,.05);
+  }
+  #bz2 .sec-title {
+    font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; gap: 7px;
+    padding: 14px 16px 8px;
+  }
+  #bz2 .sec-title::before {
+    content: ""; width: 3px; height: 13px; border-radius: 2px;
+    background: var(--red);
+  }
+  #bz2 .sec-title small { font-size: 11px; color: var(--ink-3); font-weight: 400; }
+
+  /* 按钮：成组必等宽，单一主按钮通栏 */
+  #bz2 .row3 {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    margin: 0 14px 12px;
+  }
+  #bz2 .btn {
+    border-radius: 12px; padding: 13px 4px;
+    font-size: 13px; letter-spacing: 2px; text-indent: 2px; text-align: center;
+    border: 1px solid var(--gold);
+    background: var(--card); color: var(--ink);
+    font-family: inherit; cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  #bz2 .btn:active { transform: scale(.97); }
+  #bz2 .btn.primary {
+    background: linear-gradient(180deg, #c24a3a, var(--red-deep));
+    border-color: var(--red); color: #fff6e8; font-weight: 600;
+    box-shadow: 0 6px 16px rgba(176,58,46,.26);
+  }
+  #bz2 .btn.primary:active { box-shadow: 0 2px 8px rgba(176,58,46,.30); }
+  #bz2 .btn.block { display: block; width: 100%; margin: 0 0 12px; }
+
+  /* 分段控件 */
+  #bz2 .seg {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+    padding: 0 16px 14px;
+  }
+  #bz2 .seg.two { grid-template-columns: repeat(2, 1fr); }
+  #bz2 .opt {
+    text-align: center; padding: 8px 0; font-size: 12.5px;
+    border: 1px solid var(--line); border-radius: 10px;
+    background: #faf5e8; color: var(--ink-2); cursor: pointer;
+    transition: all .15s ease; font-family: inherit;
+  }
+  #bz2 .opt.active {
+    background: var(--red); border-color: var(--red);
+    color: #fff6e8; font-weight: 600;
+    box-shadow: 0 3px 8px rgba(176,58,46,.22);
+  }
+
+  /* 开关 */
+  #bz2 .switch-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 16px; border-top: 1px solid var(--line);
+  }
+  #bz2 .switch-row:first-child { border-top: 0; }
+  #bz2 .switch-row .t { font-size: 13px; color: var(--ink); }
+  #bz2 .switch-row .d { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+  #bz2 .sw {
+    width: 44px; height: 24px; border-radius: 999px;
+    background: #d9cdb2; position: relative; flex-shrink: 0;
+    transition: background .18s ease; cursor: pointer;
+  }
+  #bz2 .sw::after {
+    content: ""; position: absolute; top: 3px; left: 3px;
+    width: 18px; height: 18px; border-radius: 50%; background: #fff;
+    box-shadow: 0 1px 3px rgba(47,37,28,.25);
+    transition: transform .18s ease;
+  }
+  #bz2 .sw.on { background: var(--red); }
+  #bz2 .sw.on::after { transform: translateX(20px); }
+
+  /* 底部导航：三栏，去掉学堂 */
+  #bz2 .tabbar {
+    display: flex;
+    background: var(--card); border-top: 1px solid var(--line);
+    padding: 10px 0 12px;
+  }
+  #bz2 .tabbar.hidden { display: none; }
+  #bz2 .tb {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 5px;
+    font-size: 11px; line-height: 1; color: var(--ink-3);
+    cursor: pointer; padding: 4px 0; border-radius: 10px;
+    transition: color .15s ease;
+  }
+  #bz2 .tb .t-ico {
+    display: flex; align-items: center; justify-content: center;
+    width: 24px; height: 22px;
+  }
+  #bz2 .tb .t-ico svg { display: block; }
+  #bz2 .tb.active { color: var(--red); font-weight: 600; }
+
+  /* 列表行 */
+  #bz2 .row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 16px; border-top: 1px solid var(--line);
+    font-size: 13px; cursor: pointer;
+    transition: background .12s ease;
+  }
+  #bz2 .row:first-child { border-top: 0; }
+  #bz2 .row:active { background: rgba(176,58,46,.04); }
+  #bz2 .row .k { color: var(--ink); }
+  #bz2 .row .v { color: var(--ink-3); font-size: 12px; }
+  #bz2 .row .arrow { color: var(--ink-3); font-size: 16px; }
+
+  /* 四柱表 */
+  #bz2 .table-wrap { margin: 0 14px 12px; overflow: hidden; border-radius: 16px; }
+  #bz2 table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  #bz2 th, #bz2 td {
+    border: 1px solid var(--line); padding: 8px 2px;
+    text-align: center; vertical-align: middle;
+  }
+  #bz2 th {
+    background: #faf5e8; font-size: 12px; font-weight: 600;
+    letter-spacing: 2px; color: var(--ink);
+  }
+  #bz2 th.day { color: var(--red); }
+  #bz2 td.label { background: #faf5e8; font-size: 11px; color: var(--ink-2); width: 15%; }
+  #bz2 td .gz {
+    font-family: "Songti SC", "STSong", serif;
+    font-size: 26px; font-weight: 700; color: var(--ink);
+  }
+  #bz2 td .gz.day { color: var(--red); }
+  #bz2 td .ss { font-size: 13px; color: var(--ink-2); }
+  #bz2 td .ss.owner { color: var(--red); font-weight: 600; }
+  #bz2 .hidegan span { display: block; font-size: 12px; line-height: 1.5; font-weight: 500; }
+  #bz2 .wood { color: var(--wood); } #bz2 .metal { color: var(--metal); }
+  #bz2 .water { color: var(--water); } #bz2 .fire { color: var(--fire); }
+  #bz2 .earth { color: var(--earth); }
+  #bz2 td .ny, #bz2 td .xy { font-size: 12px; color: var(--ink-2); }
+  #bz2 .tipable { cursor: pointer; border-radius: 6px; transition: background .12s ease; }
+  #bz2 .tipable:active { background: rgba(184,144,74,.18); }
+  #bz2 .hint { margin: -6px 14px 10px; font-size: 11px; color: var(--ink-3); text-align: right; }
+
+  /* 五行 */
+  #bz2 .wuxing { display: flex; gap: 6px; padding: 0 16px 14px; }
+  #bz2 .wx { flex: 1; text-align: center; }
+  #bz2 .wx .bar { height: 5px; border-radius: 3px; background: #efe7d3; overflow: hidden; margin: 0 2px 6px; }
+  #bz2 .wx .bar i { display: block; height: 100%; border-radius: 3px; }
+  #bz2 .wx .char { font-size: 14px; font-weight: 600; }
+  #bz2 .wx .n { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+  #bz2 .wx.wood .bar i { background: var(--wood); } #bz2 .wx.wood .char { color: var(--wood); }
+  #bz2 .wx.metal .bar i { background: var(--metal); } #bz2 .wx.metal .char { color: var(--metal); }
+  #bz2 .wx.water .bar i { background: var(--water); } #bz2 .wx.water .char { color: var(--water); }
+  #bz2 .wx.fire .bar i { background: var(--fire); } #bz2 .wx.fire .char { color: var(--fire); }
+  #bz2 .wx.earth .bar i { background: var(--earth); } #bz2 .wx.earth .char { color: var(--earth); }
+
+  /* 大运 */
+  #bz2 .dy {
+    display: grid; grid-template-columns: 64px 74px 1fr auto;
+    align-items: center; gap: 8px; padding: 12px 16px;
+    border-top: 1px solid var(--line); font-size: 12px;
+  }
+  #bz2 .dy:first-of-type { border-top: 0; }
+  #bz2 .dy .age { color: var(--ink-3); }
+  #bz2 .dy .gz { font-family: "Songti SC", serif; font-size: 18px; font-weight: 700; }
+  #bz2 .dy .yr { color: var(--ink-3); font-size: 11px; }
+  #bz2 .dy.current {
+    background: rgba(176,58,46,.05);
+    box-shadow: inset 3px 0 0 var(--red);
+  }
+  #bz2 .dy .tag {
+    background: var(--red); color: #fff6e8; font-size: 10px;
+    border-radius: 6px; padding: 2px 8px;
+  }
+
+  /* 释义底部笺纸 */
+  #bz2 .sheet {
+    position: absolute; left: 12px; right: 12px; bottom: 12px;
+    background: #fffaf0; border: 1px solid var(--gold); border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(47,37,28,.22);
+    padding: 12px 14px; z-index: 5;
+    transform: translateY(120%); transition: transform .22s ease;
+  }
+  #bz2 .sheet.show { transform: none; }
+  #bz2 .sheet .st { font-size: 11px; color: var(--gold); letter-spacing: 2px; margin-bottom: 4px; }
+  #bz2 .sheet .txt { font-size: 12.5px; line-height: 1.7; color: var(--ink); }
+  #bz2 .sheet .close {
+    position: absolute; top: 8px; right: 10px; font-size: 14px;
+    color: var(--ink-3); cursor: pointer; border: 0; background: none;
+  }
+
+  /* 提示 */
+  #bz2 .toast {
+    position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(16px);
+    background: rgba(47,37,28,.92); color: #f7f1e3; font-size: 12px;
+    padding: 9px 16px; border-radius: 999px; letter-spacing: 1px;
+    opacity: 0; pointer-events: none; transition: all .2s ease; z-index: 6;
+    white-space: nowrap;
+  }
+  #bz2 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* 通用小组件 */
+  #bz2 .hero {
+    margin: 4px 14px 12px; border-radius: 16px; padding: 18px;
+    background: linear-gradient(180deg, #c24a3a, var(--red-deep));
+    color: #fff6e8; box-shadow: 0 6px 16px rgba(176,58,46,.24);
+  }
+  #bz2 .hero .date { font-size: 11.5px; opacity: .85; letter-spacing: 1px; }
+  #bz2 .hero .gz {
+    font-family: "Songti SC", serif; font-size: 23px; font-weight: 700;
+    letter-spacing: 3px; text-indent: 3px; margin: 8px 0 10px;
+  }
+  #bz2 .chip {
+    display: inline-block; font-size: 11px; padding: 4px 11px; border-radius: 999px;
+    margin: 0 6px 6px 0; background: rgba(255,246,232,.16);
+    border: 1px solid rgba(255,246,232,.30);
+  }
+  #bz2 .chip.no { background: rgba(0,0,0,.10); border-color: rgba(255,246,232,.22); }
+  #bz2 .meta-line { font-size: 11.5px; color: var(--ink-3); }
+  #bz2 .footer-note {
+    padding: 0 14px 16px; text-align: center;
+    font-size: 10px; letter-spacing: 1px; text-indent: 1px; color: var(--ink-3);
+  }
+</style>
+<div id="bz2">
+  <div class="phone">
+
+    <!-- ============ 首页 ============ -->
+    <section class="screen screen-home">
+      <div class="top">
+        <div class="slot"></div>
+        <div class="title"><span class="seal">命</span>八字排盘</div>
+        <button class="icon-btn" aria-label="设置" onclick="bz2nav('profile')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+
+      <div class="hero">
+        <div class="date">2026-08-07 星期五</div>
+        <div class="gz">丙午年 · 乙未月 · 癸丑日</div>
+        <div class="seg two" style="padding:0 0 10px">
+          <button class="opt active" data-hday="today" onclick="bz2day(this)">今日</button>
+          <button class="opt" data-hday="tomorrow" onclick="bz2day(this)">明日</button>
+        </div>
+        <div data-hpanel="today">
+          <span class="chip">宜 祭祀</span><span class="chip">宜 出行</span>
+          <span class="chip no">忌 动土</span><span class="chip no">忌 安葬</span>
+        </div>
+        <div data-hpanel="tomorrow" style="display:none">
+          <span class="chip">宜 会友</span><span class="chip">宜 沐浴</span>
+          <span class="chip no">忌 开市</span><span class="chip no">忌 求医</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sec-title">快捷功能 <small>八点网格 · 等宽入口</small></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);padding:4px 8px 14px">
+          <button class="opt" style="margin:0 4px" onclick="bz2nav('input')">八字排盘</button>
+          <button class="opt" style="margin:0 4px" onclick="bz2nav('comp')">八字合婚</button>
+          <button class="opt" style="margin:0 4px" onclick="bz2toast('择日模块规划中')">择日</button>
+          <button class="opt" style="margin:0 4px" onclick="bz2nav('daily')">每日运势</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sec-title">最近排盘</div>
+        <div class="row" onclick="bz2nav('chart')">
+          <div><div style="font-weight:600">示例 · 男（乾造）</div><div class="meta-line">1995-10-08 14:30 · 乙亥年 · 昨日查看</div></div>
+          <span class="arrow">›</span>
+        </div>
+        <div class="row" onclick="bz2nav('chart')">
+          <div><div style="font-weight:600">示例 · 女（坤造）</div><div class="meta-line">1996-03-18 10:00 · 丙子年 · 3 天前</div></div>
+          <span class="arrow">›</span>
+        </div>
+      </div>
+
+      <div class="tabbar">
+        <div class="tb active" data-tab="home" onclick="bz2nav('home')">
+          <span class="t-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></span>首页
+        </div>
+        <div class="tb" data-tab="input" onclick="bz2nav('input')">
+          <span class="t-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>排盘
+        </div>
+        <div class="tb" data-tab="profile" onclick="bz2nav('profile')">
+          <span class="t-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg></span>我的
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 排盘输入 ============ -->
+    <section class="screen screen-input">
+      <div class="top">
+        <button class="icon-btn" aria-label="返回" onclick="bz2back()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        </button>
+        <div class="title"><span class="seal">命</span>排盘输入</div>
+        <div class="slot"></div>
+      </div>
+
+      <div class="card">
+        <div class="sec-title">基本信息</div>
+        <div style="padding:0 16px 14px">
+          <div class="meta-line" style="margin-bottom:8px">姓名（选填）</div>
+          <div class="row" style="border:1px solid var(--line);border-radius:10px;padding:10px 12px">
+            <span class="v">请输入姓名</span><span class="arrow">›</span>
+          </div>
+          <div class="meta-line" style="margin:12px 0 8px">性别</div>
+        </div>
+        <div class="seg two">
+          <button class="opt active" onclick="bz2seg(this)">男 · 乾造</button>
+          <button class="opt" onclick="bz2seg(this)">女 · 坤造</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sec-title">出生时间</div>
+        <div class="row"><span class="k">公历生日</span><span class="v">1995 年 10 月 08 日</span><span class="arrow">›</span></div>
+        <div class="row"><span class="k">出生时间</span><span class="v">14 : 30　未时</span><span class="arrow">›</span></div>
+        <div style="padding:10px 16px 14px;font-size:11px;color:var(--ink-3);line-height:1.7">出生时间越精确，排盘与运势推算越准。</div>
+      </div>
+
+      <div class="card">
+        <div class="sec-title">出生地 <small>用于真太阳时</small></div>
+        <div class="row"><span class="k">省 / 市 / 区</span><span class="v">广东省 · 深圳市</span><span class="arrow">›</span></div>
+        <div class="switch-row">
+          <div><div class="t">真太阳时</div><div class="d">按出生地经度校正，结果可能不同</div></div>
+          <div class="sw" onclick="bz2sw(this)"></div>
+        </div>
+      </div>
+
+      <div style="padding:0 14px 12px">
+        <button class="btn primary block" onclick="bz2nav('chart')">开始排盘</button>
+      </div>
+      <div class="footer-note">排盘数据仅供传统文化研究参考</div>
+    </section>
+
+    <!-- ============ 基本排盘 ============ -->
+    <section class="screen screen-chart">
+      <div class="top">
+        <button class="icon-btn" aria-label="返回" onclick="bz2back()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        </button>
+        <div class="title"><span class="seal">命</span>排盘结果</div>
+        <button class="icon-btn" aria-label="分享" onclick="bz2toast('分享功能规划中')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
+        </button>
+      </div>
+
+      <div class="card">
+        <div style="padding:13px 16px;display:flex;justify-content:space-between;align-items:center">
+          <div><div style="font-weight:600">示例 · 男（乾造）</div><div class="meta-line" style="margin-top:3px">农历 一九九五年闰八月十四 · 未时</div></div>
+          <span class="chip" style="background:rgba(184,144,74,.12);border-color:rgba(184,144,74,.35);color:#8a6a2f;margin:0">生肖 猪</span>
+        </div>
+      </div>
+
+      <div class="seg two" style="margin:0 14px 12px;padding:0">
+        <button class="opt active" data-ctab="basic" onclick="bz2ctab(this)">基本排盘</button>
+        <button class="opt" data-ctab="pro" onclick="bz2ctab(this)">专业细盘</button>
+      </div>
+
+      <div data-cpanel="basic">
+        <div class="table-wrap card">
+          <table>
+            <thead><tr><th>四柱</th><th>年柱</th><th>月柱</th><th class="day">日柱</th><th>时柱</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="label tipable" data-tip="十神是日主与其他干支关系的称谓：生我、克我、我生、我克、同我，各分正偏共十种。">主星</td>
+                <td><span class="ss tipable" data-tip="乙木生壬水，阴阳相异，为伤官。">伤官</span></td>
+                <td><span class="ss tipable" data-tip="乙木生壬水，阴阳相异，为伤官。">伤官</span></td>
+                <td><span class="ss owner">元男</span></td>
+                <td><span class="ss tipable" data-tip="丁火为壬水所克，阴阳相异，为正财。">正财</span></td>
+              </tr>
+              <tr>
+                <td class="label">天干</td>
+                <td><span class="gz">乙</span></td>
+                <td><span class="gz">乙</span></td>
+                <td><span class="gz day">壬</span></td>
+                <td><span class="gz">丁</span></td>
+              </tr>
+              <tr>
+                <td class="label">地支</td>
+                <td><span class="gz">亥</span></td>
+                <td><span class="gz">酉</span></td>
+                <td><span class="gz day">申</span></td>
+                <td><span class="gz">未</span></td>
+              </tr>
+              <tr>
+                <td class="label tipable" data-tip="地支内藏天干，代表气机层次，如申中藏庚金、壬水、戊土。">藏干</td>
+                <td class="hidegan"><span class="water tipable" data-tip="壬水为本气">壬</span><span class="wood tipable" data-tip="甲木为余气">甲</span></td>
+                <td class="hidegan"><span class="metal tipable" data-tip="辛金为本气">辛</span></td>
+                <td class="hidegan"><span class="metal tipable" data-tip="庚金为本气">庚</span><span class="water tipable" data-tip="壬水为中气">壬</span><span class="earth tipable" data-tip="戊土为余气">戊</span></td>
+                <td class="hidegan"><span class="earth tipable" data-tip="己土为本气">己</span><span class="fire tipable" data-tip="丁火为中气">丁</span><span class="wood tipable" data-tip="乙木为余气">乙</span></td>
+              </tr>
+              <tr>
+                <td class="label tipable" data-tip="纳音是六十甲子配五行的古法称谓，用于象意参考。">纳音</td>
+                <td><span class="ny tipable" data-tip="山头火：如灯火初燃，明于高处。">山头火</span></td>
+                <td><span class="ny tipable" data-tip="泉中水：暗流涌动，静而深。">泉中水</span></td>
+                <td><span class="ny tipable" data-tip="剑锋金：锋芒外露，刚而利。">剑锋金</span></td>
+                <td><span class="ny tipable" data-tip="天河水：银河之水，清而远。">天河水</span></td>
+              </tr>
+              <tr>
+                <td class="label tipable" data-tip="十二长生描述五行能量在十二地支中的旺衰状态。">星运</td>
+                <td><span class="xy">临官</span></td>
+                <td><span class="xy">沐浴</span></td>
+                <td><span class="xy">长生</span></td>
+                <td><span class="xy">养</span></td>
+              </tr>
+              <tr>
+                <td class="label tipable" data-tip="神煞源自星命术的吉凶星曜体系，需结合全局论断。">神煞</td>
+                <td><span class="ny" style="color:var(--red)">空亡</span></td>
+                <td><span class="ny" style="color:var(--red)">桃花</span></td>
+                <td><span class="ny">—</span></td>
+                <td><span class="ny">—</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="hint">点击 十神 / 藏干 / 纳音 / 神煞 查看释义</div>
+
+        <div class="card">
+          <div class="sec-title">五行占比 <small>本气计数</small></div>
+          <div class="wuxing">
+            <div class="wx metal"><div class="bar"><i style="width:100%"></i></div><div class="char">金</div><div class="n">2</div></div>
+            <div class="wx wood"><div class="bar"><i style="width:100%"></i></div><div class="char">木</div><div class="n">2</div></div>
+            <div class="wx water"><div class="bar"><i style="width:100%"></i></div><div class="char">水</div><div class="n">2</div></div>
+            <div class="wx fire"><div class="bar"><i style="width:50%"></i></div><div class="char">火</div><div class="n">1</div></div>
+            <div class="wx earth"><div class="bar"><i style="width:50%"></i></div><div class="char">土</div><div class="n">1</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div data-cpanel="pro" style="display:none">
+        <div class="card">
+          <div class="sec-title">大运 <small>十年一运</small></div>
+          <div class="dy"><span class="age">11-21 岁</span><span class="gz">甲申</span><span class="yr">2005-2015</span></div>
+          <div class="dy"><span class="age">21-31 岁</span><span class="gz">癸未</span><span class="yr">2015-2025</span></div>
+          <div class="dy current"><span class="age">31-41 岁</span><span class="gz">壬午</span><span class="yr">2025-2035</span><span class="tag">今</span></div>
+          <div class="dy"><span class="age">41-51 岁</span><span class="gz">辛巳</span><span class="yr">2035-2045</span></div>
+        </div>
+        <div class="card">
+          <div class="sec-title">2026 流年 <small>丙午</small></div>
+          <div style="padding:0 16px 14px;font-size:12px;color:var(--ink-2);line-height:1.8">
+            丙火为日主偏财（示例），流年财星透出，宜守不宜进，注意合作与投资节奏。
+          </div>
+        </div>
+      </div>
+
+      <div class="row3">
+        <button class="btn primary" onclick="bz2nav('report')">导出命书</button>
+        <button class="btn" onclick="bz2nav('comp')">合婚</button>
+        <button class="btn" onclick="bz2nav('daily')">每日运势</button>
+      </div>
+      <div class="footer-note">排盘数据仅供传统文化研究参考</div>
+    </section>
+
+    <!-- ============ 专业细盘 ============ -->
+    <section class="screen screen-pro">
+      <div class="top">
+        <button class="icon-btn" aria-label="返回" onclick="bz2back()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        </button>
+        <div class="title"><span class="seal">命</span>专业细盘</div>
+        <div class="slot"></div>
+      </div>
+
+      <div class="seg" style="margin:0 14px 12px;padding:0">
+        <button class="opt active" data-ptab="yun" onclick="bz2ptab(this)">大运</button>
+        <button class="opt" data-ptab="liu" onclick="bz2ptab(this)">流年</button>
+        <button class="opt" data-ptab="ss" onclick="bz2ptab(this)">十神</button>
+      </div>
+
+      <div data-ppanel="yun">
+        <div class="card">
+          <div class="sec-title">大运 <small>十年一运</small></div>
+          <div class="dy"><span class="age">11-21 岁</span><span class="gz">甲申</span><span class="yr">2005-2015</span></div>
+          <div class="dy"><span class="age">21-31 岁</span><span class="gz">癸未</span><span class="yr">2015-2025</span></div>
+          <div class="dy current"><span class="age">31-41 岁</span><span class="gz">壬午</span><span class="yr">2025-2035</span><span class="tag">今</span></div>
+          <div class="dy"><span class="age">41-51 岁</span><span class="gz">辛巳</span><span class="yr">2035-2045</span></div>
+          <div class="dy"><span class="age">51-61 岁</span><span class="gz">庚辰</span><span class="yr">2045-2055</span></div>
+        </div>
+      </div>
+      <div data-ppanel="liu" style="display:none">
+        <div class="card">
+          <div class="sec-title">2026 流年 <small>丙午 · 示例</small></div>
+          <div style="padding:0 16px 14px;font-size:12px;color:var(--ink-2);line-height:1.9">
+            丙火为日主壬水之偏财。流年天干丙火与月干乙木相生，财星透出而旺，
+            此年宜守不宜进，重大投资与合伙需谨慎评估，农历五月尤须注意。
+          </div>
+        </div>
+        <div class="card">
+          <div class="sec-title">2027 流年 <small>丁未 · 示例</small></div>
+          <div style="padding:0 16px 14px;font-size:12px;color:var(--ink-2);line-height:1.9">
+            丁火正财与日主相合（示例），感情与合作机会增多，但未土官星入命，
+            事业压力与机遇并存，宜早作规划。
+          </div>
+        </div>
+      </div>
+      <div data-ppanel="ss" style="display:none">
+        <div class="card">
+          <div class="sec-title">十神分布 <small>以日主壬水为原点 · 示例</small></div>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:4px 16px 16px">
+            <div style="text-align:center"><div class="gz" style="font-size:18px">比肩</div><div class="meta-line">同我</div></div>
+            <div style="text-align:center"><div class="gz" style="font-size:18px">劫财</div><div class="meta-line">同我偏</div></div>
+            <div style="text-align:center"><div class="gz" style="font-size:18px;color:var(--wood)">食神</div><div class="meta-line">我生</div></div>
+            <div style="text-align:center"><div class="gz" style="font-size:18px;color:var(--wood)">伤官</div><div class="meta-line">我生偏</div></div>
+            <div style="text-align:center"><div class="gz" style="font-size:18px;color:var(--fire)">正财</div><div class="meta-line">我克</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-note">大运流年内容为示例数据 · 以实际算法输出为准</div>
+    </section>
+
+    <!-- ============ 合婚 ============ -->
+    <section class="screen screen-comp">
+      <div class="top">
+        <button class="icon-btn" aria-label="返回" onclick="bz2back()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        </button>
+        <div class="title"><span class="seal">命</span>八字合婚</div>
+        <div class="slot"></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 14px 12px">
+        <div class="card" style="margin:0;text-align:center;padding:12px 8px">
+          <div style="font-size:12px;font-weight:600;color:var(--red)">男方 · 乾造</div>
+          <div class="meta-line" style="margin:3px 0 8px">1995-10-08 14:30</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px">
+            <div class="gz" style="font-size:14px;border:1px solid var(--line);border-radius:8px;padding:5px 0;background:#faf5e8">乙亥</div>
+            <div class="gz" style="font-size:14px;border:1px solid var(--line);border-radius:8px;padding:5px 0;background:#faf5e8">乙酉</div>
+            <div class="gz" style="font-size:14px;border:1px solid var(--line);border-radius:8px;padding:5px 0;background:#faf5e8">壬申</div>
+            <div class="gz" style="font-size:14px;border:1px solid var(--line);border-radius:8px;padding:5px 0;background:#faf5e8">丁未</div>
+          </div>
+        </div>
+        <div class="card" style="margin:0;text-align:center;padding:12px 8px">
+          <div style="font-size:12px;font-weight:600;color:var(--water)">女方 · 坤造</div>
+          <div class="meta-line" style="margin:3px 0 8px">1996-03-18 10:00</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px">
+            <div class="gz" style="font-size:14px;border:1px solid var(--line);border-radius:8px;padding:5px 0;background:#faf5e8">丙子</div>
+            <div class="gz" style="font-size:14px;border:1px solid var(--line);border-radius:8px;padding:5px 0;background:#faf5e8">辛卯</div>
+            <div class="gz" style="font-size:14px;border:1px solid var(--line);border-radius:8px;padding:5px 0;background:#faf5e8">甲寅</div>
+            <div class="gz" style="font-size:14px;border:1px solid var(--line);border-radius:8px;padding:5px 0;background:#faf5e8">己巳</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero" style="text-align:center;padding:16px">
+        <div style="font-family:'Songti SC',serif;font-size:38px;font-weight:700;line-height:1">87</div>
+        <div style="font-size:12px;letter-spacing:3px;margin-top:6px">婚配指数 · 上等（示例）</div>
+      </div>
+
+      <div class="card">
+        <div class="sec-title">五行互补</div>
+        <div style="padding:0 16px 14px">
+          <table style="font-size:12px">
+            <tr><th style="border:1px solid var(--line);padding:7px 2px">　</th><th style="border:1px solid var(--line);padding:7px 2px">金</th><th style="border:1px solid var(--line);padding:7px 2px">木</th><th style="border:1px solid var(--line);padding:7px 2px">水</th><th style="border:1px solid var(--line);padding:7px 2px">火</th><th style="border:1px solid var(--line);padding:7px 2px">土</th></tr>
+            <tr><td style="border:1px solid var(--line);padding:7px 2px;color:var(--red)">男</td><td style="border:1px solid var(--line);padding:7px 2px;text-align:center">2</td><td style="border:1px solid var(--line);padding:7px 2px;text-align:center">2</td><td style="border:1px solid var(--line);padding:7px 2px;text-align:center">2</td><td style="border:1px solid var(--line);padding:7px 2px;text-align:center">1</td><td style="border:1px solid var(--line);padding:7px 2px;text-align:center">1</td></tr>
+            <tr><td style="border:1px solid var(--line);padding:7px 2px;color:var(--water)">女</td><td style="border:1px solid var(--line);padding:7px 2px;text-align:center">1</td><td style="border:1px solid var(--line);padding:7px 2px;text-align:center">3</td><td style="border:1px solid var(--line);padding:7px 2px;text-align:center">2</td><td style="border:1px solid var(--line);padding:7px 2px;text-align:center">2</td><td style="border:1px solid var(--line);padding:7px 2px;text-align:center">0</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sec-title">冲合分析 <small>示例</small></div>
+        <div class="row"><span class="k">日主关系</span><span style="color:var(--jade);font-weight:600;font-size:12px">壬水 · 甲木 相生</span></div>
+        <div class="row"><span class="k">夫妻宫</span><span style="color:var(--red);font-weight:600;font-size:12px">申 · 寅 相冲</span></div>
+        <div class="row"><span class="k">生肖</span><span style="color:var(--jade);font-weight:600;font-size:12px">猪 · 鼠 相合</span></div>
+      </div>
+
+      <div style="padding:0 14px 12px">
+        <button class="btn primary block" onclick="bz2toast('合婚报告生成中…（示例）')">生成合婚报告</button>
+      </div>
+      <div class="footer-note">合婚结论为示例数据 · 以实际算法输出为准</div>
+    </section>
+
+    <!-- ============ 每日运势 ============ -->
+    <section class="screen screen-daily">
+      <div class="top">
+        <button class="icon-btn" aria-label="返回" onclick="bz2back()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        </button>
+        <div class="title"><span class="seal">命</span>每日运势</div>
+        <div class="slot"></div>
+      </div>
+
+      <div class="hero">
+        <div class="date">2026-08-07 星期五</div>
+        <div class="gz">丙午年 · 乙未月 · 癸丑日</div>
+        <div style="font-size:12px;letter-spacing:2px;margin-bottom:8px">★★★☆☆　今日三星（示例）</div>
+        <div style="font-size:12px;line-height:1.8;opacity:.95">癸水为日主比肩，宜稳不宜急，适合处理积压事务，忌冲动决策。</div>
+      </div>
+
+      <div class="card">
+        <div class="sec-title">今日宜忌 <small>示例</small></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:4px 16px 14px">
+          <div>
+            <div class="meta-line" style="margin-bottom:6px">宜</div>
+            <span class="chip" style="background:rgba(63,143,95,.10);border-color:rgba(63,143,95,.28);color:var(--wood);margin:0 6px 6px 0">祭祀</span>
+            <span class="chip" style="background:rgba(63,143,95,.10);border-color:rgba(63,143,95,.28);color:var(--wood);margin:0 6px 6px 0">出行</span>
+            <span class="chip" style="background:rgba(63,143,95,.10);border-color:rgba(63,143,95,.28);color:var(--wood);margin:0 6px 6px 0">会友</span>
+          </div>
+          <div>
+            <div class="meta-line" style="margin-bottom:6px">忌</div>
+            <span class="chip no" style="background:rgba(176,58,46,.08);border-color:rgba(176,58,46,.25);color:var(--red);margin:0 6px 6px 0">动土</span>
+            <span class="chip no" style="background:rgba(176,58,46,.08);border-color:rgba(176,58,46,.25);color:var(--red);margin:0 6px 6px 0">安葬</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sec-title">今日指引 <small>示例</small></div>
+        <div style="padding:0 16px 14px;font-size:12.5px;color:var(--ink-2);line-height:2">
+          幸运色　<b style="color:var(--ink)">青 / 蓝</b><br>
+          幸运方位　<b style="color:var(--ink)">东南</b><br>
+          贵人属相　<b style="color:var(--ink)">兔 · 羊</b><br>
+          注意事项　<b style="color:var(--ink)">午时（11-13 点）避免重大签约</b>
+        </div>
+      </div>
+
+      <div style="padding:0 14px 12px">
+        <button class="btn primary block" onclick="bz2toast('分享功能规划中')">分享今日运势</button>
+      </div>
+      <div class="footer-note">运势内容为示例数据 · 以实际算法输出为准</div>
+    </section>
+
+    <!-- ============ 命书 ============ -->
+    <section class="screen screen-report">
+      <div class="top">
+        <button class="icon-btn" aria-label="返回" onclick="bz2back()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        </button>
+        <div class="title"><span class="seal">命</span>命书报告</div>
+        <div class="slot"></div>
+      </div>
+
+      <div class="hero" style="padding:24px 22px;position:relative">
+        <div style="position:absolute;right:18px;top:18px;width:32px;height:32px;border:2px solid rgba(255,246,232,.85);border-radius:5px 9px 5px 9px;display:flex;align-items:center;justify-content:center;font-size:15px;transform:rotate(5deg)">命</div>
+        <div style="font-family:'Songti SC',serif;font-size:30px;font-weight:700;letter-spacing:14px">命 书</div>
+        <div style="margin-top:12px;font-size:12px;opacity:.9">示例 · <b>乾造</b></div>
+        <div style="margin-top:4px;font-size:11px;opacity:.75">生成日期 2026-08-07 · 共 12 页</div>
+      </div>
+
+      <div class="card">
+        <div class="sec-title">目录</div>
+        <div class="row"><span class="k"><span style="color:var(--red);font-weight:700;margin-right:6px">壹</span>命盘概览</span><span class="v">P.01</span></div>
+        <div class="row"><span class="k"><span style="color:var(--red);font-weight:700;margin-right:6px">贰</span>五行与用神</span><span class="v">P.03</span></div>
+        <div class="row"><span class="k"><span style="color:var(--red);font-weight:700;margin-right:6px">叁</span>大运流年</span><span class="v">P.05</span></div>
+        <div class="row"><span class="k"><span style="color:var(--red);font-weight:700;margin-right:6px">肆</span>十神详析</span><span class="v">P.08</span></div>
+        <div class="row"><span class="k"><span style="color:var(--red);font-weight:700;margin-right:6px">伍</span>综合建议</span><span class="v">P.11</span></div>
+      </div>
+
+      <div class="card">
+        <div class="sec-title">样张预览 · 命盘概览</div>
+        <div style="padding:0 16px 14px;font-size:12px;color:var(--ink-2);line-height:1.9;background:#faf5e8;border-radius:10px;margin:0 16px 14px;padding:10px 12px">
+          日主壬水，生于酉月金旺之地，得申金长生、亥水临官之助，身偏旺。用神取木火……（完整内容见正式命书）
+        </div>
+      </div>
+
+      <div style="text-align:center;font-size:12px;color:var(--ink-3);margin:0 14px 10px">
+        深度版命书 <b style="color:var(--red);font-size:16px">¥9.9</b>（示例定价，待定）
+      </div>
+      <div class="row3">
+        <button class="btn primary" onclick="bz2toast('正在生成 PDF…（示例）')">导出 PDF</button>
+        <button class="btn" onclick="bz2toast('分享功能规划中')">分享</button>
+        <button class="btn" onclick="bz2back()">返回</button>
+      </div>
+      <div class="footer-note">命书内容仅供传统文化研究参考</div>
+    </section>
+
+    <!-- ============ 我的 ============ -->
+    <section class="screen screen-profile">
+      <div class="top">
+        <div class="slot"></div>
+        <div class="title"><span class="seal">命</span>我的</div>
+        <button class="icon-btn" aria-label="设置" onclick="bz2toast('设置功能规划中')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+
+      <div class="hero" style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:15px;font-weight:600">示例 · 男（乾造）</div>
+          <div style="font-size:11px;opacity:.85;margin-top:6px">乙亥年 · 1995-10-08 14:30</div>
+        </div>
+        <span style="font-size:20px;opacity:.8">›</span>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px">
+          <div>
+            <div style="font-size:13px;font-weight:600">未开通会员</div>
+            <div class="meta-line" style="margin-top:3px">开通后享 15 项权益（流日流时等）</div>
+          </div>
+          <button class="btn primary" style="padding:8px 16px;border-radius:999px;font-size:12px" onclick="bz2toast('会员开通流程规划中')">开通会员</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row" onclick="bz2nav('chart')"><span class="k">我的命盘</span><span class="arrow">›</span></div>
+        <div class="row" onclick="bz2nav('report')"><span class="k">我的命书</span><span class="arrow">›</span></div>
+        <div class="row" onclick="bz2toast('历史记录规划中')"><span class="k">历史记录</span><span class="arrow">›</span></div>
+      </div>
+
+      <div class="card">
+        <div class="switch-row">
+          <div><div class="t">真太阳时默认开启</div><div class="d">新排盘默认按出生地校正</div></div>
+          <div class="sw on" onclick="bz2sw(this)"></div>
+        </div>
+        <div class="switch-row">
+          <div><div class="t">显示神煞</div><div class="d">在四柱表中展示神煞行</div></div>
+          <div class="sw on" onclick="bz2sw(this)"></div>
+        </div>
+        <div class="row" onclick="bz2toast('关于与合规声明规划中')"><span class="k">关于与合规声明</span><span class="arrow">›</span></div>
+      </div>
+
+      <div style="margin:0 14px 12px;text-align:center;font-size:13px;color:var(--red);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 0">退出登录</div>
+
+      <div class="tabbar">
+        <div class="tb" data-tab="home" onclick="bz2nav('home')">
+          <span class="t-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></span>首页
+        </div>
+        <div class="tb" data-tab="input" onclick="bz2nav('input')">
+          <span class="t-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>排盘
+        </div>
+        <div class="tb active" data-tab="profile" onclick="bz2nav('profile')">
+          <span class="t-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg></span>我的
+        </div>
+      </div>
+    </section>
+
+    <!-- 释义笺纸 -->
+    <div class="sheet" id="bz2sheet">
+      <button class="close" onclick="bz2closeSheet()" aria-label="关闭">×</button>
+      <div class="st" id="bz2sheet-title">释义</div>
+      <div class="txt" id="bz2sheet-text"></div>
+    </div>
+
+    <div class="toast" id="bz2toast"></div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bz2');
+  var screens = ['home', 'input', 'chart', 'pro', 'comp', 'daily', 'report', 'profile'];
+  var history = [];
+  var toastTimer = null;
+
+  function current() {
+    for (var i = 0; i < screens.length; i++) {
+      if (root.querySelector('.screen-' + screens[i]).classList.contains('active')) return screens[i];
+    }
+    return 'home';
+  }
+
+  window.bz2nav = function (name) {
+    if (name === current()) return;
+    history.push(current());
+    show(name);
+  };
+
+  window.bz2back = function () {
+    var prev = history.pop();
+    show(prev || 'home');
+  };
+
+  function show(name) {
+    for (var i = 0; i < screens.length; i++) {
+      root.querySelector('.screen-' + screens[i]).classList.toggle('active', screens[i] === name);
+    }
+    var bars = root.querySelectorAll('.tabbar');
+    for (var b = 0; b < bars.length; b++) {
+      bars[b].classList.toggle('hidden', name !== 'home' && name !== 'input' && name !== 'profile');
+    }
+    var tabs = root.querySelectorAll('.tabbar .tb');
+    for (var j = 0; j < tabs.length; j++) {
+      tabs[j].classList.toggle('active', tabs[j].getAttribute('data-tab') === name);
+    }
+  }
+
+  window.bz2seg = function (el) {
+    var group = el.parentNode;
+    var opts = group.querySelectorAll('.opt');
+    for (var i = 0; i < opts.length; i++) opts[i].classList.remove('active');
+    el.classList.add('active');
+  };
+
+  window.bz2sw = function (el) {
+    el.classList.toggle('on');
+  };
+
+  window.bz2day = function (el) {
+    var seg = el.parentNode;
+    var opts = seg.querySelectorAll('.opt');
+    for (var i = 0; i < opts.length; i++) opts[i].classList.remove('active');
+    el.classList.add('active');
+    var val = el.getAttribute('data-hday');
+    var hero = seg.parentNode;
+    var panels = hero.querySelectorAll('[data-hpanel]');
+    for (var j = 0; j < panels.length; j++) {
+      panels[j].style.display = panels[j].getAttribute('data-hpanel') === val ? '' : 'none';
+    }
+  };
+
+  window.bz2ctab = function (el) {
+    var seg = el.parentNode;
+    var opts = seg.querySelectorAll('.opt');
+    for (var i = 0; i < opts.length; i++) opts[i].classList.remove('active');
+    el.classList.add('active');
+    var val = el.getAttribute('data-ctab');
+    var wrap = seg.parentNode;
+    var panels = wrap.querySelectorAll('[data-cpanel]');
+    for (var j = 0; j < panels.length; j++) {
+      panels[j].style.display = panels[j].getAttribute('data-cpanel') === val ? '' : 'none';
+    }
+  };
+
+  window.bz2ptab = function (el) {
+    var seg = el.parentNode;
+    var opts = seg.querySelectorAll('.opt');
+    for (var i = 0; i < opts.length; i++) opts[i].classList.remove('active');
+    el.classList.add('active');
+    var val = el.getAttribute('data-ptab');
+    var wrap = seg.parentNode;
+    var panels = wrap.querySelectorAll('[data-ppanel]');
+    for (var j = 0; j < panels.length; j++) {
+      panels[j].style.display = panels[j].getAttribute('data-ppanel') === val ? '' : 'none';
+    }
+  };
+
+  window.bz2toast = function (msg) {
+    var t = document.getElementById('bz2toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove('show'); }, 1600);
+  };
+
+  var sheet = document.getElementById('bz2sheet');
+  window.bz2closeSheet = function () { sheet.classList.remove('show'); };
+
+  var tipables = root.querySelectorAll('.tipable');
+  for (var k = 0; k < tipables.length; k++) {
+    (function (el) {
+      el.addEventListener('click', function () {
+        document.getElementById('bz2sheet-title').textContent = el.textContent.trim();
+        document.getElementById('bz2sheet-text').textContent = el.getAttribute('data-tip') || '';
+        sheet.classList.add('show');
+      });
+    })(tipables[k]);
+  }
+
+  show('home');
+})();
+</script>
