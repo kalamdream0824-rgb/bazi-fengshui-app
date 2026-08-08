@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/Button'
 import { Card, CardTitle } from '@/components/Card'
 import { SegControl } from '@/components/SegControl'
+import { RegionSelect } from '@/components/RegionSelect'
 import { Switch } from '@/components/Switch'
 import { TopBar } from '@/components/TopBar'
 import { getBaziApi } from '@/services/baziApi'
@@ -37,6 +38,10 @@ export function InputPage() {
   const submit = () => {
     if (!datetime) {
       toast('请选择出生时间')
+      return
+    }
+    if (trueSolar && !birthPlace) {
+      toast('开启真太阳时请先选择出生地（省/市）')
       return
     }
     mutation.mutate({
@@ -91,12 +96,8 @@ export function InputPage() {
       <Card>
         <CardTitle hint="用于真太阳时">出生地</CardTitle>
         <div className="field">
-          <input
-            className="input-box"
-            value={birthPlace}
-            placeholder="如：广东省 · 深圳市"
-            onChange={(e) => setBirthPlace(e.target.value)}
-          />
+          <div className="lbl">省 / 市</div>
+          <RegionSelect value={birthPlace} onChange={setBirthPlace} />
         </div>
         <Switch
           checked={trueSolar}

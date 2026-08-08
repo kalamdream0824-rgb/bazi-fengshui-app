@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.101.4",
+    "china-division": "^2.7.0",
     "lunar-javascript": "^1.7.7",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
