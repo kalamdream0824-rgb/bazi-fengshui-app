@@ -37,6 +37,14 @@ export interface DaYun {
   isCurrent: boolean
 }
 
+export interface TrueSolarInfo {
+  original: string
+  adjusted: string
+  offsetMinutes: number
+  eotMinutes: number
+  longitude: number
+}
+
 export interface PaipanResult {
   solarText: string
   lunarText: string
@@ -46,4 +54,5 @@ export interface PaipanResult {
   wuXing: Record<WuxingKey, number>
   daYun: DaYun[]
   currentYearGanZhi: string
+  trueSolar?: TrueSolarInfo
 }

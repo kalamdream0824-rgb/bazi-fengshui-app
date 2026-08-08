@@ -45,6 +45,12 @@ export function ChartPage() {
             <div className="meta-line" style={{ marginTop: 3 }}>
               农历 {result.lunarText} · {result.timeZhi}时
             </div>
+            {result.trueSolar ? (
+              <div className="meta-line" style={{ marginTop: 3 }}>
+                真太阳时 {result.trueSolar.original} → {result.trueSolar.adjusted}
+                （经度 {result.trueSolar.longitude}°E）
+              </div>
+            ) : null}
           </div>
           <span className="chip" style={{ background: 'rgba(184,144,74,.12)', borderColor: 'rgba(184,144,74,.35)', color: '#8a6a2f', margin: 0 }}>
             生肖 {result.shengXiao}

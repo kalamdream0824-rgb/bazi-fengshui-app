@@ -56,4 +56,19 @@ describe('baziMapper.paipan 结构完整性', () => {
     const female = paipan({ gender: 'female', solarDateTime: '1995-10-08T14:30:00', trueSolarTime: false })
     expect(male.daYun[0].ganZhi).not.toBe(female.daYun[0].ganZhi)
   })
+
+  it('真太阳时校正改变时辰：深圳 13:05 由未时变为午时', () => {
+    const withTrueSolar = paipan({
+      gender: 'male',
+      solarDateTime: '1995-10-08T13:05:00',
+      trueSolarTime: true,
+      birthPlace: '广东省 深圳市',
+    })
+    const without = paipan({ gender: 'male', solarDateTime: '1995-10-08T13:05:00', trueSolarTime: false })
+
+    expect(without.pillars.time.gan + without.pillars.time.zhi).toBe('丁未')
+    expect(withTrueSolar.pillars.time.gan + withTrueSolar.pillars.time.zhi).toBe('丙午')
+    expect(withTrueSolar.trueSolar?.longitude).toBe(114.05)
+    expect(withTrueSolar.trueSolar?.adjusted).toContain('12:54')
+  })
 })

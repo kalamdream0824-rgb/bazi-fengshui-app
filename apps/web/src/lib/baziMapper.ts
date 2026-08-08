@@ -1,5 +1,6 @@
 import { Lunar, Solar } from 'lunar-javascript'
 import type { DaYun, PaipanRequest, PaipanResult, Pillar, PillarKey, WuxingKey } from '@/types/bazi'
+import { formatAdjusted, longitudeOf, trueSolarTime } from './trueSolarTime'
 import { GAN_WUXING, ZHI_WUXING } from './wuxing'
 
 const YUN_GENDER = { male: 1, female: 0 } as const
@@ -40,7 +41,26 @@ export function paipan(req: PaipanRequest): PaipanResult {
   const [y, m, d] = datePart.split('-').map(Number)
   const [hh, mm] = timePart.split(':').map(Number)
 
-  const solar = Solar.fromYmdHms(y, m, d, hh || 0, mm || 0, 0)
+  const base = new Date(y, (m || 1) - 1, d || 1, hh || 0, mm || 0, 0)
+  let solarDate = base
+  let trueSolar: PaipanResult['trueSolar']
+
+  if (req.trueSolarTime && req.birthPlace) {
+    const lng = longitudeOf(req.birthPlace)
+    if (lng != null) {
+      const r = trueSolarTime(base, lng)
+      solarDate = r.adjusted
+      trueSolar = {
+        original: req.solarDateTime.slice(0, 16),
+        adjusted: formatAdjusted(r.adjusted),
+        offsetMinutes: Math.round(r.offsetMinutes),
+        eotMinutes: Math.round(r.eotMinutes * 10) / 10,
+        longitude: lng,
+      }
+    }
+  }
+
+  const solar = Solar.fromYmdHms(solarDate.getFullYear(), solarDate.getMonth() + 1, solarDate.getDate(), solarDate.getHours(), solarDate.getMinutes(), 0)
   const lunar = solar.getLunar()
   const ec = lunar.getEightChar()
 
@@ -84,6 +104,7 @@ export function paipan(req: PaipanRequest): PaipanResult {
     wuXing,
     daYun,
     currentYearGanZhi: `${today.getYearInGanZhiExact()}年 ${today.getMonthInGanZhiExact()}月 ${today.getDayInGanZhiExact()}日`,
+    trueSolar,
   }
 }
 
