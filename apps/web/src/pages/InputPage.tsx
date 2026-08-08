@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/Button'
 import { Card, CardTitle } from '@/components/Card'
+import { DateTimePicker } from '@/components/DateTimePicker'
 import { SegControl } from '@/components/SegControl'
 import { RegionSelect } from '@/components/RegionSelect'
 import { Switch } from '@/components/Switch'
@@ -81,12 +82,7 @@ export function InputPage() {
         <CardTitle>出生时间</CardTitle>
         <div className="field">
           <div className="lbl">公历出生日期与时间</div>
-          <input
-            className="input-box"
-            type="datetime-local"
-            value={datetime}
-            onChange={(e) => setDatetime(e.target.value)}
-          />
+          <DateTimePicker value={datetime} onChange={setDatetime} />
         </div>
         <div className="field">
           <div className="note">出生时间越精确，排盘与运势推算越准。</div>
