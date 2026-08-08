@@ -2,7 +2,7 @@
 
 | 项目 | 内容 |
 |---|---|
-| 文档版本 | v0.1（开发前基线） |
+| 文档版本 | v0.2（已实现：M0.5 + M0.8） |
 | 日期 | 2026-08-08 |
 | 适用范围 | 前端（apps/web）开发 |
 | 关联文档 | [产品图文档](/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/bazi-app-mockups.md)、[PRD](/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/bazi-fengshui-app-PRD.md)、[设计哲学](/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/design-philosophy.md) |
@@ -12,20 +12,20 @@
 ## 1. 背景与目标
 
 - 产品形态：Web 起步的八字排盘 App，后续可迁移微信小程序；前后端分离。
-- 当前阶段：**先做前端**，后端（Spring Boot + Java 17 + MyBatis-Plus + MySQL）后置。
-- 前端目标：
-  1. 基于已定稿的「朱墨星图」设计系统与 8 模块产品图，还原交互原型；
-  2. **契约先行**：排盘数据层抽象为 `BaziApi` 接口，开发期用 Mock 实现（内部 lunar-javascript 真算），后端就绪后切换 HTTP 实现，页面零改动；
-  3. 排盘正确性前置：建立测试夹具与单测基线。
+- 当前阶段：前端已完成 M0.5（工程化 + 排盘输入/基本排盘）与 M0.8（其余模块补齐），**8 个模块全部可走通**；后端（Spring Boot + Java 17 + MyBatis-Plus + MySQL）待启动。
+- 前端设计原则（已落实）：
+  1. 设计系统基于「朱墨星图」哲学与产品图文档令牌实现；
+  2. **契约先行**：排盘数据层抽象为 `BaziApi`，开发期 `MockBaziApi`（lunar-javascript 真算），后端就绪后切 `HttpBaziApi`，页面零改动；
+  3. 排盘正确性前置：测试夹具 + 单测基线（当前 15 用例全绿）。
 
 ## 2. 总体架构
 
 ```mermaid
 flowchart LR
   subgraph repo[仓库根目录]
-    W[apps/web —— 本次开发范围]
+    W[apps/web —— 已完成 M0.5/M0.8]
     C[contracts —— OpenAPI 契约 + 测试夹具]
-    S[apps/server —— 后续 Java 后端]
+    S[apps/server —— 待启动 Java 后端]
     D[docs —— 设计文档]
   end
   W -->|开发期 MockBaziApi| B[lunar-javascript]
@@ -36,153 +36,105 @@ flowchart LR
 ```
 
 要点：
-- `apps/web` 是纯前端，不直接依赖后端运行；
+- `apps/web` 纯前端，不依赖后端即可运行；
 - 排盘结果形状（`PaipanResult`）由 contracts 定义，Mock 与 Http 实现输出同一形状；
-- 测试夹具（名人八字数据集）为语言无关 JSON，未来用于前后端一致性回归。
+- 夹具（`contracts/fixtures/bazi-cases.json`，6 组边界用例）为语言无关 JSON，未来用于前后端一致性回归。
 
-## 3. 技术选型
+## 3. 技术选型（实际版本）
 
-| 领域 | 选择 | 说明 |
+| 领域 | 选择 | 状态 |
 |---|---|---|
-| 构建 | Vite 8 + React 19 | 现有脚手架迁移 |
-| 语言 | TypeScript（strict） | 全量开启严格模式 |
-| 路由 | react-router（v7 library 模式） | 8 模块路由 + 底部导航显隐 |
-| 服务端状态 | TanStack Query v5 | API 缓存/加载/重试，配合 BaziApi |
-| 客户端状态 | zustand | 当前命盘、UI 偏好（真太阳时默认等） |
-| 样式 | CSS Variables 令牌 + CSS Modules | 设计系统令牌来自产品图文档，禁用全局散写样式 |
-| 表单 | 受控组件（暂不引入表单库） | MVP 表单简单；复杂后再加 react-hook-form |
-| 测试 | Vitest + Testing Library | 排盘映射、核心组件 smoke |
-| 排盘计算（仅开发期） | lunar-javascript | 封装在 MockBaziApi 内，禁止页面直接调用 |
+| 构建 | Vite 8.2 + React 19.2 | ✅ 已装 |
+| 语言 | TypeScript strict（tsconfig 已移除 baseUrl，paths 用相对路径） | ✅ |
+| 路由 | react-router-dom 7.18 | ✅ |
+| 服务端状态 | @tanstack/react-query 5.101 | ✅（排盘输入/合婚乙方用 useMutation） |
+| 客户端状态 | zustand 5.0.14 | ✅（bazi / toast / settings 三个 store） |
+| 样式 | CSS Variables（tokens.css）+ 全局 app.css | ✅（见 7 节偏差记录） |
+| 测试 | vitest 4.1 + jsdom + @testing-library/jest-dom 7 | ✅ 15 用例 |
+| 排盘计算（开发期） | lunar-javascript 1.7.7 | ✅ 仅存在于 MockBaziApi/lib |
+| Node 类型 | @types/node | ✅ |
 
-## 4. 仓库布局（前端相关）
+## 4. 仓库布局（实际）
 
 ```
 bazi-fengshui-app/
-├─ apps/web/                    # 前端应用
-│  ├─ index.html
-│  ├─ vite.config.ts
-│  ├─ package.json
+├─ apps/web/
+│  ├─ index.html / vite.config.ts / package.json
 │  └─ src/
-│     ├─ main.tsx
-│     ├─ app/                   # 路由、布局、底部导航
-│     ├─ components/            # 通用设计系统组件
-│     ├─ features/              # 领域模块（bazi/comp/daily/report...）
-│     ├─ pages/                 # 8 个路由页面
-│     ├─ services/              # BaziApi 接口 + Mock/Http 实现
-│     ├─ lib/                   # 排盘映射、格式化、工具
-│     ├─ hooks/                 # 通用 hooks
-│     ├─ types/                 # 领域类型
-│     ├─ styles/                # 令牌、reset、全局样式
-│     ├─ mocks/                 # 开发期假数据
-│     └─ tests/                 # 夹具导入与测试入口
+│     ├─ main.tsx                    # QueryClientProvider + 样式入口
+│     ├─ app/App.tsx                 # BrowserRouter + 路由 + TabBar/Toast
+│     ├─ pages/                      # 8 个页面（全部实现）
+│     ├─ components/                 # 11 个设计系统组件
+│     ├─ services/                   # baziApi 接口 + Mock/Http 实现
+│     ├─ lib/                        # baziMapper / compRules / wuxing
+│     ├─ store/                      # useBaziStore / useToastStore / useSettingsStore
+│     ├─ types/                      # bazi.ts + lunar-javascript.d.ts + env.d.ts
+│     ├─ styles/                     # tokens.css + app.css
+│     └─ tests/setup.ts
 ├─ contracts/
-│  ├─ openapi.yaml              # 后端契约草案（后续完善）
-│  └─ fixtures/bazi-cases.json  # 名人八字测试数据集
-├─ docs/
-└─ README.md
+│  ├─ openapi.yaml                   # 排盘契约草案
+│  └─ fixtures/bazi-cases.json       # 6 组夹具（立春/闰月/子时等）
+└─ docs/
 ```
 
-## 5. 路由与导航
+## 5. 路由与导航（实现状态）
 
-| 路径 | 页面 | 底部导航 | 来源（原型模块） |
+| 路径 | 页面 | 底部导航 | 状态 |
 |---|---|---|---|
-| `/` | 首页 | 显示 | 首页 |
-| `/input` | 排盘输入 | 显示 | 排盘输入 |
-| `/chart` | 基本排盘 | 隐藏 | 基本排盘 |
-| `/chart/pro` | 专业细盘 | 隐藏 | 专业细盘 |
-| `/comp` | 八字合婚 | 隐藏 | 八字合婚 |
-| `/daily` | 每日运势 | 隐藏 | 每日运势 |
-| `/report` | 命书报告 | 隐藏 | 命书报告 |
-| `/profile` | 我的 | 显示 | 我的 |
+| `/` | 首页（今日/明日切换、快捷入口、最近排盘） | 显示 | ✅ M0.8 |
+| `/input` | 排盘输入（表单 + 真太阳时开关） | 显示 | ✅ M0.5 |
+| `/chart` | 基本排盘（四柱表 + 释义 + 五行） | 隐藏 | ✅ M0.5 |
+| `/chart/pro` | 专业细盘（大运/流年/十神/神煞页签） | 隐藏 | ✅ M0.8 |
+| `/comp` | 八字合婚（双人排盘 + Mock 规则） | 隐藏 | ✅ M0.8 |
+| `/daily` | 每日运势（今日/明日） | 隐藏 | ✅ M0.8 |
+| `/report` | 命书报告（封面/目录/样张） | 隐藏 | ✅ M0.8 |
+| `/profile` | 我的（命盘/设置/占位项） | 显示 | ✅ M0.8 |
 
-规则：只有顶层三页（首页/排盘/我的）显示底部导航；子页面提供返回键（`navigate(-1)`）。当前命盘数据存 zustand，子页面从 store 读取，未命中时跳回 `/input`。
+规则：顶层三页显示底部导航；子页面返回键 `navigate(-1)`；无命盘时跳转 `/input`。
 
-## 6. 数据契约（排盘核心）
+## 6. 数据契约与领域逻辑（实现）
 
-`contracts/openapi.yaml` 的 TypeScript 对应形状（前端以 `types/` 为准，后端以 OpenAPI 为准，两边由夹具保证一致）：
+- `PaipanRequest` / `PaipanResult` / `Pillar` / `DaYun` 与 `contracts/openapi.yaml` 一致；`lib/baziMapper.ts` 负责 lunar-javascript → 契约形状映射。
+- 开发期 Mock 行为：真实排盘 + 220ms 模拟延迟；`VITE_API_MODE=http` 切换 `HttpBaziApi`（POST `/api/v1/records`）。
+- 新增领域逻辑：
+  - `lib/compRules.ts`：生肖六合（鼠牛/虎猪/兔狗/龙鸡/蛇猴/马羊）+ 日主五行生克 + 五行互补 → 婚配指数（示例规则，60 基础分 ± 加分，0-100 截断）；
+  - `lib/baziMapper.getGanZhiFor(offset)`：今日/明日干支真实推算；
+  - `store/useSettingsStore`：真太阳时默认开关，localStorage 持久化，排盘页联动。
+- 仍待后端：神煞（`shenSha` 恒为空数组）、真太阳时校正、流年/运势文案、PDF 导出。
 
-```ts
-interface PaipanRequest {
-  name?: string
-  gender: 'male' | 'female'
-  solarDateTime: string          // ISO，如 1995-10-08T14:30:00
-  birthPlace?: string            // 用于真太阳时
-  trueSolarTime: boolean
-}
+## 7. 设计系统落地（含偏差记录）
 
-interface Pillar {
-  label: 'year' | 'month' | 'day' | 'time'
-  gan: string
-  zhi: string
-  shiShen: string                // 十神；日柱为 '日主'
-  hideGan: { gan: string; wuxing: 'jin'|'mu'|'shui'|'huo'|'tu' }[]
-  naYin: string
-  diShi?: string                 // 十二长生
-  xunKong?: string[]             // 旬空
-  shenSha?: string[]             // 神煞（后端实现，前端展示）
-}
+- 令牌：`styles/tokens.css`（色板/五行色/圆角/间距/字体），与产品图文档一致。
+- 组件（11 个）：Button(+ButtonRow)、Card(+CardTitle)、SegControl、Switch、TopBar、TabBar、BaziTable(内嵌释义 Sheet)、WuxingBar、DaYunList、Toast。
+- 交互规范已落实：按压回弹、页签/分段切换、开关滑动、动效 < 300ms 尊重 reduced-motion、居中文本 `letter-spacing` 等量 `text-indent` 补偿。
+- **偏差记录**：v0.1 计划 CSS Modules，实际采用"全局 app.css + 前缀类名"以加速 MVP；后续如需隔离可迁移，组件接口不变。
 
-interface DaYun {
-  ageRange: string               // '31-41 岁'
-  ganZhi: string
-  yearRange: string              // '2025-2035'
-  isCurrent: boolean
-}
+## 8. 测试与验证（当前状态）
 
-interface PaipanResult {
-  solarText: string
-  lunarText: string              // '一九九五年闰八月十四'
-  shengXiao: string
-  pillars: { year: Pillar; month: Pillar; day: Pillar; time: Pillar }
-  wuXing: { jin: number; mu: number; shui: number; huo: number; tu: number }
-  daYun: DaYun[]
-  currentYearGanZhi?: string
-}
-```
+- **15/15 用例通过**：
+  - `baziMapper`：6 组夹具（普通男/女、立春前后年柱切换、闰二月、晚子时）+ 结构完整性（五行合计 8、大运排序与当前标记、男女大运顺逆不同）；
+  - `compRules`：五行生克/比和、合婚评分与生肖六合识别。
+- `npm run build`（tsc strict + vite build）通过；存在主包 >500KB 警告（lunar-javascript + 路由未分割），列入剩余工作。
+- 浏览器走查：沙箱无法启动浏览器，由用户在 `npm run dev` 验收；后续可接入 `webapp-testing` 技能（Playwright，需沙箱外）。
 
-`BaziApi` 接口与实现：
+## 9. 里程碑与剩余工作
 
-```ts
-interface BaziApi {
-  paipan(req: PaipanRequest): Promise<PaipanResult>
-}
+| 里程碑 | 状态 |
+|---|---|
+| M0.5 工程化 + 排盘输入/基本排盘 | ✅ 已交付（提交 db121ff） |
+| M0.8 其余 6 模块 + 首页/细盘完善 | ✅ 已交付（提交 9c0de4a） |
+| M1.5 后端联调 | ⏳ 待启动：Spring Boot + lunar-java 出盘；HttpBaziApi 切换；夹具一致性回归 |
+| 代码分割 | ⏳ 路由级 lazy 加载，消除 600KB 主包警告 |
+| 神煞 / 真太阳时 / 流年文案 / PDF | ⏳ 后端实现或专项方案 |
 
-// 开发期：lunar-javascript 真算（唯一允许引用 lunar-javascript 的地方）
-class MockBaziApi implements BaziApi {}
-// 上线：fetch POST /api/v1/records（形状不变）
-class HttpBaziApi implements BaziApi {}
-```
+## 10. 风险与决策记录（更新）
 
-由 `VITE_API_MODE=mock|http` 环境变量选择实现；默认 mock。
-
-## 7. 设计系统落地
-
-- 令牌：色板（paper/card/ink/red/gold/jade/五行五色）、圆角、间距、字号阶梯，全部取自产品图文档，写入 `styles/tokens.css`。
-- 组件清单（第一批）：`Button`（主/次/三等宽组）、`Card`、`SegControl`、`Switch`、`TabBar`（3 项）、`TopBar`（对称三栏）、`BaziTable`（四柱表 + 释义弹出）、`Sheet`（底部释义笺纸）、`Toast`、`WuxingBar`、`DaYunList`。
-- 交互规范：按压回弹（`:active scale .97`）、页签/分段切换、开关滑动、动效 < 300ms 且尊重 `prefers-reduced-motion`；居中文本若使用 `letter-spacing` 必须加等量 `text-indent` 抵消尾部空隙。
-
-## 8. 页面开发顺序
-
-| 轮次 | 内容 | 验收 |
-|---|---|---|
-| M0.5（本轮） | 迁移 monorepo；路由+布局；设计系统组件；排盘输入页；基本排盘页（BaziTable+五行+释义）；Vitest 基线 | 输入生日 → 出真实四柱；构建绿；单测绿 |
-| M0.8 | 专业细盘（大运/流年/十神页签）；首页完整化（今日宜忌/快捷入口/最近排盘） | 原型 v2 对应交互可用 |
-| M1 | 每日运势；合婚（Mock 规则）；命书（PDF 占位）；我的 | 8 模块全部可走通 |
-| M1.5 | 后端联调：HttpBaziApi 切换、OpenAPI 对齐、夹具一致性回归 | 前后端结果一致 |
-
-## 9. 测试与验证策略
-
-- 单元：`lib/bazi-mapper`（lunar-javascript 输出 → `PaipanResult`）用夹具断言；边界用例：闰月、节气交界、子时、真太阳时开/关。
-- 组件：排盘输入表单校验、BaziTable 渲染、底部导航显隐 smoke 测试。
-- 构建：`npm run build` 保持通过（tsc 严格模式 + vite build）。
-- 走查：开发环境沙箱无法启动浏览器，交互效果由用户在 `npm run dev` 确认；后续可接入 `webapp-testing` 技能做 Playwright 回归（需沙箱外运行）。
-
-## 10. 风险与决策记录
-
-- 排盘方案：产品决策为后端 Java（lunar-java）出盘；前端开发期用 lunar-javascript 真算模拟，**两实现一致性由 contracts/fixtures 回归保证**，不在页面层混用。
-- 神煞、真太阳时、合婚规则：lunar-javascript 不含，Mock 阶段先返回占位/空数组，标注"示例"，待后端实现。
-- 依赖与网络：npm 安装需走本地代理（127.0.0.1:7890），README 已记录。
+- 排盘：前端开发期用 lunar-javascript 真算模拟后端 lunar-java，一致性由 contracts/fixtures 回归保证；页面层不直接依赖 lunar-javascript（仅 lib/Mock 引用）。
+- 合婚指数为示例规则，已标注 UI；后端可替换为更严谨算法。
+- 沙箱网络授权会中途失效，GitHub 推送/依赖安装需即时执行；不影响用户本机开发。
+- 提交署名：历史提交为占位身份，新提交使用 GitHub 身份 `kalamdream0824-rgb`。
 
 ## 11. 变更日志
 
-- v0.1（2026-08-08）：建立前端技术设计基线，确定架构/目录/路由/契约/设计系统落地/测试策略。
+- v0.1（2026-08-08）：建立前端技术设计基线。
+- v0.2（2026-08-08）：整合 M0.5/M0.8 实现状态——8 模块全部可走通；记录实际技术版本、领域逻辑（compRules/settings/getGanZhiFor）、样式偏差、测试与里程碑状态、剩余工作。
