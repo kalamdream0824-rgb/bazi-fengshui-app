@@ -2,7 +2,7 @@
 
 | 项目 | 内容 |
 |---|---|
-| 文档版本 | v0.2（已实现：M0.5 + M0.8） |
+| 文档版本 | v0.3（已实现：M0.5 + M0.8 + 表单组件 + 真太阳时） |
 | 日期 | 2026-08-08 |
 | 适用范围 | 前端（apps/web）开发 |
 | 关联文档 | [产品图文档](/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/bazi-app-mockups.md)、[PRD](/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/bazi-fengshui-app-PRD.md)、[设计哲学](/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/design-philosophy.md) |
@@ -99,8 +99,12 @@ bazi-fengshui-app/
 - 新增领域逻辑：
   - `lib/compRules.ts`：生肖六合（鼠牛/虎猪/兔狗/龙鸡/蛇猴/马羊）+ 日主五行生克 + 五行互补 → 婚配指数（示例规则，60 基础分 ± 加分，0-100 截断）；
   - `lib/baziMapper.getGanZhiFor(offset)`：今日/明日干支真实推算；
-  - `store/useSettingsStore`：真太阳时默认开关，localStorage 持久化，排盘页联动。
-- 仍待后端：神煞（`shenSha` 恒为空数组）、真太阳时校正、流年/运势文案、PDF 导出。
+  - `store/useSettingsStore`：真太阳时默认开关，localStorage 持久化，排盘页联动；
+  - `components/RegionSelect`：出生地省→市联动下拉（`china-division` 民政部数据，34 省级 + 400+ 地级市，含港澳台）；
+  - `components/DateTimePicker`：出生时间底部滚轮选择（年/月/日/时/分五列 + 时辰提示，无手动输入）；
+  - `lib/trueSolarTime.ts`：真太阳时真实校正——内置 356 城市经度（省会兜底）+ 经度差 + NOAA 均时差，结果记入 `PaipanResult.trueSolar` 并在结果页展示。
+- 仍待后端：神煞（`shenSha` 恒为空数组）、流年/运势文案、PDF 导出。
+- **待办：时辰边界提示**——当真太阳时校正跨越时辰/节气边界时，结果页高亮提示"该时间经校正后时辰发生变化"，避免用户困惑。
 
 ## 7. 设计系统落地（含偏差记录）
 
@@ -111,9 +115,13 @@ bazi-fengshui-app/
 
 ## 8. 测试与验证（当前状态）
 
-- **15/15 用例通过**：
+- **30/30 用例通过**：
   - `baziMapper`：6 组夹具（普通男/女、立春前后年柱切换、闰二月、晚子时）+ 结构完整性（五行合计 8、大运排序与当前标记、男女大运顺逆不同）；
-  - `compRules`：五行生克/比和、合婚评分与生肖六合识别。
+  - `compRules`：五行生克/比和、合婚评分与生肖六合识别；
+  - `datePicker`：闰年天数、时辰映射、解析往返、年份范围；
+  - `DateTimePicker`：面板开合、确定/取消回传；
+  - `trueSolarTime`：城市经度解析与省会兜底、均时差近似值、校正数学；
+  - 真太阳时端到端：深圳 13:05 校正后由未时（丁未）变午时（丙午）。
 - `npm run build`（tsc strict + vite build）通过；存在主包 >500KB 警告（lunar-javascript + 路由未分割），列入剩余工作。
 - 浏览器走查：沙箱无法启动浏览器，由用户在 `npm run dev` 验收；后续可接入 `webapp-testing` 技能（Playwright，需沙箱外）。
 
@@ -123,14 +131,17 @@ bazi-fengshui-app/
 |---|---|
 | M0.5 工程化 + 排盘输入/基本排盘 | ✅ 已交付（提交 db121ff） |
 | M0.8 其余 6 模块 + 首页/细盘完善 | ✅ 已交付（提交 9c0de4a） |
+| 表单组件 + 真太阳时（省市下拉/时间滚轮/经度均时差校正） | ✅ 已交付（提交 ed8991d） |
 | M1.5 后端联调 | ⏳ 待启动：Spring Boot + lunar-java 出盘；HttpBaziApi 切换；夹具一致性回归 |
 | 代码分割 | ⏳ 路由级 lazy 加载，消除 600KB 主包警告 |
-| 神煞 / 真太阳时 / 流年文案 / PDF | ⏳ 后端实现或专项方案 |
+| 神煞 / 流年文案 / PDF | ⏳ 后端实现或专项方案 |
+| 时辰边界提示 | ⏳ 待办：校正跨边界时结果页高亮 |
 
 ## 10. 风险与决策记录（更新）
 
 - 排盘：前端开发期用 lunar-javascript 真算模拟后端 lunar-java，一致性由 contracts/fixtures 回归保证；页面层不直接依赖 lunar-javascript（仅 lib/Mock 引用）。
 - 合婚指数为示例规则，已标注 UI；后端可替换为更严谨算法。
+- 真太阳时：前端已实现市级经度 + 均时差校正；后端联调时需对齐公式与经度数据口径。
 - 沙箱网络授权会中途失效，GitHub 推送/依赖安装需即时执行；不影响用户本机开发。
 - 提交署名：历史提交为占位身份，新提交使用 GitHub 身份 `kalamdream0824-rgb`。
 
@@ -138,3 +149,4 @@ bazi-fengshui-app/
 
 - v0.1（2026-08-08）：建立前端技术设计基线。
 - v0.2（2026-08-08）：整合 M0.5/M0.8 实现状态——8 模块全部可走通；记录实际技术版本、领域逻辑（compRules/settings/getGanZhiFor）、样式偏差、测试与里程碑状态、剩余工作。
+- v0.3（2026-08-08）：记录表单组件与真太阳时实现（RegionSelect/DateTimePicker/trueSolarTime，30 用例）；新增"时辰边界提示"待办；更新里程碑与风险记录。
