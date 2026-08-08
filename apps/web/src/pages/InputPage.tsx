@@ -1,0 +1,115 @@
+import { useState } from 'react'
+import { useMutation } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
+import { Button } from '@/components/Button'
+import { Card, CardTitle } from '@/components/Card'
+import { SegControl } from '@/components/SegControl'
+import { Switch } from '@/components/Switch'
+import { TopBar } from '@/components/TopBar'
+import { getBaziApi } from '@/services/baziApi'
+import { useBaziStore } from '@/store/useBaziStore'
+import { useToastStore } from '@/store/useToastStore'
+import type { Gender, PaipanRequest } from '@/types/bazi'
+
+export function InputPage() {
+  const navigate = useNavigate()
+  const setResult = useBaziStore((s) => s.setResult)
+  const toast = useToastStore((s) => s.show)
+  const api = getBaziApi()
+
+  const [name, setName] = useState('')
+  const [gender, setGender] = useState<Gender>('male')
+  const [datetime, setDatetime] = useState('1995-10-08T14:30')
+  const [birthPlace, setBirthPlace] = useState('')
+  const [trueSolar, setTrueSolar] = useState(false)
+
+  const mutation = useMutation({
+    mutationFn: (req: PaipanRequest) => api.paipan(req),
+    onSuccess: (result, req) => {
+      setResult(req, result)
+      navigate('/chart')
+    },
+    onError: (err: Error) => toast(err.message || '排盘失败，请重试'),
+  })
+
+  const submit = () => {
+    if (!datetime) {
+      toast('请选择出生时间')
+      return
+    }
+    mutation.mutate({
+      name: name.trim() || undefined,
+      gender,
+      solarDateTime: datetime,
+      birthPlace: birthPlace.trim() || undefined,
+      trueSolarTime: trueSolar,
+    })
+  }
+
+  return (
+    <>
+      <TopBar title="排盘输入" />
+
+      <Card>
+        <CardTitle>基本信息</CardTitle>
+        <div className="field">
+          <div className="lbl">姓名（选填）</div>
+          <input className="input-box" value={name} placeholder="请输入姓名" onChange={(e) => setName(e.target.value)} />
+        </div>
+        <div className="field">
+          <div className="lbl">性别</div>
+          <SegControl
+            two
+            options={[
+              { label: '男 · 乾造', value: 'male' },
+              { label: '女 · 坤造', value: 'female' },
+            ]}
+            value={gender}
+            onChange={(v) => setGender(v as Gender)}
+          />
+        </div>
+      </Card>
+
+      <Card>
+        <CardTitle>出生时间</CardTitle>
+        <div className="field">
+          <div className="lbl">公历出生日期与时间</div>
+          <input
+            className="input-box"
+            type="datetime-local"
+            value={datetime}
+            onChange={(e) => setDatetime(e.target.value)}
+          />
+        </div>
+        <div className="field">
+          <div className="note">出生时间越精确，排盘与运势推算越准。</div>
+        </div>
+      </Card>
+
+      <Card>
+        <CardTitle hint="用于真太阳时">出生地</CardTitle>
+        <div className="field">
+          <input
+            className="input-box"
+            value={birthPlace}
+            placeholder="如：广东省 · 深圳市"
+            onChange={(e) => setBirthPlace(e.target.value)}
+          />
+        </div>
+        <Switch
+          checked={trueSolar}
+          onChange={setTrueSolar}
+          title="真太阳时"
+          desc="按出生地经度校正，结果可能与本地时间不同"
+        />
+      </Card>
+
+      <div style={{ padding: '0 14px 12px' }}>
+        <Button variant="primary" block onClick={submit} disabled={mutation.isPending}>
+          {mutation.isPending ? '排盘中…' : '开始排盘'}
+        </Button>
+      </div>
+      <div className="footer-note">排盘数据仅供传统文化研究参考</div>
+    </>
+  )
+}

@@ -1,0 +1,25 @@
+:root {
+  --paper: #f6f1e4;
+  --card: #fffcf4;
+  --ink: #2f251c;
+  --ink-2: #6f5d48;
+  --ink-3: #a08b6d;
+  --red: #b03a2e;
+  --red-deep: #98301f;
+  --gold: #b8904a;
+  --jade: #3f6f5c;
+  --line: #e4d8bd;
+
+  --wood: #3f8f5f;
+  --metal: #b08d3e;
+  --water: #3d7ab5;
+  --fire: #c8452c;
+  --earth: #8a6d3f;
+
+  --radius-card: 16px;
+  --radius-btn: 12px;
+  --radius-pill: 999px;
+  --space-page: 14px;
+  --font-display: "Songti SC", "STSong", "SimSun", serif;
+  --font-ui: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}

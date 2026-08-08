@@ -1,0 +1,142 @@
+openapi: 3.0.3
+info:
+  title: 八字排盘 App API
+  version: 0.1.0
+  description: 前后端契约草案。开发期前端使用 MockBaziApi，后端就绪后按本契约实现。
+servers:
+  - url: /api/v1
+paths:
+  /records:
+    post:
+      summary: 排盘并保存一条记录
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaipanRequest'
+      responses:
+        '200':
+          description: 排盘结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaipanResult'
+    get:
+      summary: 我的排盘历史
+      responses:
+        '200':
+          description: 记录列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaipanResult'
+  /records/{id}:
+    get:
+      summary: 单条排盘记录
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 排盘结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaipanResult'
+components:
+  schemas:
+    PaipanRequest:
+      type: object
+      required: [gender, solarDateTime, trueSolarTime]
+      properties:
+        name:
+          type: string
+        gender:
+          type: string
+          enum: [male, female]
+        solarDateTime:
+          type: string
+          description: ISO 格式公历时间，如 1995-10-08T14:30:00
+        birthPlace:
+          type: string
+          description: 出生地，用于真太阳时
+        trueSolarTime:
+          type: boolean
+    PaipanResult:
+      type: object
+      properties:
+        solarText:
+          type: string
+        lunarText:
+          type: string
+        shengXiao:
+          type: string
+        pillars:
+          type: object
+          properties:
+            year: { $ref: '#/components/schemas/Pillar' }
+            month: { $ref: '#/components/schemas/Pillar' }
+            day: { $ref: '#/components/schemas/Pillar' }
+            time: { $ref: '#/components/schemas/Pillar' }
+        wuXing:
+          type: object
+          properties:
+            jin: { type: integer }
+            mu: { type: integer }
+            shui: { type: integer }
+            huo: { type: integer }
+            tu: { type: integer }
+        daYun:
+          type: array
+          items:
+            $ref: '#/components/schemas/DaYun'
+        currentYearGanZhi:
+          type: string
+    Pillar:
+      type: object
+      properties:
+        label:
+          type: string
+          enum: [year, month, day, time]
+        gan:
+          type: string
+        zhi:
+          type: string
+        shiShen:
+          type: string
+        hideGan:
+          type: array
+          items:
+            type: object
+            properties:
+              gan: { type: string }
+              wuxing:
+                type: string
+                enum: [jin, mu, shui, huo, tu]
+        naYin:
+          type: string
+        diShi:
+          type: string
+        xunKong:
+          type: string
+        shenSha:
+          type: array
+          items:
+            type: string
+    DaYun:
+      type: object
+      properties:
+        ageRange:
+          type: string
+        ganZhi:
+          type: string
+        yearRange:
+          type: string
+        isCurrent:
+          type: boolean

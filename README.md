@@ -1,36 +1,42 @@
 # 八字命理 · 排盘 App
 
-一个基于 Web 的八字（四柱）排盘应用，采用 `lunar-javascript` 计算农历、干支、节气等数据。
+一个基于 Web 的八字（四柱）排盘应用，前后端分离架构。前端采用 React 19 + TypeScript，设计语言「朱墨星图」，信息架构参考问真八字（非品牌抄袭）。
 
-## 技术栈
+## 仓库结构
 
-- Vite + React 19 + TypeScript
-- [lunar-javascript](https://www.npmjs.com/package/lunar-javascript)（6tail 农历/八字算法库）
+```
+bazi-fengshui-app/
+├─ apps/
+│  ├─ web/          # 前端应用（Vite + React 19 + TS）
+│  └─ server/       # 后端服务（规划中：Spring Boot + Java 17 + MyBatis-Plus）
+├─ contracts/       # 前后端共享契约：OpenAPI + 测试夹具
+├─ docs/            # 设计文档（产品图、前端技术设计、设计哲学）
+└─ README.md
+```
 
-## 本地开发
+## 快速开始（前端）
 
 ```bash
+cd apps/web
 npm install
 npm run dev
 ```
 
-打开 http://localhost:5173 即可使用。
+打开 http://localhost:5173 即可使用。默认 `VITE_API_MODE=mock`，排盘数据由 lunar-javascript 本地真算；后端就绪后切换为 `http` 模式（见前端技术设计文档）。
 
-## 构建
+## 常用命令（apps/web）
 
 ```bash
-npm run build
-npm run preview
+npm run dev       # 开发服务器
+npm run build     # 类型检查 + 构建
+npm test          # Vitest 单元测试
 ```
 
-## 规划功能
+## 文档
 
-- [x] 四柱八字排盘（年、月、日、时柱 + 十神 + 纳音）
-- [ ] 大运与流年推算
-- [ ] 五行力量分析
-- [ ] 合婚（八字配对）
-- [ ] 风水罗盘 / 命理查询（可扩展）
-- [ ] 微信小程序 / 线上部署
+- 产品图文档：`docs/mockups/bazi-app-mockups.md`
+- 前端技术设计：`docs/design/bazi-frontend-design.md`
+- 设计哲学：`docs/mockups/design-philosophy.md`
 
 ## 网络说明
 

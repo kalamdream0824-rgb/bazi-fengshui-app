@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "generatedBy": "lunar-javascript",
+  "note": "前后端一致性回归用测试数据集。expected.pillars 为四柱干支与天干十神；shenSha/diShi 等扩展字段待后端补齐。",
+  "cases": [
+    {
+      "id": "normal-male",
+      "desc": "普通男命（含闰八月）",
+      "request": { "gender": "male", "solarDateTime": "1995-10-08T14:30:00", "trueSolarTime": false },
+      "expected": {
+        "lunarText": "一九九五年闰八月十四",
+        "shengXiao": "猪",
+        "pillars": {
+          "year": { "ganZhi": "乙亥", "shiShen": "伤官" },
+          "month": { "ganZhi": "乙酉", "shiShen": "伤官" },
+          "day": { "ganZhi": "壬申", "shiShen": "日主" },
+          "time": { "ganZhi": "丁未", "shiShen": "正财" }
+        }
+      }
+    },
+    {
+      "id": "female",
+      "desc": "普通女命",
+      "request": { "gender": "female", "solarDateTime": "1996-03-18T10:00:00", "trueSolarTime": false },
+      "expected": {
+        "lunarText": "一九九六年正月廿九",
+        "shengXiao": "鼠",
+        "pillars": {
+          "year": { "ganZhi": "丙子", "shiShen": "食神" },
+          "month": { "ganZhi": "辛卯", "shiShen": "正官" },
+          "day": { "ganZhi": "甲寅", "shiShen": "日主" },
+          "time": { "ganZhi": "己巳", "shiShen": "正财" }
+        }
+      }
+    },
+    {
+      "id": "lichun-before",
+      "desc": "立春前 15:00，年柱应为癸卯",
+      "request": { "gender": "male", "solarDateTime": "2024-02-04T15:00:00", "trueSolarTime": false },
+      "expected": {
+        "lunarText": "二〇二三年腊月廿五",
+        "shengXiao": "兔",
+        "pillars": {
+          "year": { "ganZhi": "癸卯", "shiShen": "正财" },
+          "month": { "ganZhi": "乙丑", "shiShen": "正官" },
+          "day": { "ganZhi": "戊戌", "shiShen": "日主" },
+          "time": { "ganZhi": "庚申", "shiShen": "食神" }
+        }
+      }
+    },
+    {
+      "id": "lichun-after",
+      "desc": "立春后 17:00，年柱应切换为甲辰",
+      "request": { "gender": "male", "solarDateTime": "2024-02-04T17:00:00", "trueSolarTime": false },
+      "expected": {
+        "lunarText": "二〇二三年腊月廿五",
+        "shengXiao": "兔",
+        "pillars": {
+          "year": { "ganZhi": "甲辰", "shiShen": "七杀" },
+          "month": { "ganZhi": "丙寅", "shiShen": "偏印" },
+          "day": { "ganZhi": "戊戌", "shiShen": "日主" },
+          "time": { "ganZhi": "辛酉", "shiShen": "伤官" }
+        }
+      }
+    },
+    {
+      "id": "leap-month",
+      "desc": "闰二月（2023-03-22 为闰二月初一）",
+      "request": { "gender": "female", "solarDateTime": "2023-03-22T09:00:00", "trueSolarTime": false },
+      "expected": {
+        "lunarText": "二〇二三年闰二月初一",
+        "shengXiao": "兔",
+        "pillars": {
+          "year": { "ganZhi": "癸卯", "shiShen": "偏财" },
+          "month": { "ganZhi": "乙卯", "shiShen": "七杀" },
+          "day": { "ganZhi": "己卯", "shiShen": "日主" },
+          "time": { "ganZhi": "己巳", "shiShen": "比肩" }
+        }
+      }
+    },
+    {
+      "id": "zishi",
+      "desc": "晚子时 23:30（1989 年腊月初五）",
+      "request": { "gender": "male", "solarDateTime": "1990-01-01T23:30:00", "trueSolarTime": false },
+      "expected": {
+        "lunarText": "一九八九年腊月初五",
+        "shengXiao": "蛇",
+        "pillars": {
+          "year": { "ganZhi": "己巳", "shiShen": "伤官" },
+          "month": { "ganZhi": "丙子", "shiShen": "比肩" },
+          "day": { "ganZhi": "丙寅", "shiShen": "日主" },
+          "time": { "ganZhi": "庚子", "shiShen": "偏财" }
+        }
+      }
+    }
+  ]
+}
