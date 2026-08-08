@@ -161,6 +161,9 @@ button {
 .seg.two {
   grid-template-columns: repeat(2, 1fr);
 }
+.seg.four {
+  grid-template-columns: repeat(4, 1fr);
+}
 .opt {
   text-align: center;
   padding: 8px 0;
@@ -544,6 +547,19 @@ button {
   letter-spacing: 3px;
   text-indent: 3px;
   margin: 8px 0 10px;
+}
+.hero .seg {
+  padding: 0 0 10px;
+}
+.hero .opt {
+  background: rgba(255, 246, 232, 0.14);
+  border-color: rgba(255, 246, 232, 0.35);
+  color: #f7efe0;
+}
+.hero .opt.active {
+  background: rgba(255, 246, 232, 0.95);
+  border-color: rgba(255, 246, 232, 0.95);
+  color: var(--red-deep);
 }
 .chip {
   display: inline-block;

@@ -91,3 +91,14 @@ export function getTodayGanZhi(): string {
   const today = Lunar.fromDate(new Date())
   return `${today.getYearInGanZhiExact()}年 ${today.getMonthInGanZhiExact()}月 ${today.getDayInGanZhiExact()}日`
 }
+
+export function getGanZhiFor(offsetDays: number): { ganZhi: string; dateText: string } {
+  const d = new Date()
+  d.setDate(d.getDate() + offsetDays)
+  const lunar = Lunar.fromDate(d)
+  const week = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][d.getDay()]
+  return {
+    ganZhi: `${lunar.getYearInGanZhiExact()}年 ${lunar.getMonthInGanZhiExact()}月 ${lunar.getDayInGanZhiExact()}日`,
+    dateText: `${d.getMonth() + 1}月${d.getDate()}日 ${week}`,
+  }
+}

@@ -8,6 +8,7 @@ import { Switch } from '@/components/Switch'
 import { TopBar } from '@/components/TopBar'
 import { getBaziApi } from '@/services/baziApi'
 import { useBaziStore } from '@/store/useBaziStore'
+import { useSettingsStore } from '@/store/useSettingsStore'
 import { useToastStore } from '@/store/useToastStore'
 import type { Gender, PaipanRequest } from '@/types/bazi'
 
@@ -15,13 +16,14 @@ export function InputPage() {
   const navigate = useNavigate()
   const setResult = useBaziStore((s) => s.setResult)
   const toast = useToastStore((s) => s.show)
+  const trueSolarDefault = useSettingsStore((s) => s.trueSolarDefault)
   const api = getBaziApi()
 
   const [name, setName] = useState('')
   const [gender, setGender] = useState<Gender>('male')
   const [datetime, setDatetime] = useState('1995-10-08T14:30')
   const [birthPlace, setBirthPlace] = useState('')
-  const [trueSolar, setTrueSolar] = useState(false)
+  const [trueSolar, setTrueSolar] = useState(trueSolarDefault)
 
   const mutation = useMutation({
     mutationFn: (req: PaipanRequest) => api.paipan(req),

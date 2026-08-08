@@ -8,6 +8,7 @@ declare module 'lunar-javascript' {
 
   export class Lunar {
     static fromDate(date: Date): Lunar
+    next(days: number): Lunar
     getEightChar(): EightChar
     getYearShengXiao(): string
     getTimeZhi(): string

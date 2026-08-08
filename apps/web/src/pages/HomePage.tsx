@@ -1,10 +1,13 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, CardTitle } from '@/components/Card'
-import { getTodayGanZhi } from '@/lib/baziMapper'
+import { SegControl } from '@/components/SegControl'
+import { getGanZhiFor } from '@/lib/baziMapper'
 import { useBaziStore } from '@/store/useBaziStore'
 import { useToastStore } from '@/store/useToastStore'
 
-const TODAY = getTodayGanZhi()
+const TODAY = getGanZhiFor(0)
+const TOMORROW = getGanZhiFor(1)
 
 const QUICK = [
   { to: '/input', label: '八字排盘' },
@@ -16,6 +19,8 @@ const QUICK = [
 export function HomePage() {
   const result = useBaziStore((s) => s.result)
   const toast = useToastStore((s) => s.show)
+  const [day, setDay] = useState<'today' | 'tomorrow'>('today')
+  const info = day === 'today' ? TODAY : TOMORROW
 
   return (
     <>
@@ -34,14 +39,33 @@ export function HomePage() {
       </div>
 
       <div className="hero">
-        <div className="date">今日 · {new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}</div>
-        <div className="gz">{TODAY}</div>
-        <div>
-          <span className="chip">宜 祭祀</span>
-          <span className="chip">宜 出行</span>
-          <span className="chip no">忌 动土</span>
-          <span className="chip no">忌 安葬</span>
-        </div>
+        <div className="date">{day === 'today' ? '今日' : '明日'} · {info.dateText}</div>
+        <div className="gz">{info.ganZhi}</div>
+        <SegControl
+          two
+          className="hero-seg"
+          options={[
+            { label: '今日', value: 'today' },
+            { label: '明日', value: 'tomorrow' },
+          ]}
+          value={day}
+          onChange={(v) => setDay(v as 'today' | 'tomorrow')}
+        />
+        {day === 'today' ? (
+          <div>
+            <span className="chip">宜 祭祀</span>
+            <span className="chip">宜 出行</span>
+            <span className="chip no">忌 动土</span>
+            <span className="chip no">忌 安葬</span>
+          </div>
+        ) : (
+          <div>
+            <span className="chip">宜 会友</span>
+            <span className="chip">宜 沐浴</span>
+            <span className="chip no">忌 开市</span>
+            <span className="chip no">忌 求医</span>
+          </div>
+        )}
       </div>
 
       <Card>
@@ -62,7 +86,7 @@ export function HomePage() {
             <div>
               <div style={{ fontWeight: 600 }}>最近一次 · {result.lunarText}</div>
               <div className="meta-line" style={{ marginTop: 3 }}>
-                {result.solarText} · {result.shengXiao}年
+                {result.solarText} · 生肖 {result.shengXiao}
               </div>
             </div>
             <span className="arrow">›</span>
