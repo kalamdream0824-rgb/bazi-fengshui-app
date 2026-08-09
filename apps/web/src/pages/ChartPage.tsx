@@ -2,6 +2,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { Button, ButtonRow } from '@/components/Button'
 import { Card, CardTitle } from '@/components/Card'
 import { BaziTable } from '@/components/BaziTable'
+import { FooterNote } from '@/components/FooterNote'
 import { TopBar } from '@/components/TopBar'
 import { WuxingBar } from '@/components/WuxingBar'
 import { useBaziStore } from '@/store/useBaziStore'
@@ -81,7 +82,7 @@ export function ChartPage() {
         <Button onClick={() => navigate('/comp')}>合婚</Button>
         <Button onClick={() => navigate('/daily')}>每日运势</Button>
       </ButtonRow>
-      <div className="footer-note">排盘数据仅供传统文化研究参考</div>
+      <FooterNote>排盘数据仅供传统文化研究参考</FooterNote>
     </>
   )
 }

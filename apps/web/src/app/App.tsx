@@ -1,15 +1,17 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { TabBar } from '@/components/TabBar'
 import { Toast } from '@/components/Toast'
-import { ChartPage } from '@/pages/ChartPage'
-import { CompPage } from '@/pages/CompPage'
-import { DailyPage } from '@/pages/DailyPage'
-import { HomePage } from '@/pages/HomePage'
-import { HistoryPage } from '@/pages/HistoryPage'
-import { InputPage } from '@/pages/InputPage'
-import { ProfilePage } from '@/pages/ProfilePage'
-import { ProPage } from '@/pages/ProPage'
-import { ReportPage } from '@/pages/ReportPage'
+
+const HomePage = lazy(() => import('@/pages/HomePage').then((m) => ({ default: m.HomePage })))
+const HistoryPage = lazy(() => import('@/pages/HistoryPage').then((m) => ({ default: m.HistoryPage })))
+const InputPage = lazy(() => import('@/pages/InputPage').then((m) => ({ default: m.InputPage })))
+const ChartPage = lazy(() => import('@/pages/ChartPage').then((m) => ({ default: m.ChartPage })))
+const ProPage = lazy(() => import('@/pages/ProPage').then((m) => ({ default: m.ProPage })))
+const CompPage = lazy(() => import('@/pages/CompPage').then((m) => ({ default: m.CompPage })))
+const DailyPage = lazy(() => import('@/pages/DailyPage').then((m) => ({ default: m.DailyPage })))
+const ReportPage = lazy(() => import('@/pages/ReportPage').then((m) => ({ default: m.ReportPage })))
+const ProfilePage = lazy(() => import('@/pages/ProfilePage').then((m) => ({ default: m.ProfilePage })))
 
 const TAB_PATHS = ['/', '/input', '/profile']
 
@@ -18,18 +20,20 @@ function Shell() {
   const showTab = TAB_PATHS.includes(pathname)
   return (
     <div className="app-shell">
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/input" element={<InputPage />} />
-        <Route path="/history" element={<HistoryPage />} />
-        <Route path="/chart" element={<ChartPage />} />
-        <Route path="/chart/pro" element={<ProPage />} />
-        <Route path="/comp" element={<CompPage />} />
-        <Route path="/daily" element={<DailyPage />} />
-        <Route path="/report" element={<ReportPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="*" element={<HomePage />} />
-      </Routes>
+      <Suspense fallback={<div className="placeholder">加载中…</div>}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/input" element={<InputPage />} />
+          <Route path="/history" element={<HistoryPage />} />
+          <Route path="/chart" element={<ChartPage />} />
+          <Route path="/chart/pro" element={<ProPage />} />
+          <Route path="/comp" element={<CompPage />} />
+          <Route path="/daily" element={<DailyPage />} />
+          <Route path="/report" element={<ReportPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="*" element={<HomePage />} />
+        </Routes>
+      </Suspense>
       {showTab ? <TabBar /> : null}
       <Toast />
     </div>

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/Button'
 import { Card, CardTitle } from '@/components/Card'
 import { DateTimePicker } from '@/components/DateTimePicker'
+import { FooterNote } from '@/components/FooterNote'
 import { SegControl } from '@/components/SegControl'
 import { RegionSelect } from '@/components/RegionSelect'
 import { Switch } from '@/components/Switch'
@@ -112,7 +113,7 @@ export function InputPage() {
           {mutation.isPending ? '排盘中…' : '开始排盘'}
         </Button>
       </div>
-      <div className="footer-note">排盘数据仅供传统文化研究参考</div>
+      <FooterNote>排盘数据仅供传统文化研究参考</FooterNote>
     </>
   )
 }

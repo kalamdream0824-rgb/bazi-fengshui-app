@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Card, CardTitle } from '@/components/Card'
+import { FooterNote } from '@/components/FooterNote'
+import { RecordRow } from '@/components/RecordRow'
 import { SegControl } from '@/components/SegControl'
 import { useHistory } from '@/hooks/useHistory'
 import { getGanZhiFor } from '@/lib/baziMapper'
@@ -87,35 +89,22 @@ export function HomePage() {
         <CardTitle>最近排盘</CardTitle>
         {recent.length > 0 ? (
           recent.map((record) => (
-            <div
-              className="row"
+            <RecordRow
               key={record.id}
+              title={record.result.lunarText}
+              subtitle={`${record.result.solarText} · 生肖 ${record.result.shengXiao}`}
               onClick={() => {
                 setResult(record.request, record.result)
                 void navigate('/chart')
               }}
-            >
-              <div>
-                <div style={{ fontWeight: 600 }}>{record.result.lunarText}</div>
-                <div className="meta-line" style={{ marginTop: 3 }}>
-                  {record.result.solarText} · 生肖 {record.result.shengXiao}
-                </div>
-              </div>
-              <span className="arrow">›</span>
-            </div>
+            />
           ))
         ) : (
-          <Link className="row" to="/input">
-            <div>
-              <div style={{ fontWeight: 600 }}>暂无排盘记录</div>
-              <div className="meta-line" style={{ marginTop: 3 }}>去排一次，查看你的四柱八字</div>
-            </div>
-            <span className="arrow">›</span>
-          </Link>
+          <RecordRow title="暂无排盘记录" subtitle="去排一次，查看你的四柱八字" onClick={() => void navigate('/input')} />
         )}
       </Card>
 
-      <div className="footer-note">排盘数据仅供传统文化研究参考</div>
+      <FooterNote>排盘数据仅供传统文化研究参考</FooterNote>
     </>
   )
 }

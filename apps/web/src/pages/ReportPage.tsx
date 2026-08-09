@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { Button, ButtonRow } from '@/components/Button'
 import { Card, CardTitle } from '@/components/Card'
+import { EmptyState } from '@/components/EmptyState'
+import { FooterNote } from '@/components/FooterNote'
 import { TopBar } from '@/components/TopBar'
 import { GAN_WUXING, WUXING_LABEL } from '@/lib/wuxing'
 import { exportMingshuPdf } from '@/lib/reportPdf'
@@ -41,12 +42,8 @@ export function ReportPage() {
 
       {!result ? (
         <>
-          <div className="placeholder">
-            还没有命盘数据
-            <br />
-            <Link to="/input" style={{ color: 'var(--red)' }}>先去排一次盘</Link>
-          </div>
-          <div className="footer-note">命书内容仅供传统文化研究参考</div>
+          <EmptyState title="还没有命盘数据" hint="先去排一次盘" linkTo="/input" linkText="先去排一次盘" />
+          <FooterNote>命书内容仅供传统文化研究参考</FooterNote>
         </>
       ) : (
         <>
@@ -107,7 +104,7 @@ export function ReportPage() {
             <Button onClick={() => toast('分享功能规划中')}>分享</Button>
             <Button onClick={() => window.history.back()}>返回</Button>
           </ButtonRow>
-          <div className="footer-note">命书内容仅供传统文化研究参考</div>
+          <FooterNote>命书内容仅供传统文化研究参考</FooterNote>
         </>
       )}
     </>

@@ -2,7 +2,7 @@
 
 | 项目 | 内容 |
 |---|---|
-| 文档版本 | v0.8（已实现：M0.5 + M0.8 + 表单组件 + 真太阳时 + A2 神煞 + A1 命书 PDF + A3 合婚规则完善 + A4a 本地历史） |
+| 文档版本 | v0.9（已实现：M0.5 + M0.8 + 表单组件 + 真太阳时 + A2 神煞 + A1 命书 PDF + A3 合婚规则完善 + A4a 本地历史；B0 工程加固） |
 | 日期 | 2026-08-08 |
 | 适用范围 | 前端（apps/web）开发 |
 | 关联文档 | [产品图文档](/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/bazi-app-mockups.md)、[PRD](/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/bazi-fengshui-app-PRD.md)、[设计哲学](/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/design-philosophy.md) |
@@ -155,6 +155,13 @@ bazi-fengshui-app/
 
 ## 11. 变更日志
 
+## 12. 代码复用与优化原则（B0 起生效）
+
+- **三次法则（Rule of Three）**：同一领域逻辑或 UI 结构出现 **≥3 处且形态稳定** 才抽取；1-2 处时重复往往比错误抽象便宜，避免提前抽象造成反复重构。
+- **真重复 vs 假相似**：领域逻辑（五行映射、时辰、格式化）必须共享；演进方向不同的相似 UI（如首页与每日运势的"今日/明日"切换）不强行合并，避免 prop 膨胀与互相拖累。
+- **优化纪律**：优化改动不得引入次要缺陷；每次改动必须伴随充分测试——抽取的组件要有组件测试，受影响页面保持既有用例通过，最终构建必须绿。
+- **B0 范围 ✅ 已完成**：抽取真实重复组件（FooterNote / EmptyState / RecordRow，含组件测试）；路由懒加载（React.lazy + Suspense，主包拆分生效）；GitHub Actions CI（push 自动 npm ci + test + build）。**CSS 全量作用域化（CSS Modules）暂缓**——当前无法在沙箱目视验证，纯重构回归风险大于收益，待有浏览器验证环境后另行处理。
+
 - v0.1（2026-08-08）：建立前端技术设计基线。
 - v0.2（2026-08-08）：整合 M0.5/M0.8 实现状态——8 模块全部可走通；记录实际技术版本、领域逻辑（compRules/settings/getGanZhiFor）、样式偏差、测试与里程碑状态、剩余工作。
 - v0.3（2026-08-08）：记录表单组件与真太阳时实现（RegionSelect/DateTimePicker/trueSolarTime，30 用例）；新增"时辰边界提示"待办；更新里程碑与风险记录。
@@ -164,3 +171,4 @@ bazi-fengshui-app/
 - v0.7（2026-08-09）：A3 合婚规则完善交付（测试 39/39，构建绿）。
 - v0.7.1（2026-08-09）：修正"仍待后端"口径——神煞（四柱）与命书 PDF 已实现；明确剩余待办清单。
 - v0.8（2026-08-09）：A4a 本地历史 + 导出备份交付（测试 47/47，构建绿）。
+- v0.9（2026-08-09）：B0 工程加固交付——抽取 FooterNote/EmptyState/RecordRow、路由懒加载、GitHub Actions CI（测试 51/51，构建绿）。

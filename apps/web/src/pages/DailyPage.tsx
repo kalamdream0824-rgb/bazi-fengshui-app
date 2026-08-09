@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/Button'
 import { Card, CardTitle } from '@/components/Card'
+import { FooterNote } from '@/components/FooterNote'
 import { SegControl } from '@/components/SegControl'
 import { TopBar } from '@/components/TopBar'
 import { getGanZhiFor } from '@/lib/baziMapper'
@@ -96,7 +97,7 @@ export function DailyPage() {
       <div style={{ padding: '0 14px 12px' }}>
         <Button variant="primary" block onClick={() => toast('分享功能规划中')}>分享今日运势</Button>
       </div>
-      <div className="footer-note">运势内容为示例数据 · 以实际算法输出为准</div>
+      <FooterNote>运势内容为示例数据 · 以实际算法输出为准</FooterNote>
     </>
   )
 }

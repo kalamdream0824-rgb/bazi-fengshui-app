@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { Card, CardTitle } from '@/components/Card'
 import { DaYunList } from '@/components/DaYunList'
+import { EmptyState } from '@/components/EmptyState'
+import { FooterNote } from '@/components/FooterNote'
 import { SegControl } from '@/components/SegControl'
 import { TopBar } from '@/components/TopBar'
 import { GAN_WUXING, WUXING_LABEL } from '@/lib/wuxing'
@@ -87,15 +89,11 @@ export function ProPage() {
       {panel === 'shensha' && (
         <Card>
           <CardTitle hint="开发期占位">神煞</CardTitle>
-          <div className="placeholder" style={{ margin: '8px 16px 16px' }}>
-            神煞数据将在后端（lunar-java）实现后输出
-            <br />
-            当前版本暂无数据
-          </div>
+          <EmptyState title="神煞数据将在后端（lunar-java）实现后输出" hint="当前版本暂无数据" />
         </Card>
       )}
 
-      <div className="footer-note">大运流年内容以实际算法输出为准</div>
+      <FooterNote>大运流年内容以实际算法输出为准</FooterNote>
     </>
   )
 }

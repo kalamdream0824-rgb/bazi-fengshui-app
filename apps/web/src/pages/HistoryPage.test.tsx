@@ -21,7 +21,7 @@ describe('HistoryPage', () => {
   it('空态引导去排盘', async () => {
     await clearHistory()
     renderPage()
-    expect(await screen.findByText('暂无排盘记录')).toBeInTheDocument()
+    expect(await screen.findByText(/暂无排盘记录/)).toBeInTheDocument()
   })
 
   it('有记录时展示列表与导出按钮', async () => {

@@ -1,11 +1,14 @@
 import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Card, CardTitle } from '@/components/Card'
+import { RecordRow } from '@/components/RecordRow'
 import { Switch } from '@/components/Switch'
 import { useBaziStore } from '@/store/useBaziStore'
 import { useSettingsStore } from '@/store/useSettingsStore'
 import { useToastStore } from '@/store/useToastStore'
 
 export function ProfilePage() {
+  const navigate = useNavigate()
   const result = useBaziStore((s) => s.result)
   const toast = useToastStore((s) => s.show)
   const trueSolarDefault = useSettingsStore((s) => s.trueSolarDefault)
@@ -30,21 +33,13 @@ export function ProfilePage() {
       <Card>
         <CardTitle>我的命盘</CardTitle>
         {result ? (
-          <Link className="row" to="/chart">
-            <div>
-              <div style={{ fontWeight: 600 }}>{result.lunarText}</div>
-              <div className="meta-line" style={{ marginTop: 3 }}>{result.solarText} · 生肖 {result.shengXiao}</div>
-            </div>
-            <span className="arrow">›</span>
-          </Link>
+          <RecordRow
+            title={result.lunarText}
+            subtitle={`${result.solarText} · 生肖 ${result.shengXiao}`}
+            onClick={() => navigate('/chart')}
+          />
         ) : (
-          <Link className="row" to="/input">
-            <div>
-              <div style={{ fontWeight: 600 }}>还没有命盘</div>
-              <div className="meta-line" style={{ marginTop: 3 }}>先去排一次盘</div>
-            </div>
-            <span className="arrow">›</span>
-          </Link>
+          <RecordRow title="还没有命盘" subtitle="先去排一次盘" onClick={() => navigate('/input')} />
         )}
       </Card>
 

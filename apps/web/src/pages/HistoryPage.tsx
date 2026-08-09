@@ -1,7 +1,10 @@
 import { useRef, useState, type ChangeEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Button, ButtonRow } from '@/components/Button'
 import { Card, CardTitle } from '@/components/Card'
+import { EmptyState } from '@/components/EmptyState'
+import { FooterNote } from '@/components/FooterNote'
+import { RecordRow } from '@/components/RecordRow'
 import { TopBar } from '@/components/TopBar'
 import { useHistory } from '@/hooks/useHistory'
 import { backupToRecords, downloadBackup, importHistory, removeHistory } from '@/services/historyStore'
@@ -61,37 +64,30 @@ export function HistoryPage() {
       {isLoading ? (
         <div className="placeholder">加载中…</div>
       ) : records.length === 0 ? (
-        <>
-          <div className="placeholder">
-            暂无排盘记录
-            <br />
-            <Link to="/input" style={{ color: 'var(--red)' }}>去排一次盘</Link>
-          </div>
-        </>
+        <EmptyState title="暂无排盘记录" hint="去排一次盘，记录会自动保存在本地" linkTo="/input" linkText="去排一次盘" />
       ) : (
         <Card>
           <CardTitle hint={`共 ${records.length} 条`}>排盘记录</CardTitle>
           {records.map((record) => (
-            <div className="row" key={record.id} onClick={() => openRecord(record.request, record.result)}>
-              <div style={{ minWidth: 0 }}>
-                <div style={{ fontWeight: 600 }}>{record.result.lunarText}</div>
-                <div className="meta-line" style={{ marginTop: 3 }}>
-                  {record.result.solarText} · 生肖 {record.result.shengXiao} ·{' '}
-                  {new Date(record.createdAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                </div>
-              </div>
-              <button
-                type="button"
-                aria-label="删除记录"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  void handleDelete(record.id as number)
-                }}
-                style={{ border: '1px solid var(--line)', background: 'var(--card)', borderRadius: 8, width: 30, height: 30, color: 'var(--ink-3)' }}
-              >
-                ×
-              </button>
-            </div>
+            <RecordRow
+              key={record.id}
+              title={record.result.lunarText}
+              subtitle={`${record.result.solarText} · 生肖 ${record.result.shengXiao} · ${new Date(record.createdAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`}
+              onClick={() => openRecord(record.request, record.result)}
+              action={
+                <button
+                  type="button"
+                  aria-label="删除记录"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    void handleDelete(record.id as number)
+                  }}
+                  style={{ border: '1px solid var(--line)', background: 'var(--card)', borderRadius: 8, width: 30, height: 30, color: 'var(--ink-3)' }}
+                >
+                  ×
+                </button>
+              }
+            />
           ))}
         </Card>
       )}
@@ -106,7 +102,7 @@ export function HistoryPage() {
         </ButtonRow>
       )}
       <input ref={fileRef} type="file" accept="application/json,.json" style={{ display: 'none' }} onChange={handleImportFile} />
-      <div className="footer-note">本地历史仅保存在当前浏览器，建议定期导出备份</div>
+      <FooterNote>本地历史仅保存在当前浏览器，建议定期导出备份</FooterNote>
     </>
   )
 }

@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
 import { Button, ButtonRow } from '@/components/Button'
 import { Card, CardTitle } from '@/components/Card'
+import { EmptyState } from '@/components/EmptyState'
+import { FooterNote } from '@/components/FooterNote'
 import { SegControl } from '@/components/SegControl'
 import { TopBar } from '@/components/TopBar'
 import { computeCompatibility } from '@/lib/compRules'
@@ -61,12 +62,8 @@ export function CompPage() {
 
       {!personA ? (
         <>
-          <div className="placeholder">
-            还没有命盘数据
-            <br />
-            <Link to="/input" style={{ color: 'var(--red)' }}>先去排一次盘</Link>
-          </div>
-          <div className="footer-note">合婚结论以实际算法输出为准</div>
+          <EmptyState title="还没有命盘数据" hint="先去排一次盘" linkTo="/input" linkText="先去排一次盘" />
+          <FooterNote>合婚结论以实际算法输出为准</FooterNote>
         </>
       ) : (
         <>
@@ -198,7 +195,7 @@ export function CompPage() {
               </ButtonRow>
             </>
           )}
-          <div className="footer-note">合婚结论为示例规则 · 以实际算法输出为准</div>
+          <FooterNote>合婚结论为示例规则 · 以实际算法输出为准</FooterNote>
         </>
       )}
     </>
