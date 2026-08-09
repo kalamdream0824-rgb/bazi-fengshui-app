@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, ButtonRow } from '@/components/Button'
 import { Card, CardTitle } from '@/components/Card'
 import { TopBar } from '@/components/TopBar'
 import { GAN_WUXING, WUXING_LABEL } from '@/lib/wuxing'
+import { exportMingshuPdf } from '@/lib/reportPdf'
 import { useBaziStore } from '@/store/useBaziStore'
 import { useToastStore } from '@/store/useToastStore'
 
@@ -16,8 +18,22 @@ const TOC = [
 
 export function ReportPage() {
   const toast = useToastStore((s) => s.show)
+  const [exporting, setExporting] = useState(false)
   const request = useBaziStore((s) => s.request)
   const result = useBaziStore((s) => s.result)
+
+  const handleExport = async () => {
+    if (!request || !result || exporting) return
+    setExporting(true)
+    try {
+      await exportMingshuPdf(request, result)
+      toast('命书 PDF 已生成')
+    } catch {
+      toast('生成失败，请重试')
+    } finally {
+      setExporting(false)
+    }
+  }
 
   return (
     <>
@@ -85,7 +101,9 @@ export function ReportPage() {
             深度版命书 <b style={{ color: 'var(--red)', fontSize: 16 }}>¥9.9</b>（示例定价，待定）
           </div>
           <ButtonRow>
-            <Button variant="primary" onClick={() => toast('PDF 导出将在后端实现后开放（示例）')}>导出 PDF</Button>
+            <Button variant="primary" onClick={handleExport} disabled={exporting}>
+              {exporting ? '生成中…' : '导出 PDF'}
+            </Button>
             <Button onClick={() => toast('分享功能规划中')}>分享</Button>
             <Button onClick={() => window.history.back()}>返回</Button>
           </ButtonRow>
