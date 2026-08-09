@@ -2,16 +2,17 @@
 
 | 项目 | 内容 |
 |---|---|
-| 版本 | v0.1（开工基线） |
+| 版本 | v0.2（骨架已交付） |
 | 日期 | 2026-08-09 |
 | 关联 | 契约 `contracts/openapi.yaml`；前端 `frontend-design.md`；文档索引 `README.md` |
 
 ## 1. 定位与范围（第一版）
 
-- ✅ 排盘 API：lunar-java 出盘，响应 JSON 与前端 `PaipanResult` 字段一一对应（camelCase）。
-- ✅ 历史记录存储：`bazi_record` 表 + 列表/详情接口。
-- ✅ fixtures 一致性回归：6 组边界用例，lunar-java vs lunar-javascript 逐字段断言。
-- ⏸️ 神煞 / 合婚 / 运势文案：前端已有且可用，**第一版不重复实现**；后续按需下沉。
+- ✅ 排盘 API：lunar-java 出盘，响应与前端 `PaipanResult` 字段对应（camelCase）；**fixtures 一致性测试通过**（lunar-java vs lunar-javascript 关键字段一致）。
+- ✅ 历史记录存储：`bazi_record` 表 + POST/GET/GET-by-id 接口。
+- ✅ 环境：Maven 3.9.11 已装；开发库 H2（MySQL 切换仅改 datasource 配置）。
+- ⚠️ 神煞 / 真太阳时：**后端第一版不实现**——前端 `HttpBaziApi` 用与 Mock 同一套规则补充（`enrichResult` / `adjustRequestForTrueSolar`），保持结果一致；后续需要可下沉。
+- ⏸️ 合婚 / 运势文案：前端保留，不在本端实现。
 - ⏸️ 账号 / 会员 / 云同步 / 部署域名：M1.5 后续阶段。
 
 ## 2. 技术栈
@@ -74,4 +75,5 @@ CREATE TABLE bazi_record (
 
 ## 8. 变更日志
 
+- v0.2（2026-08-09）：骨架交付——排盘服务 + 记录接口 + fixtures 一致性测试通过；明确神煞/真太阳时由前端补充。
 - v0.1（2026-08-09）：建立后端技术设计基线（范围收敛、技术栈、目录、API、表结构、一致性策略）。

@@ -8,7 +8,7 @@
 bazi-fengshui-app/
 ├─ apps/
 │  ├─ web/          # 前端应用（Vite + React 19 + TS）
-│  └─ server/       # 后端服务（规划中：Spring Boot + Java 17 + MyBatis-Plus）
+│  └─ server/       # 后端服务（Spring Boot 3 + Java 17 + MyBatis-Plus + H2）
 ├─ contracts/       # 前后端共享契约：OpenAPI + 测试夹具
 ├─ docs/            # 设计文档（产品图、前端技术设计、设计哲学）
 └─ README.md
@@ -46,3 +46,12 @@ npm test          # Vitest 单元测试
 npm config set proxy http://127.0.0.1:7890
 npm config set https-proxy http://127.0.0.1:7890
 ```
+
+## 快速开始（后端）
+
+```bash
+cd apps/server
+mvn spring-boot:run    # http://localhost:8080
+```
+
+前端联调：`apps/web` 下设置 `VITE_API_MODE=http` 后 `npm run dev`（`/api` 已代理到 8080）。

@@ -8,6 +8,14 @@ export default defineConfig({
       '@': new URL('./src', import.meta.url).pathname,
     },
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+    },
+  },
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/tests/setup.ts'],
