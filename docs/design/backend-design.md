@@ -59,6 +59,8 @@ apps/server/
 
 ## 5. 数据模型
 
+详细字段、索引与迁移策略见 [database-design.md](./database-design.md)。
+
 ```sql
 CREATE TABLE bazi_record (
   id BIGINT PRIMARY KEY AUTO_INCREMENT,
