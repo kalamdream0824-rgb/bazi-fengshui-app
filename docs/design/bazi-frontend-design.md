@@ -2,7 +2,7 @@
 
 | 项目 | 内容 |
 |---|---|
-| 文档版本 | v0.10（已实现：M0.5 + M0.8 + 表单组件 + 真太阳时 + A2 神煞 + A1 命书 PDF + A3 合婚规则完善 + A4a 本地历史 + B0 工程加固 + C1 大运流年神煞/时辰边界提示） |
+| 文档版本 | v0.11（已实现：M0.5 + M0.8 + 表单组件 + 真太阳时 + A2 神煞 + A1 命书 PDF + A3 合婚规则完善 + A4a 本地历史 + B0 工程加固 + C1 + C2 真实黄历/运势文案） |
 | 日期 | 2026-08-08 |
 | 适用范围 | 前端（apps/web）开发 |
 | 关联文档 | [产品图文档](/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/bazi-app-mockups.md)、[PRD](/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/bazi-fengshui-app-PRD.md)、[设计哲学](/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/design-philosophy.md) |
@@ -171,6 +171,14 @@ bazi-fengshui-app/
   - 空亡：以原局日柱旬空查；孤辰/寡宿：以原局年支查。
   - 来源延续 A2 通行口径（《三命通会》《渊海子平》），UI 公示。`DaYun` 增加 `shenSha`，结果增加 `currentLiuNian`（当年干支 + 神煞）；专业细盘"神煞"页签展示流年神煞与大运神煞。
 - 实现：`computeExternalShenSha` 对照命局原局推算大运/流年神煞；`TrueSolarInfo` 增加时辰与边界标记，结果页跨边界时红色高亮提示（测试 55/55）。
+
+## 14. C2 真实黄历 / 运势文案 ✅ 已交付（方案 A：温和参考型）
+
+- **数据源**：lunar-javascript 自带黄历能力（`getDayYi/getDayJi/getDayChongDesc/getDaySha/getDayChongShengXiao/getZhiXing/getPengZuGan|Zhi/getDayPositionFu`），前端直接取用，零外部依赖。
+- **运势规则引擎** `lib/dailyFortune.ts`：今日天干 vs 日主 → 十神主题文案；今日五行 vs 日主五行 → 基调（生/克/比和）；值星吉凶、冲命主生肖、彭祖百忌 → 星级与注意事项；幸运色取当日五行、方位取福神方位。
+- **合规红线（方案 A）**：文案一律"温和参考"语气，不出现绝对化预测（不写"大凶/必发财"）；保留"仅供传统文化研究参考"；无命盘时首页只显示黄历、不做个性化运势；不做医疗/投资/婚姻确定性建议。
+- 页面：首页宜忌 chips 换真实黄历（含冲煞）；每日运势页星级/宜忌/指引接真实数据，去掉"示例"标注。
+- 实现：`lib/almanac.ts` 取 lunar 黄历（宜/忌/冲/煞/值星/彭祖/福神方位）；`lib/dailyFortune.ts` 规则引擎（十神主题 + 五行基调 + 值星 + 生肖冲 + 彭祖 → 星级/文案/幸运色/方位）；首页与运势页接入，无命盘时仅黄历参考（测试 60/60）。
 
 - v0.1（2026-08-08）：建立前端技术设计基线。
 - v0.2（2026-08-08）：整合 M0.5/M0.8 实现状态——8 模块全部可走通；记录实际技术版本、领域逻辑（compRules/settings/getGanZhiFor）、样式偏差、测试与里程碑状态、剩余工作。

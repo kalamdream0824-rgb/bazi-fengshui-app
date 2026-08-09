@@ -5,12 +5,15 @@ import { FooterNote } from '@/components/FooterNote'
 import { RecordRow } from '@/components/RecordRow'
 import { SegControl } from '@/components/SegControl'
 import { useHistory } from '@/hooks/useHistory'
+import { getAlmanacFor } from '@/lib/almanac'
 import { getGanZhiFor } from '@/lib/baziMapper'
 import { useBaziStore } from '@/store/useBaziStore'
 import { useToastStore } from '@/store/useToastStore'
 
 const TODAY = getGanZhiFor(0)
 const TOMORROW = getGanZhiFor(1)
+const ALM_TODAY = getAlmanacFor(0)
+const ALM_TOMORROW = getAlmanacFor(1)
 
 const QUICK = [
   { to: '/input', label: '八字排盘' },
@@ -27,6 +30,7 @@ export function HomePage() {
   const recent = records.slice(0, 3)
   const [day, setDay] = useState<'today' | 'tomorrow'>('today')
   const info = day === 'today' ? TODAY : TOMORROW
+  const alm = day === 'today' ? ALM_TODAY : ALM_TOMORROW
 
   return (
     <>
@@ -57,21 +61,17 @@ export function HomePage() {
           value={day}
           onChange={(v) => setDay(v as 'today' | 'tomorrow')}
         />
-        {day === 'today' ? (
-          <div>
-            <span className="chip">宜 祭祀</span>
-            <span className="chip">宜 出行</span>
-            <span className="chip no">忌 动土</span>
-            <span className="chip no">忌 安葬</span>
-          </div>
-        ) : (
-          <div>
-            <span className="chip">宜 会友</span>
-            <span className="chip">宜 沐浴</span>
-            <span className="chip no">忌 开市</span>
-            <span className="chip no">忌 求医</span>
-          </div>
-        )}
+        <div>
+          {alm.yi.slice(0, 4).map((t) => (
+            <span key={t} className="chip">宜 {t}</span>
+          ))}
+          {alm.ji.slice(0, 3).map((t) => (
+            <span key={t} className="chip no">忌 {t}</span>
+          ))}
+        </div>
+        <div className="meta-line" style={{ marginTop: 8, color: 'rgba(255,246,232,.85)' }}>
+          冲煞：{alm.chongDesc} · 煞{alm.sha}
+        </div>
       </div>
 
       <Card>
