@@ -121,7 +121,7 @@ export function CompPage() {
             <>
               <div className="hero" style={{ textAlign: 'center', padding: 16 }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: 38, fontWeight: 700, lineHeight: 1 }}>{comp.score}</div>
-                <div style={{ fontSize: 12, letterSpacing: 3, marginTop: 6 }}>婚配指数 · {comp.grade}（示例规则）</div>
+                <div style={{ fontSize: 12, letterSpacing: 3, marginTop: 6 }}>婚配指数 · {comp.grade}（参考规则）</div>
               </div>
 
               <Card>
@@ -153,7 +153,7 @@ export function CompPage() {
               </Card>
 
               <Card>
-                <CardTitle hint="示例规则">冲合分析</CardTitle>
+                <CardTitle hint="参考规则">冲合分析</CardTitle>
                 <div className="row">
                   <span className="k">生肖关系</span>
                   <span style={{ color: comp.shengXiaoRelation === '六合' ? 'var(--jade)' : 'var(--ink-3)', fontWeight: 600, fontSize: 12 }}>
@@ -164,6 +164,24 @@ export function CompPage() {
                   <span className="k">日主关系</span>
                   <span style={{ color: comp.dayMasterRelation === '相克' ? 'var(--red)' : 'var(--jade)', fontWeight: 600, fontSize: 12 }}>
                     {comp.dayMasterRelation}
+                  </span>
+                </div>
+                <div className="row">
+                  <span className="k">日柱纳音</span>
+                  <span style={{ color: comp.nayinRelation === '相克' ? 'var(--red)' : 'var(--jade)', fontWeight: 600, fontSize: 12 }}>
+                    {personA.pillars.day.naYin} · {personB.pillars.day.naYin}　{comp.nayinRelation}
+                  </span>
+                </div>
+                <div className="row">
+                  <span className="k">夫妻宫</span>
+                  <span style={{ color: comp.spousePalaceRelation === '六冲' ? 'var(--red)' : 'var(--jade)', fontWeight: 600, fontSize: 12 }}>
+                    {personA.pillars.day.zhi} · {personB.pillars.day.zhi}　{comp.spousePalaceRelation === '—' ? '无特殊' : comp.spousePalaceRelation}
+                  </span>
+                </div>
+                <div className="row">
+                  <span className="k">年柱关系</span>
+                  <span style={{ color: comp.yearRelation === '六冲' ? 'var(--red)' : 'var(--jade)', fontWeight: 600, fontSize: 12 }}>
+                    {comp.yearRelation === '—' && !comp.yearGanHe ? '无特殊' : `${comp.yearRelation === '—' ? '' : comp.yearRelation}${comp.yearGanHe ? '·年干五合' : ''}`}
                   </span>
                 </div>
                 {comp.tips.map((tip) => (
