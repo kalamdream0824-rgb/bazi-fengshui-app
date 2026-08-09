@@ -22,10 +22,10 @@ public class GlobalExceptionHandler {
     return Map.of("code", "UNAUTHORIZED", "message", e.getMessage());
   }
 
-  @ExceptionHandler(IllegalArgumentException.class)
+  @ExceptionHandler(BusinessException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public Map<String, String> handleBadRequest(IllegalArgumentException e) {
-    return Map.of("code", "BAD_REQUEST", "message", e.getMessage());
+  public Map<String, String> handleBusiness(BusinessException e) {
+    return Map.of("code", e.getCode(), "message", e.getMessage());
   }
 
   @ExceptionHandler(TooManyRequestsException.class)

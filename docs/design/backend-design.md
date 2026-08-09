@@ -89,8 +89,17 @@ CREATE TABLE bazi_user (
 - 接口只输出数据；免责声明与"温和参考"文案由前端呈现层负责。
 - 不输出医疗、投资、婚姻等确定性建议。
 
+## 7.5 分层与耦合规范（后续开发强制约定）
+
+- 依赖方向单向：`Controller → Service → Mapper`；Controller 只做 HTTP 参数接收与响应，**业务规则（去重/校验/状态流转）不进 Controller**。
+- 业务错误统一抛 `BusinessException(code, message)`，由 `GlobalExceptionHandler` 映射；**禁止用通用异常（如 IllegalArgumentException）表达业务语义**。
+- 领域常量（五行表等）放 `domain/constants`；日期/字符串解析等工具独立成 `util`，不散落在 Service。
+- 纯领域层（如 BaziCalculator / Assembler 拆分）：**等出现第二个消费方或 Service 明显膨胀（>200 行）再拆**，避免过早抽象（Rule of Three）。
+- 新增接口时对照本规范自查：Controller 是否超过 10 行业务逻辑、是否用了通用异常、业务常量是否留在 Service。
+
 ## 8. 变更日志
 
+- v0.4.1（2026-08-09）：解耦最小修正——新增 `BusinessException` 业务异常体系、去重/保存下沉 `RecordService`（Controller 瘦身）、五行常量归入 `domain/constants`；立"分层与耦合规范"为后续强制约定。
 - v0.4（2026-08-09）：P0 交付——配置分层与安全底线（secret 环境变量、CORS 可配置、MySQL 驱动）、登录防爆破、控制器集成测试（后端测试 8/8）。
 - v0.3.1（2026-08-09）：标记会员/支付为待办（资质前置），当前不实现支付通道。
 - v0.3（2026-08-09）：账号 + 云同步交付——注册/登录（JWT + BCrypt）、记录按用户隔离与去重、DELETE 接口；前端登录页与历史云同步（后端测试 5/5，前端 64/64）。

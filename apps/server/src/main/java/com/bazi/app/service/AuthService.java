@@ -3,6 +3,7 @@ package com.bazi.app.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.bazi.app.config.JwtUtil;
 import com.bazi.app.config.LoginRateLimiter;
+import com.bazi.app.config.BusinessException;
 import com.bazi.app.domain.User;
 import com.bazi.app.mapper.UserMapper;
 import java.time.LocalDateTime;
@@ -26,11 +27,11 @@ public class AuthService {
 
   public String register(String username, String password) {
     if (username == null || username.isBlank() || password == null || password.length() < 6) {
-      throw new IllegalArgumentException("用户名不能为空，密码至少 6 位");
+      throw new BusinessException("USERNAME_INVALID", "用户名不能为空，密码至少 6 位");
     }
     Long count = userMapper.selectCount(new QueryWrapper<User>().eq("username", username));
     if (count > 0) {
-      throw new IllegalArgumentException("用户名已存在");
+      throw new BusinessException("USERNAME_EXISTS", "用户名已存在");
     }
     User user = new User();
     user.setUsername(username.trim());
@@ -45,7 +46,7 @@ public class AuthService {
     User user = userMapper.selectOne(new QueryWrapper<User>().eq("username", username));
     if (user == null || !encoder.matches(password, user.getPasswordHash())) {
       rateLimiter.recordFailure(username);
-      throw new IllegalArgumentException("用户名或密码错误");
+      throw new BusinessException("BAD_CREDENTIALS", "用户名或密码错误");
     }
     rateLimiter.clear(username);
     return jwtUtil.create(user.getId());

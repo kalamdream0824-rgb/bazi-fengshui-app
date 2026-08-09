@@ -11,6 +11,7 @@ import com.bazi.app.dto.LiuNianDto;
 import com.bazi.app.dto.PaipanRequest;
 import com.bazi.app.dto.PaipanResultDto;
 import com.bazi.app.dto.PillarDto;
+import com.bazi.app.domain.constants.WuXingConstants;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,23 +22,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class BaziService {
-
-  private static final Map<String, String> GAN_WUXING = Map.of(
-      "甲", "mu", "乙", "mu", "丙", "huo", "丁", "huo", "戊", "tu",
-      "己", "tu", "庚", "jin", "辛", "jin", "壬", "shui", "癸", "shui");
-  private static final Map<String, String> ZHI_WUXING = Map.ofEntries(
-      Map.entry("子", "shui"),
-      Map.entry("丑", "tu"),
-      Map.entry("寅", "mu"),
-      Map.entry("卯", "mu"),
-      Map.entry("辰", "tu"),
-      Map.entry("巳", "huo"),
-      Map.entry("午", "huo"),
-      Map.entry("未", "tu"),
-      Map.entry("申", "jin"),
-      Map.entry("酉", "jin"),
-      Map.entry("戌", "tu"),
-      Map.entry("亥", "shui"));
 
   public PaipanResultDto paipan(PaipanRequest req) {
     String[] parts = req.solarDateTime().split("T");
@@ -66,8 +50,8 @@ public class BaziService {
     wuXing.put("huo", 0);
     wuXing.put("tu", 0);
     for (PillarDto p : pillars.values()) {
-      wuXing.merge(GAN_WUXING.getOrDefault(p.gan(), "tu"), 1, Integer::sum);
-      wuXing.merge(ZHI_WUXING.getOrDefault(p.zhi(), "tu"), 1, Integer::sum);
+      wuXing.merge(WuXingConstants.GAN_WUXING.getOrDefault(p.gan(), "tu"), 1, Integer::sum);
+      wuXing.merge(WuXingConstants.ZHI_WUXING.getOrDefault(p.zhi(), "tu"), 1, Integer::sum);
     }
 
     List<DaYunDto> daYun = new ArrayList<>();
@@ -111,7 +95,7 @@ public class BaziService {
     List<HideGanDto> hideGanDtos = new ArrayList<>();
     if (hideGan != null) {
       for (String g : hideGan) {
-        hideGanDtos.add(new HideGanDto(g, GAN_WUXING.getOrDefault(g, "tu")));
+        hideGanDtos.add(new HideGanDto(g, WuXingConstants.GAN_WUXING.getOrDefault(g, "tu")));
       }
     }
     return new PillarDto(label, gan, zhi, shiShen, hideGanDtos, naYin, diShi, xunKong, List.of());
