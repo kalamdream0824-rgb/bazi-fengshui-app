@@ -104,8 +104,9 @@ export async function exportMingshuPdf(request: PaipanRequest, result: PaipanRes
     const pages = Array.from(container.querySelectorAll<HTMLElement>('.page'))
 
     for (let i = 0; i < pages.length; i += 1) {
-      const canvas = await html2canvas(pages[i], { scale: 2, backgroundColor: C.paper, useCORS: true })
-      const img = canvas.toDataURL('image/png')
+      const canvas = await html2canvas(pages[i], { scale: 1.5, backgroundColor: C.paper, useCORS: true })
+      // JPEG 压缩显著减小 PDF 体积（页面为不透明纸色底，无损透明需求）
+      const img = canvas.toDataURL('image/jpeg', 0.85)
       if (i > 0) pdf.addPage()
 
       const ratio = canvas.width / canvas.height
