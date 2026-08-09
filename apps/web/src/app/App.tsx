@@ -5,6 +5,7 @@ import { ChartPage } from '@/pages/ChartPage'
 import { CompPage } from '@/pages/CompPage'
 import { DailyPage } from '@/pages/DailyPage'
 import { HomePage } from '@/pages/HomePage'
+import { HistoryPage } from '@/pages/HistoryPage'
 import { InputPage } from '@/pages/InputPage'
 import { ProfilePage } from '@/pages/ProfilePage'
 import { ProPage } from '@/pages/ProPage'
@@ -20,6 +21,7 @@ function Shell() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/input" element={<InputPage />} />
+        <Route path="/history" element={<HistoryPage />} />
         <Route path="/chart" element={<ChartPage />} />
         <Route path="/chart/pro" element={<ProPage />} />
         <Route path="/comp" element={<CompPage />} />

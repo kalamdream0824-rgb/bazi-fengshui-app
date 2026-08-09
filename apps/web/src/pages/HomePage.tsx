@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Card, CardTitle } from '@/components/Card'
 import { SegControl } from '@/components/SegControl'
+import { useHistory } from '@/hooks/useHistory'
 import { getGanZhiFor } from '@/lib/baziMapper'
 import { useBaziStore } from '@/store/useBaziStore'
 import { useToastStore } from '@/store/useToastStore'
@@ -17,8 +18,11 @@ const QUICK = [
 ]
 
 export function HomePage() {
-  const result = useBaziStore((s) => s.result)
+  const navigate = useNavigate()
+  const setResult = useBaziStore((s) => s.setResult)
   const toast = useToastStore((s) => s.show)
+  const { data: records = [] } = useHistory()
+  const recent = records.slice(0, 3)
   const [day, setDay] = useState<'today' | 'tomorrow'>('today')
   const info = day === 'today' ? TODAY : TOMORROW
 
@@ -81,16 +85,25 @@ export function HomePage() {
 
       <Card>
         <CardTitle>最近排盘</CardTitle>
-        {result ? (
-          <Link className="row" to="/chart">
-            <div>
-              <div style={{ fontWeight: 600 }}>最近一次 · {result.lunarText}</div>
-              <div className="meta-line" style={{ marginTop: 3 }}>
-                {result.solarText} · 生肖 {result.shengXiao}
+        {recent.length > 0 ? (
+          recent.map((record) => (
+            <div
+              className="row"
+              key={record.id}
+              onClick={() => {
+                setResult(record.request, record.result)
+                void navigate('/chart')
+              }}
+            >
+              <div>
+                <div style={{ fontWeight: 600 }}>{record.result.lunarText}</div>
+                <div className="meta-line" style={{ marginTop: 3 }}>
+                  {record.result.solarText} · 生肖 {record.result.shengXiao}
+                </div>
               </div>
+              <span className="arrow">›</span>
             </div>
-            <span className="arrow">›</span>
-          </Link>
+          ))
         ) : (
           <Link className="row" to="/input">
             <div>

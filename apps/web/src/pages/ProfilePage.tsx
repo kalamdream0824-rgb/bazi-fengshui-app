@@ -64,10 +64,10 @@ export function ProfilePage() {
           <span className="k">会员中心</span>
           <span className="arrow">›</span>
         </div>
-        <div className="row" onClick={() => toast('历史记录规划中')}>
+        <Link className="row" to="/history">
           <span className="k">历史记录</span>
           <span className="arrow">›</span>
-        </div>
+        </Link>
         <Link className="row" to="/report">
           <span className="k">我的命书</span>
           <span className="arrow">›</span>

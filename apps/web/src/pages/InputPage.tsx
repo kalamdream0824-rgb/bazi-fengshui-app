@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/Button'
 import { Card, CardTitle } from '@/components/Card'
@@ -9,6 +9,7 @@ import { RegionSelect } from '@/components/RegionSelect'
 import { Switch } from '@/components/Switch'
 import { TopBar } from '@/components/TopBar'
 import { getBaziApi } from '@/services/baziApi'
+import { addHistory } from '@/services/historyStore'
 import { useBaziStore } from '@/store/useBaziStore'
 import { useSettingsStore } from '@/store/useSettingsStore'
 import { useToastStore } from '@/store/useToastStore'
@@ -16,6 +17,7 @@ import type { Gender, PaipanRequest } from '@/types/bazi'
 
 export function InputPage() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const setResult = useBaziStore((s) => s.setResult)
   const toast = useToastStore((s) => s.show)
   const trueSolarDefault = useSettingsStore((s) => s.trueSolarDefault)
@@ -31,6 +33,8 @@ export function InputPage() {
     mutationFn: (req: PaipanRequest) => api.paipan(req),
     onSuccess: (result, req) => {
       setResult(req, result)
+      addHistory(req, result).catch(() => undefined)
+      void queryClient.invalidateQueries({ queryKey: ['history'] })
       navigate('/chart')
     },
     onError: (err: Error) => toast(err.message || '排盘失败，请重试'),
