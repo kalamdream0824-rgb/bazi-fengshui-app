@@ -1,5 +1,6 @@
 import { Lunar, Solar } from 'lunar-javascript'
 import type { DaYun, PaipanRequest, PaipanResult, Pillar, PillarKey, WuxingKey } from '@/types/bazi'
+import { computeShenSha } from './shenSha'
 import { formatAdjusted, longitudeOf, trueSolarTime } from './trueSolarTime'
 import { GAN_WUXING, ZHI_WUXING } from './wuxing'
 
@@ -72,6 +73,11 @@ export function paipan(req: PaipanRequest): PaipanResult {
     month: toPillar('month', ec.getMonthGan(), ec.getMonthZhi(), ec.getMonthShiShenGan(), ec.getMonthHideGan(), ec.getMonthNaYin(), ec.getMonthDiShi(), ec.getMonthXunKong()),
     day: toPillar('day', ec.getDayGan(), ec.getDayZhi(), '日主', ec.getDayHideGan(), ec.getDayNaYin(), ec.getDayDiShi(), ec.getDayXunKong()),
     time: toPillar('time', ec.getTimeGan(), ec.getTimeZhi(), ec.getTimeShiShenGan(), ec.getTimeHideGan(), ec.getTimeNaYin(), ec.getTimeDiShi(), ec.getTimeXunKong()),
+  }
+
+  const shenSha = computeShenSha(pillars, ec.getDayXunKong())
+  for (const key of ['year', 'month', 'day', 'time'] as const) {
+    pillars[key].shenSha = shenSha[key]
   }
 
   const wuXing: PaipanResult['wuXing'] = { jin: 0, mu: 0, shui: 0, huo: 0, tu: 0 }

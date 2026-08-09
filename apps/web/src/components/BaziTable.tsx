@@ -115,7 +115,7 @@ export function BaziTable({ pillars }: BaziTableProps) {
               </td>
               {KEYS.map((k) => (
                 <td key={k}>
-                  <span className="shensha">{pillars[k].shenSha.length ? pillars[k].shenSha.join(' ') : '—'}</span>
+                  <span className="shensha">{pillars[k].shenSha.length ? pillars[k].shenSha.join('·') : '—'}</span>
                 </td>
               ))}
             </tr>
