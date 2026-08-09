@@ -7,7 +7,9 @@ import { FooterNote } from '@/components/FooterNote'
 import { RecordRow } from '@/components/RecordRow'
 import { TopBar } from '@/components/TopBar'
 import { useHistory } from '@/hooks/useHistory'
+import { deleteCloudRecord } from '@/services/cloudSync'
 import { backupToRecords, downloadBackup, importHistory, removeHistory } from '@/services/historyStore'
+import { useAuthStore } from '@/store/useAuthStore'
 import { useBaziStore } from '@/store/useBaziStore'
 import { useToastStore } from '@/store/useToastStore'
 import type { PaipanRequest, PaipanResult } from '@/types/bazi'
@@ -17,6 +19,7 @@ export function HistoryPage() {
   const toast = useToastStore((s) => s.show)
   const setResult = useBaziStore((s) => s.setResult)
   const { data: records = [], isLoading, invalidate } = useHistory()
+  const token = useAuthStore((s) => s.token)
   const fileRef = useRef<HTMLInputElement>(null)
   const [importing, setImporting] = useState(false)
 
@@ -27,7 +30,11 @@ export function HistoryPage() {
 
   const handleDelete = async (id: number) => {
     if (!window.confirm('确定删除这条排盘记录？')) return
-    await removeHistory(id)
+    if (import.meta.env.VITE_API_MODE === 'http' && token) {
+      await deleteCloudRecord(id)
+    } else {
+      await removeHistory(id)
+    }
     invalidate()
   }
 

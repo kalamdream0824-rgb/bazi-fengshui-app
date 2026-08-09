@@ -16,6 +16,18 @@ public class GlobalExceptionHandler {
     return Map.of("code", "VALIDATION", "message", "参数校验失败");
   }
 
+  @ExceptionHandler(UnauthorizedException.class)
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  public Map<String, String> handleUnauthorized(UnauthorizedException e) {
+    return Map.of("code", "UNAUTHORIZED", "message", e.getMessage());
+  }
+
+  @ExceptionHandler(IllegalArgumentException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public Map<String, String> handleBadRequest(IllegalArgumentException e) {
+    return Map.of("code", "BAD_REQUEST", "message", e.getMessage());
+  }
+
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public Map<String, String> handleGeneric(Exception e) {

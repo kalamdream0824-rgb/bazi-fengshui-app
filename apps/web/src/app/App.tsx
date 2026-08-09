@@ -4,6 +4,7 @@ import { TabBar } from '@/components/TabBar'
 import { Toast } from '@/components/Toast'
 
 const HomePage = lazy(() => import('@/pages/HomePage').then((m) => ({ default: m.HomePage })))
+const AuthPage = lazy(() => import('@/pages/AuthPage').then((m) => ({ default: m.AuthPage })))
 const HistoryPage = lazy(() => import('@/pages/HistoryPage').then((m) => ({ default: m.HistoryPage })))
 const InputPage = lazy(() => import('@/pages/InputPage').then((m) => ({ default: m.InputPage })))
 const ChartPage = lazy(() => import('@/pages/ChartPage').then((m) => ({ default: m.ChartPage })))
@@ -23,6 +24,7 @@ function Shell() {
       <Suspense fallback={<div className="placeholder">加载中…</div>}>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/auth" element={<AuthPage />} />
           <Route path="/input" element={<InputPage />} />
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/chart" element={<ChartPage />} />

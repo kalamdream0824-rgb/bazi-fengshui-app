@@ -18,3 +18,8 @@ spring:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
+
+app:
+  jwt:
+    secret: "dev-secret-change-me-0123456789abcdef0123456789abcdef"
+    expire-hours: 720

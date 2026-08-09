@@ -54,6 +54,11 @@ export interface LiuNianInfo {
   shenSha: string[]
 }
 
+export interface AuthResponse {
+  token: string
+  username: string
+}
+
 export interface PaipanResult {
   solarText: string
   lunarText: string

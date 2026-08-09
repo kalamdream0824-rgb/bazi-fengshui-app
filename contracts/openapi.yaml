@@ -6,7 +6,40 @@ info:
 servers:
   - url: /api/v1
 paths:
+  /auth/register:
+    post:
+      summary: 注册并返回 token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        '200':
+          description: 注册成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+  /auth/login:
+    post:
+      summary: 登录并返回 token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        '200':
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
   /records:
+    # 需 Authorization: Bearer <token>
     post:
       summary: 排盘并保存一条记录
       requestBody:
@@ -51,6 +84,21 @@ paths:
                 $ref: '#/components/schemas/PaipanResult'
 components:
   schemas:
+    AuthRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        username:
+          type: string
     PaipanRequest:
       type: object
       required: [gender, solarDateTime, trueSolarTime]

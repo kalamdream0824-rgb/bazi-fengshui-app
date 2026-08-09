@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Card, CardTitle } from '@/components/Card'
 import { RecordRow } from '@/components/RecordRow'
 import { Switch } from '@/components/Switch'
+import { useAuthStore } from '@/store/useAuthStore'
 import { useBaziStore } from '@/store/useBaziStore'
 import { useSettingsStore } from '@/store/useSettingsStore'
 import { useToastStore } from '@/store/useToastStore'
@@ -13,6 +14,8 @@ export function ProfilePage() {
   const toast = useToastStore((s) => s.show)
   const trueSolarDefault = useSettingsStore((s) => s.trueSolarDefault)
   const toggleTrueSolar = useSettingsStore((s) => s.toggleTrueSolarDefault)
+  const username = useAuthStore((s) => s.username)
+  const clearAuth = useAuthStore((s) => s.clear)
 
   return (
     <>
@@ -53,6 +56,35 @@ export function ProfilePage() {
       </Card>
 
       <Card>
+        <CardTitle>我的账号</CardTitle>
+        {username ? (
+          <>
+            <RecordRow title={username} subtitle="已登录 · 排盘记录自动云同步" onClick={() => toast('账号信息规划中')} />
+            <div
+              style={{
+                margin: '0 16px 14px',
+                textAlign: 'center',
+                fontSize: 13,
+                color: 'var(--red)',
+                background: 'var(--paper)',
+                border: '1px solid var(--line)',
+                borderRadius: 10,
+                padding: '10px 0',
+              }}
+              onClick={() => {
+                clearAuth()
+                toast('已退出登录')
+              }}
+            >
+              退出登录
+            </div>
+          </>
+        ) : (
+          <RecordRow title="未登录" subtitle="登录后可云同步排盘记录" onClick={() => navigate('/auth')} />
+        )}
+      </Card>
+
+      <Card>
         <CardTitle>设置</CardTitle>
         <Switch
           checked={trueSolarDefault}
@@ -87,21 +119,6 @@ export function ProfilePage() {
         </div>
       </Card>
 
-      <div
-        style={{
-          margin: '0 14px 12px',
-          textAlign: 'center',
-          fontSize: 13,
-          color: 'var(--red)',
-          background: 'var(--card)',
-          border: '1px solid var(--line)',
-          borderRadius: 14,
-          padding: '13px 0',
-        }}
-        onClick={() => toast('登录体系将在后端实现后接入')}
-      >
-        退出登录
-      </div>
     </>
   )
 }

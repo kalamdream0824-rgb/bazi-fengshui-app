@@ -2,7 +2,7 @@
 
 | 项目 | 内容 |
 |---|---|
-| 版本 | v0.2（骨架已交付） |
+| 版本 | v0.3（账号 + 云同步已交付） |
 | 日期 | 2026-08-09 |
 | 关联 | 契约 `contracts/openapi.yaml`；前端 `frontend-design.md`；文档索引 `README.md` |
 
@@ -10,6 +10,7 @@
 
 - ✅ 排盘 API：lunar-java 出盘，响应与前端 `PaipanResult` 字段对应（camelCase）；**fixtures 一致性测试通过**（lunar-java vs lunar-javascript 关键字段一致）。
 - ✅ 历史记录存储：`bazi_record` 表 + POST/GET/GET-by-id 接口。
+- ✅ 账号体系：注册/登录（BCrypt 密码哈希 + JWT），记录按用户隔离（`user_id`），创建去重，支持 DELETE。
 - ✅ 环境：Maven 3.9.11 已装；开发库 H2（MySQL 切换仅改 datasource 配置）。
 - ⚠️ 神煞 / 真太阳时：**后端第一版不实现**——前端 `HttpBaziApi` 用与 Mock 同一套规则补充（`enrichResult` / `adjustRequestForTrueSolar`），保持结果一致；后续需要可下沉。
 - ⏸️ 合婚 / 运势文案：前端保留，不在本端实现。
@@ -43,9 +44,12 @@ apps/server/
 
 ## 4. API（契约为准）
 
+- `POST /api/v1/auth/register`、`POST /api/v1/auth/login`：返回 `{ token, username }`。
 - `POST /api/v1/records`：请求 `PaipanRequest` → 排盘并保存 → 返回 `PaipanResult`。
-- `GET /api/v1/records`：记录列表（新→旧）。
+- `GET /api/v1/records`：当前用户记录列表（新→旧）。
 - `GET /api/v1/records/{id}`：单条记录。
+- `DELETE /api/v1/records/{id}`：删除本人记录。
+- `/records/**` 需 `Authorization: Bearer <token>`；401 返回 `{code:"UNAUTHORIZED"}`。
 - 错误响应统一 `{ "code": string, "message": string }`；入参 `@Valid` 校验。
 - 开发期 CORS 允许 `http://localhost:5173`。
 
@@ -59,7 +63,16 @@ CREATE TABLE bazi_record (
   result_json TEXT NOT NULL,    -- PaipanResult
   created_at DATETIME NOT NULL
 );
+
+CREATE TABLE bazi_user (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  username VARCHAR(64) NOT NULL UNIQUE,
+  password_hash VARCHAR(100) NOT NULL,
+  created_at DATETIME NOT NULL
+);
 ```
+
+前端登录后自动将本地 IndexedDB 历史批量上传（后端按 `request_json` 去重），实现"本地 → 云端"迁移。
 
 ## 6. 一致性策略（命根子）
 
@@ -75,5 +88,6 @@ CREATE TABLE bazi_record (
 
 ## 8. 变更日志
 
+- v0.3（2026-08-09）：账号 + 云同步交付——注册/登录（JWT + BCrypt）、记录按用户隔离与去重、DELETE 接口；前端登录页与历史云同步（后端测试 5/5，前端 64/64）。
 - v0.2（2026-08-09）：骨架交付——排盘服务 + 记录接口 + fixtures 一致性测试通过；明确神煞/真太阳时由前端补充。
 - v0.1（2026-08-09）：建立后端技术设计基线（范围收敛、技术栈、目录、API、表结构、一致性策略）。
