@@ -1,0 +1,18 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: bazi-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: bazi
+      MYSQL_USER: bazi
+      MYSQL_PASSWORD: bazi123
+    ports:
+      - "3306:3306"
+    volumes:
+      - bazi-mysql-data:/var/lib/mysql
+      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+volumes:
+  bazi-mysql-data:

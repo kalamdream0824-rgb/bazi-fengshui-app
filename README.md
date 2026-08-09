@@ -55,3 +55,11 @@ mvn spring-boot:run    # http://localhost:8080
 ```
 
 前端联调：`apps/web` 下设置 `VITE_API_MODE=http` 后 `npm run dev`（`/api` 已代理到 8080）。
+
+可选 MySQL（Docker）：
+
+```bash
+cd apps/server
+docker compose up -d
+SPRING_PROFILES_ACTIVE=mysql mvn spring-boot:run
+```
