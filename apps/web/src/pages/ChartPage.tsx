@@ -52,6 +52,11 @@ export function ChartPage() {
                 （经度 {result.trueSolar.longitude}°E）
               </div>
             ) : null}
+            {result.trueSolar?.boundaryChanged ? (
+              <div className="meta-line" style={{ marginTop: 3, color: 'var(--red)' }}>
+                校正后时辰由 {result.trueSolar.originalShichen} 时变为 {result.trueSolar.adjustedShichen} 时，排盘已按校正后时辰计算
+              </div>
+            ) : null}
           </div>
           <span className="chip" style={{ background: 'rgba(184,144,74,.12)', borderColor: 'rgba(184,144,74,.35)', color: '#8a6a2f', margin: 0 }}>
             生肖 {result.shengXiao}

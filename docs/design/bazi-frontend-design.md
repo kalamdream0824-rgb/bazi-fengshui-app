@@ -2,7 +2,7 @@
 
 | 项目 | 内容 |
 |---|---|
-| 文档版本 | v0.9（已实现：M0.5 + M0.8 + 表单组件 + 真太阳时 + A2 神煞 + A1 命书 PDF + A3 合婚规则完善 + A4a 本地历史；B0 工程加固） |
+| 文档版本 | v0.10（已实现：M0.5 + M0.8 + 表单组件 + 真太阳时 + A2 神煞 + A1 命书 PDF + A3 合婚规则完善 + A4a 本地历史 + B0 工程加固 + C1 大运流年神煞/时辰边界提示） |
 | 日期 | 2026-08-08 |
 | 适用范围 | 前端（apps/web）开发 |
 | 关联文档 | [产品图文档](/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/bazi-app-mockups.md)、[PRD](/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/bazi-fengshui-app-PRD.md)、[设计哲学](/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/design-philosophy.md) |
@@ -161,6 +161,16 @@ bazi-fengshui-app/
 - **真重复 vs 假相似**：领域逻辑（五行映射、时辰、格式化）必须共享；演进方向不同的相似 UI（如首页与每日运势的"今日/明日"切换）不强行合并，避免 prop 膨胀与互相拖累。
 - **优化纪律**：优化改动不得引入次要缺陷；每次改动必须伴随充分测试——抽取的组件要有组件测试，受影响页面保持既有用例通过，最终构建必须绿。
 - **B0 范围 ✅ 已完成**：抽取真实重复组件（FooterNote / EmptyState / RecordRow，含组件测试）；路由懒加载（React.lazy + Suspense，主包拆分生效）；GitHub Actions CI（push 自动 npm ci + test + build）。**CSS 全量作用域化（CSS Modules）暂缓**——当前无法在沙箱目视验证，纯重构回归风险大于收益，待有浏览器验证环境后另行处理。
+
+## 13. C1 大运流年神煞 + 时辰边界提示 ✅ 已交付
+
+- **时辰边界提示**：真太阳时校正前后时辰不同（如 13:05 → 12:54，未时变午时）时，结果页高亮提示"该时间经校正后时辰发生变化，排盘已按校正后时辰计算"。纯前端，`TrueSolarInfo` 增加 `originalShichen / adjustedShichen / boundaryChanged`。
+- **大运流年神煞口径**（已定）：以大运/流年干支对照**命局原局**推算——
+  - 三合局类（桃花/驿马/华盖/劫煞/亡神/将星）：以原局年支、日支查；
+  - 日干类（羊刃/禄神/天乙贵人/文昌/红艳/流霞/金舆）：以原局日干查；
+  - 空亡：以原局日柱旬空查；孤辰/寡宿：以原局年支查。
+  - 来源延续 A2 通行口径（《三命通会》《渊海子平》），UI 公示。`DaYun` 增加 `shenSha`，结果增加 `currentLiuNian`（当年干支 + 神煞）；专业细盘"神煞"页签展示流年神煞与大运神煞。
+- 实现：`computeExternalShenSha` 对照命局原局推算大运/流年神煞；`TrueSolarInfo` 增加时辰与边界标记，结果页跨边界时红色高亮提示（测试 55/55）。
 
 - v0.1（2026-08-08）：建立前端技术设计基线。
 - v0.2（2026-08-08）：整合 M0.5/M0.8 实现状态——8 模块全部可走通；记录实际技术版本、领域逻辑（compRules/settings/getGanZhiFor）、样式偏差、测试与里程碑状态、剩余工作。

@@ -35,6 +35,7 @@ export interface DaYun {
   ganZhi: string
   yearRange: string
   isCurrent: boolean
+  shenSha: string[]
 }
 
 export interface TrueSolarInfo {
@@ -43,6 +44,14 @@ export interface TrueSolarInfo {
   offsetMinutes: number
   eotMinutes: number
   longitude: number
+  originalShichen: string
+  adjustedShichen: string
+  boundaryChanged: boolean
+}
+
+export interface LiuNianInfo {
+  ganZhi: string
+  shenSha: string[]
 }
 
 export interface PaipanResult {
@@ -54,5 +63,6 @@ export interface PaipanResult {
   wuXing: Record<WuxingKey, number>
   daYun: DaYun[]
   currentYearGanZhi: string
+  currentLiuNian?: LiuNianInfo
   trueSolar?: TrueSolarInfo
 }

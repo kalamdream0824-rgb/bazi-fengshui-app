@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { Card, CardTitle } from '@/components/Card'
 import { DaYunList } from '@/components/DaYunList'
-import { EmptyState } from '@/components/EmptyState'
 import { FooterNote } from '@/components/FooterNote'
 import { SegControl } from '@/components/SegControl'
 import { TopBar } from '@/components/TopBar'
@@ -87,10 +86,23 @@ export function ProPage() {
       )}
 
       {panel === 'shensha' && (
-        <Card>
-          <CardTitle hint="开发期占位">神煞</CardTitle>
-          <EmptyState title="神煞数据将在后端（lunar-java）实现后输出" hint="当前版本暂无数据" />
-        </Card>
+        <>
+          <Card>
+            <CardTitle hint="大运/流年干支对照原局 · 口径见设计文档">流年神煞（2026 · {result.currentLiuNian?.ganZhi ?? '—'}）</CardTitle>
+            <div style={{ padding: '0 16px 14px', fontSize: 13 }}>
+              {result.currentLiuNian?.shenSha.join('·') || '—'}
+            </div>
+          </Card>
+          <Card>
+            <CardTitle hint="大运干支对照原局">大运神煞</CardTitle>
+            {result.daYun.map((d) => (
+              <div className="row" key={d.ganZhi}>
+                <span className="k">{d.ganZhi}</span>
+                <span className="v">{d.shenSha.join('·') || '—'}</span>
+              </div>
+            ))}
+          </Card>
+        </>
       )}
 
       <FooterNote>大运流年内容以实际算法输出为准</FooterNote>

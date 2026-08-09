@@ -105,3 +105,46 @@ export function computeShenSha(pillars: Record<PillarKey, Pillar>, dayXunKong: s
 
   return result
 }
+
+export interface ShenShaRef {
+  yearZhi: string
+  dayZhi: string
+  dayGan: string
+  dayXunKong: string
+}
+
+/**
+ * 大运/流年神煞：以大运或流年干支对照命局原局推算（口径见设计文档第 13 节）。
+ * 入参 ganZhi 形如 "甲申"（前一位天干、后一位地支）。
+ */
+export function computeExternalShenSha(ref: ShenShaRef, ganZhi: string): string[] {
+  const externalZhi = ganZhi[1]
+  const hits: string[] = []
+
+  const addHit = (name: string) => {
+    if (!hits.includes(name)) hits.push(name)
+  }
+
+  for (const anchor of [ref.yearZhi, ref.dayZhi]) {
+    const table = GROUP_SHEN_SHA[SANHE_GROUP[anchor]]
+    if (table) {
+      for (const [name, target] of Object.entries(table)) {
+        if (target === externalZhi) addHit(name)
+      }
+    }
+  }
+
+  if (ref.dayXunKong.includes(externalZhi)) addHit('空亡')
+
+  if (YANG_REN[ref.dayGan] === externalZhi) addHit('羊刃')
+  if (LU_SHEN[ref.dayGan] === externalZhi) addHit('禄神')
+  if ((TIANYI[ref.dayGan] ?? []).includes(externalZhi)) addHit('天乙贵人')
+  if (WENCHANG[ref.dayGan] === externalZhi) addHit('文昌')
+  if (HONGYAN[ref.dayGan] === externalZhi) addHit('红艳')
+  if (LIUXIA[ref.dayGan] === externalZhi) addHit('流霞')
+  if (JINYU[ref.dayGan] === externalZhi) addHit('金舆')
+  if (GUCHEN[ref.yearZhi] === externalZhi) addHit('孤辰')
+  if (GUASU[ref.yearZhi] === externalZhi) addHit('寡宿')
+
+  return hits
+}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { paipan } from './baziMapper'
-import { computeShenSha } from './shenSha'
+import { computeExternalShenSha, computeShenSha } from './shenSha'
 import type { Pillar, PillarKey } from '@/types/bazi'
 
 function fakePillar(gan: string, zhi: string): Pillar {
@@ -37,5 +37,16 @@ describe('shenSha.computeShenSha', () => {
     }
     const result = computeShenSha(pillars, '')
     expect(result.month).toEqual(expect.arrayContaining(['桃花']))
+  })
+
+  it('大运神煞：1995 命局对甲申 → 劫煞；对壬午 → 无', () => {
+    const ref = { yearZhi: '亥', dayZhi: '申', dayGan: '壬', dayXunKong: '戌亥' }
+    expect(computeExternalShenSha(ref, '甲申')).toEqual(['劫煞'])
+    expect(computeExternalShenSha(ref, '壬午')).toEqual([])
+  })
+
+  it('大运神煞：旬空命中', () => {
+    const ref = { yearZhi: '亥', dayZhi: '申', dayGan: '壬', dayXunKong: '戌亥' }
+    expect(computeExternalShenSha(ref, '甲戌')).toContain('空亡')
   })
 })

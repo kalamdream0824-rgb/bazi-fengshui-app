@@ -1,6 +1,7 @@
 import { Lunar, Solar } from 'lunar-javascript'
-import type { DaYun, PaipanRequest, PaipanResult, Pillar, PillarKey, WuxingKey } from '@/types/bazi'
-import { computeShenSha } from './shenSha'
+import type { DaYun, LiuNianInfo, PaipanRequest, PaipanResult, Pillar, PillarKey, WuxingKey } from '@/types/bazi'
+import { timeToShichen } from './datePicker'
+import { computeExternalShenSha, computeShenSha, type ShenShaRef } from './shenSha'
 import { formatAdjusted, longitudeOf, trueSolarTime } from './trueSolarTime'
 import { GAN_WUXING, ZHI_WUXING } from './wuxing'
 
@@ -57,6 +58,9 @@ export function paipan(req: PaipanRequest): PaipanResult {
         offsetMinutes: Math.round(r.offsetMinutes),
         eotMinutes: Math.round(r.eotMinutes * 10) / 10,
         longitude: lng,
+        originalShichen: timeToShichen(base.getHours()),
+        adjustedShichen: timeToShichen(r.adjusted.getHours()),
+        boundaryChanged: timeToShichen(base.getHours()) !== timeToShichen(r.adjusted.getHours()),
       }
     }
   }
@@ -80,6 +84,13 @@ export function paipan(req: PaipanRequest): PaipanResult {
     pillars[key].shenSha = shenSha[key]
   }
 
+  const shenShaRef: ShenShaRef = {
+    yearZhi: pillars.year.zhi,
+    dayZhi: pillars.day.zhi,
+    dayGan: pillars.day.gan,
+    dayXunKong: ec.getDayXunKong(),
+  }
+
   const wuXing: PaipanResult['wuXing'] = { jin: 0, mu: 0, shui: 0, huo: 0, tu: 0 }
   for (const key of ['year', 'month', 'day', 'time'] as const) {
     wuXing[wuxingOfGan(pillars[key].gan)] += 1
@@ -98,8 +109,15 @@ export function paipan(req: PaipanRequest): PaipanResult {
         ganZhi: d.getGanZhi(),
         yearRange: `${startYear} - ${startYear + 10}`,
         isCurrent: startYear <= now.getFullYear() && now.getFullYear() < startYear + 10,
+        shenSha: computeExternalShenSha(shenShaRef, d.getGanZhi()),
       }
     })
+
+  const currentYearGanZhi = today.getYearInGanZhiExact()
+  const currentLiuNian: LiuNianInfo = {
+    ganZhi: currentYearGanZhi,
+    shenSha: computeExternalShenSha(shenShaRef, currentYearGanZhi),
+  }
 
   return {
     solarText: solar.toYmdHms().slice(0, 16),
@@ -109,7 +127,8 @@ export function paipan(req: PaipanRequest): PaipanResult {
     pillars,
     wuXing,
     daYun,
-    currentYearGanZhi: `${today.getYearInGanZhiExact()}年 ${today.getMonthInGanZhiExact()}月 ${today.getDayInGanZhiExact()}日`,
+    currentYearGanZhi: `${currentYearGanZhi}年 ${today.getMonthInGanZhiExact()}月 ${today.getDayInGanZhiExact()}日`,
+    currentLiuNian,
     trueSolar,
   }
 }

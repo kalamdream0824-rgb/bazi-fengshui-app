@@ -70,5 +70,25 @@ describe('baziMapper.paipan 结构完整性', () => {
     expect(withTrueSolar.pillars.time.gan + withTrueSolar.pillars.time.zhi).toBe('丙午')
     expect(withTrueSolar.trueSolar?.longitude).toBe(114.05)
     expect(withTrueSolar.trueSolar?.adjusted).toContain('12:54')
+    expect(withTrueSolar.trueSolar?.boundaryChanged).toBe(true)
+    expect(withTrueSolar.trueSolar?.originalShichen).toBe('未')
+    expect(withTrueSolar.trueSolar?.adjustedShichen).toBe('午')
+  })
+
+  it('真太阳时未跨边界时 boundaryChanged 为 false', () => {
+    const result = paipan({
+      gender: 'male',
+      solarDateTime: '1995-10-08T14:30:00',
+      trueSolarTime: true,
+      birthPlace: '广东省 深圳市',
+    })
+    expect(result.trueSolar?.boundaryChanged).toBe(false)
+  })
+
+  it('大运神煞与当年流年神煞已计算', () => {
+    const result = paipan({ gender: 'male', solarDateTime: '1995-10-08T14:30:00', trueSolarTime: false })
+    expect(result.daYun[0].shenSha).toEqual(expect.arrayContaining(['劫煞']))
+    expect(result.currentLiuNian?.ganZhi).toBeTruthy()
+    expect(Array.isArray(result.currentLiuNian?.shenSha)).toBe(true)
   })
 })
