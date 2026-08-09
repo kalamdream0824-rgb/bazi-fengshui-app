@@ -41,7 +41,13 @@ export interface DateTimeValue {
 
 export function parseInput(value: string): DateTimeValue {
   const now = new Date()
-  const fallback: DateTimeValue = { y: now.getFullYear(), m: now.getMonth() + 1, d: now.getDate(), h: now.getHours(), min: now.getMinutes() }
+  const fallback: DateTimeValue = {
+    y: now.getFullYear(),
+    m: now.getMonth() + 1,
+    d: now.getDate(),
+    h: now.getHours(),
+    min: now.getMinutes(),
+  }
   if (!value) return fallback
   const [datePart, timePart = '00:00'] = value.split('T')
   const [y, m, d] = datePart.split('-').map(Number)

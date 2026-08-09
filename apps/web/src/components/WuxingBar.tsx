@@ -10,7 +10,10 @@ export function WuxingBar({ wuXing }: { wuXing: Record<WuxingKey, number> }) {
       {ORDER.map((key) => (
         <div key={key} className="wx">
           <div className="bar">
-            <i className={`wuxing-${key}`} style={{ width: `${(wuXing[key] / max) * 100}%`, background: 'currentColor' }} />
+            <i
+              className={`wuxing-${key}`}
+              style={{ width: `${(wuXing[key] / max) * 100}%`, background: 'currentColor' }}
+            />
           </div>
           <div className={`char wuxing-${key}`}>{WUXING_LABEL[key]}</div>
           <div className="n">{wuXing[key]}</div>

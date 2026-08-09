@@ -44,7 +44,9 @@ describe('historyStore', () => {
 
   it('导入按「性别+出生时间+姓名」去重', async () => {
     await addHistory(reqA, paipan(reqA))
-    const dup = backupToRecords(historyToBackup([{ request: reqA, result: paipan(reqA), createdAt: new Date().toISOString() }]))
+    const dup = backupToRecords(
+      historyToBackup([{ request: reqA, result: paipan(reqA), createdAt: new Date().toISOString() }]),
+    )
     const res = await importHistory(dup)
     expect(res.added).toBe(0)
     expect(res.skipped).toBe(1)

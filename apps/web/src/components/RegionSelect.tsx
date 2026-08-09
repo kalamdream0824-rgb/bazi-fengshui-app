@@ -13,12 +13,7 @@ export function RegionSelect({ value, onChange }: RegionSelectProps) {
 
   return (
     <div className="region-row">
-      <select
-        className="input-box"
-        value={province}
-        aria-label="省份"
-        onChange={(e) => onChange(e.target.value || '')}
-      >
+      <select className="input-box" value={province} aria-label="省份" onChange={(e) => onChange(e.target.value || '')}>
         <option value="">请选择省份</option>
         {REGIONS.map((r) => (
           <option key={r.province} value={r.province}>

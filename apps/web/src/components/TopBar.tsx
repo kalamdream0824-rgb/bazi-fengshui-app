@@ -12,7 +12,16 @@ export function TopBar({ title, onBack, right }: TopBarProps) {
   return (
     <div className="top">
       <button className="icon-btn" aria-label="返回" onClick={onBack ?? (() => navigate(-1))}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <path d="M19 12H5" />
           <path d="m12 19-7-7 7-7" />
         </svg>

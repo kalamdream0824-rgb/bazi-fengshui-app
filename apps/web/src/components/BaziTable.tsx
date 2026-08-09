@@ -42,9 +42,7 @@ export function BaziTable({ pillars }: BaziTableProps) {
                 <td key={k}>
                   <span
                     className={`ss ${k === 'day' ? 'owner' : 'tipable'}`}
-                    onClick={
-                      k === 'day' ? undefined : () => setTip({ title: pillars[k].shiShen, text: TIPS['主星'] })
-                    }
+                    onClick={k === 'day' ? undefined : () => setTip({ title: pillars[k].shiShen, text: TIPS['主星'] })}
                   >
                     {pillars[k].shiShen}
                   </span>

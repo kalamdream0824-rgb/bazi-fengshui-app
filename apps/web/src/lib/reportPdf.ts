@@ -32,7 +32,9 @@ export function buildReportHtml(request: PaipanRequest, result: PaipanResult): s
   const today = new Date().toLocaleDateString('zh-CN')
 
   const wuxingRow = (['jin', 'mu', 'shui', 'huo', 'tu'] as WuxingKey[])
-    .map((k) => `<td style="padding:8px 4px;text-align:center;font-size:13px">${WUXING_LABEL[k]} ${result.wuXing[k]}</td>`)
+    .map(
+      (k) => `<td style="padding:8px 4px;text-align:center;font-size:13px">${WUXING_LABEL[k]} ${result.wuXing[k]}</td>`,
+    )
     .join('')
 
   return `

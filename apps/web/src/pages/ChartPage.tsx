@@ -27,7 +27,16 @@ export function ChartPage() {
         onBack={() => navigate('/input')}
         right={
           <button className="icon-btn" aria-label="分享" onClick={() => toast('分享功能规划中')}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <circle cx="18" cy="5" r="3" />
               <circle cx="6" cy="12" r="3" />
               <circle cx="18" cy="19" r="3" />
@@ -54,11 +63,20 @@ export function ChartPage() {
             ) : null}
             {result.trueSolar?.boundaryChanged ? (
               <div className="meta-line" style={{ marginTop: 3, color: 'var(--red)' }}>
-                校正后时辰由 {result.trueSolar.originalShichen} 时变为 {result.trueSolar.adjustedShichen} 时，排盘已按校正后时辰计算
+                校正后时辰由 {result.trueSolar.originalShichen} 时变为 {result.trueSolar.adjustedShichen}{' '}
+                时，排盘已按校正后时辰计算
               </div>
             ) : null}
           </div>
-          <span className="chip" style={{ background: 'rgba(184,144,74,.12)', borderColor: 'rgba(184,144,74,.35)', color: '#8a6a2f', margin: 0 }}>
+          <span
+            className="chip"
+            style={{
+              background: 'rgba(184,144,74,.12)',
+              borderColor: 'rgba(184,144,74,.35)',
+              color: '#8a6a2f',
+              margin: 0,
+            }}
+          >
             生肖 {result.shengXiao}
           </span>
         </div>

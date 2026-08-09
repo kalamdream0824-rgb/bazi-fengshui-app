@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { buildYears, daysInMonth, formatDateTime, pad2, parseInput, timeToShichen, type DateTimeValue } from '@/lib/datePicker'
+import {
+  buildYears,
+  daysInMonth,
+  formatDateTime,
+  pad2,
+  parseInput,
+  timeToShichen,
+  type DateTimeValue,
+} from '@/lib/datePicker'
 
 const ITEM_HEIGHT = 36
 const WHEEL_HEIGHT = 180
@@ -18,7 +26,6 @@ function Wheel({ options, value, label, onChange }: WheelProps) {
   useEffect(() => {
     const el = ref.current
     if (el) el.scrollTop = index * ITEM_HEIGHT
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index])
 
   const handleScroll = () => {
@@ -56,7 +63,10 @@ export function DateTimePicker({ value, onChange }: DateTimePickerProps) {
 
   const years = useMemo(() => buildYears().map(String), [])
   const months = useMemo(() => Array.from({ length: 12 }, (_, i) => String(i + 1)), [])
-  const days = useMemo(() => Array.from({ length: daysInMonth(temp.y, temp.m) }, (_, i) => String(i + 1)), [temp.y, temp.m])
+  const days = useMemo(
+    () => Array.from({ length: daysInMonth(temp.y, temp.m) }, (_, i) => String(i + 1)),
+    [temp.y, temp.m],
+  )
   const hours = useMemo(() => Array.from({ length: 24 }, (_, i) => pad2(i)), [])
   const minutes = useMemo(() => Array.from({ length: 60 }, (_, i) => pad2(i)), [])
 
@@ -85,16 +95,45 @@ export function DateTimePicker({ value, onChange }: DateTimePickerProps) {
         <div className="picker-mask" onClick={() => setOpen(false)}>
           <div className="picker-panel" onClick={(e) => e.stopPropagation()}>
             <div className="picker-head">
-              <button type="button" onClick={() => setOpen(false)}>取消</button>
+              <button type="button" onClick={() => setOpen(false)}>
+                取消
+              </button>
               <span>出生时间</span>
-              <button type="button" onClick={confirm}>确定</button>
+              <button type="button" onClick={confirm}>
+                确定
+              </button>
             </div>
             <div className="wheels">
-              <Wheel options={years} value={String(temp.y)} label="年" onChange={(v) => setTemp((t) => ({ ...t, y: Number(v) }))} />
-              <Wheel options={months} value={String(temp.m)} label="月" onChange={(v) => setTemp((t) => ({ ...t, m: Number(v) }))} />
-              <Wheel options={days} value={String(temp.d)} label="日" onChange={(v) => setTemp((t) => ({ ...t, d: Number(v) }))} />
-              <Wheel options={hours} value={pad2(temp.h)} label="时" onChange={(v) => setTemp((t) => ({ ...t, h: Number(v) }))} />
-              <Wheel options={minutes} value={pad2(temp.min)} label="分" onChange={(v) => setTemp((t) => ({ ...t, min: Number(v) }))} />
+              <Wheel
+                options={years}
+                value={String(temp.y)}
+                label="年"
+                onChange={(v) => setTemp((t) => ({ ...t, y: Number(v) }))}
+              />
+              <Wheel
+                options={months}
+                value={String(temp.m)}
+                label="月"
+                onChange={(v) => setTemp((t) => ({ ...t, m: Number(v) }))}
+              />
+              <Wheel
+                options={days}
+                value={String(temp.d)}
+                label="日"
+                onChange={(v) => setTemp((t) => ({ ...t, d: Number(v) }))}
+              />
+              <Wheel
+                options={hours}
+                value={pad2(temp.h)}
+                label="时"
+                onChange={(v) => setTemp((t) => ({ ...t, h: Number(v) }))}
+              />
+              <Wheel
+                options={minutes}
+                value={pad2(temp.min)}
+                label="分"
+                onChange={(v) => setTemp((t) => ({ ...t, min: Number(v) }))}
+              />
               <div className="picker-highlight" />
             </div>
             <div className="picker-hint">

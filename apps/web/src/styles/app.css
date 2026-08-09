@@ -23,8 +23,7 @@ button {
   margin: 0 auto;
   background:
     radial-gradient(150% 70% at 100% 0%, rgba(184, 144, 74, 0.09), transparent 46%),
-    radial-gradient(120% 60% at 0% 100%, rgba(63, 111, 92, 0.05), transparent 42%),
-    var(--paper);
+    radial-gradient(120% 60% at 0% 100%, rgba(63, 111, 92, 0.05), transparent 42%), var(--paper);
   box-shadow: 0 0 40px rgba(47, 37, 28, 0.12);
   padding-bottom: 72px;
   position: relative;
@@ -52,7 +51,9 @@ button {
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 6px rgba(47, 37, 28, 0.06);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
 }
 .icon-btn:active {
   transform: scale(0.94);
@@ -98,7 +99,7 @@ button {
   padding: 14px 16px 8px;
 }
 .sec-title::before {
-  content: "";
+  content: '';
   width: 3px;
   height: 13px;
   border-radius: 2px;
@@ -131,7 +132,9 @@ button {
   border: 1px solid var(--gold);
   background: var(--card);
   color: var(--ink);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
   text-decoration: none;
   display: inline-block;
 }
@@ -213,7 +216,7 @@ button {
   transition: background 0.18s ease;
 }
 .sw::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 3px;
   left: 3px;
@@ -388,11 +391,21 @@ button {
 }
 
 /* 五行颜色 */
-.wuxing-wood { color: var(--wood); }
-.wuxing-metal { color: var(--metal); }
-.wuxing-water { color: var(--water); }
-.wuxing-fire { color: var(--fire); }
-.wuxing-earth { color: var(--earth); }
+.wuxing-wood {
+  color: var(--wood);
+}
+.wuxing-metal {
+  color: var(--metal);
+}
+.wuxing-water {
+  color: var(--water);
+}
+.wuxing-fire {
+  color: var(--fire);
+}
+.wuxing-earth {
+  color: var(--earth);
+}
 
 /* 五行占比 */
 .wuxing {
@@ -599,8 +612,12 @@ button {
 }
 select.input-box {
   appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, var(--ink-3) 50%), linear-gradient(135deg, var(--ink-3) 50%, transparent 50%);
-  background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ink-3) 50%),
+    linear-gradient(135deg, var(--ink-3) 50%, transparent 50%);
+  background-position:
+    calc(100% - 16px) 50%,
+    calc(100% - 11px) 50%;
   background-size: 5px 5px;
   background-repeat: no-repeat;
   padding-right: 28px;

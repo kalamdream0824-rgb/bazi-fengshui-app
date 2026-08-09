@@ -64,7 +64,12 @@ export function HistoryPage() {
       {isLoading ? (
         <div className="placeholder">加载中…</div>
       ) : records.length === 0 ? (
-        <EmptyState title="暂无排盘记录" hint="去排一次盘，记录会自动保存在本地" linkTo="/input" linkText="去排一次盘" />
+        <EmptyState
+          title="暂无排盘记录"
+          hint="去排一次盘，记录会自动保存在本地"
+          linkTo="/input"
+          linkText="去排一次盘"
+        />
       ) : (
         <Card>
           <CardTitle hint={`共 ${records.length} 条`}>排盘记录</CardTitle>
@@ -82,7 +87,14 @@ export function HistoryPage() {
                     e.stopPropagation()
                     void handleDelete(record.id as number)
                   }}
-                  style={{ border: '1px solid var(--line)', background: 'var(--card)', borderRadius: 8, width: 30, height: 30, color: 'var(--ink-3)' }}
+                  style={{
+                    border: '1px solid var(--line)',
+                    background: 'var(--card)',
+                    borderRadius: 8,
+                    width: 30,
+                    height: 30,
+                    color: 'var(--ink-3)',
+                  }}
                 >
                   ×
                 </button>
@@ -94,14 +106,22 @@ export function HistoryPage() {
 
       {records.length > 0 && (
         <ButtonRow>
-          <Button variant="primary" onClick={handleExport}>导出全部</Button>
+          <Button variant="primary" onClick={handleExport}>
+            导出全部
+          </Button>
           <Button onClick={() => fileRef.current?.click()} disabled={importing}>
             {importing ? '导入中…' : '导入备份'}
           </Button>
           <Button onClick={() => navigate('/input')}>去排盘</Button>
         </ButtonRow>
       )}
-      <input ref={fileRef} type="file" accept="application/json,.json" style={{ display: 'none' }} onChange={handleImportFile} />
+      <input
+        ref={fileRef}
+        type="file"
+        accept="application/json,.json"
+        style={{ display: 'none' }}
+        onChange={handleImportFile}
+      />
       <FooterNote>本地历史仅保存在当前浏览器，建议定期导出备份</FooterNote>
     </>
   )

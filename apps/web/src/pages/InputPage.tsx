@@ -67,7 +67,12 @@ export function InputPage() {
         <CardTitle>基本信息</CardTitle>
         <div className="field">
           <div className="lbl">姓名（选填）</div>
-          <input className="input-box" value={name} placeholder="请输入姓名" onChange={(e) => setName(e.target.value)} />
+          <input
+            className="input-box"
+            value={name}
+            placeholder="请输入姓名"
+            onChange={(e) => setName(e.target.value)}
+          />
         </div>
         <div className="field">
           <div className="lbl">性别</div>

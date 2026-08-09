@@ -95,7 +95,10 @@ export function dailyFortune(result: PaipanResult | null, almanac: AlmanacInfo):
 
   const luckyColor = LUCKY_COLOR[GAN_WUXING[almanac.ganZhi[0]]] ?? '—'
   const direction = almanac.positionFu || '—'
-  const tip = [almanac.pengZu ? `彭祖百忌：${almanac.pengZu}` : '', almanac.chongDesc ? `冲煞：${almanac.chongDesc} · 煞${almanac.sha}` : '']
+  const tip = [
+    almanac.pengZu ? `彭祖百忌：${almanac.pengZu}` : '',
+    almanac.chongDesc ? `冲煞：${almanac.chongDesc} · 煞${almanac.sha}` : '',
+  ]
     .filter(Boolean)
     .join('；')
 

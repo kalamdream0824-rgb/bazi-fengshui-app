@@ -65,7 +65,14 @@ export function paipan(req: PaipanRequest): PaipanResult {
     }
   }
 
-  const solar = Solar.fromYmdHms(solarDate.getFullYear(), solarDate.getMonth() + 1, solarDate.getDate(), solarDate.getHours(), solarDate.getMinutes(), 0)
+  const solar = Solar.fromYmdHms(
+    solarDate.getFullYear(),
+    solarDate.getMonth() + 1,
+    solarDate.getDate(),
+    solarDate.getHours(),
+    solarDate.getMinutes(),
+    0,
+  )
   const lunar = solar.getLunar()
   const ec = lunar.getEightChar()
 
@@ -73,10 +80,46 @@ export function paipan(req: PaipanRequest): PaipanResult {
   const today = Lunar.fromDate(now)
 
   const pillars: PaipanResult['pillars'] = {
-    year: toPillar('year', ec.getYearGan(), ec.getYearZhi(), ec.getYearShiShenGan(), ec.getYearHideGan(), ec.getYearNaYin(), ec.getYearDiShi(), ec.getYearXunKong()),
-    month: toPillar('month', ec.getMonthGan(), ec.getMonthZhi(), ec.getMonthShiShenGan(), ec.getMonthHideGan(), ec.getMonthNaYin(), ec.getMonthDiShi(), ec.getMonthXunKong()),
-    day: toPillar('day', ec.getDayGan(), ec.getDayZhi(), '日主', ec.getDayHideGan(), ec.getDayNaYin(), ec.getDayDiShi(), ec.getDayXunKong()),
-    time: toPillar('time', ec.getTimeGan(), ec.getTimeZhi(), ec.getTimeShiShenGan(), ec.getTimeHideGan(), ec.getTimeNaYin(), ec.getTimeDiShi(), ec.getTimeXunKong()),
+    year: toPillar(
+      'year',
+      ec.getYearGan(),
+      ec.getYearZhi(),
+      ec.getYearShiShenGan(),
+      ec.getYearHideGan(),
+      ec.getYearNaYin(),
+      ec.getYearDiShi(),
+      ec.getYearXunKong(),
+    ),
+    month: toPillar(
+      'month',
+      ec.getMonthGan(),
+      ec.getMonthZhi(),
+      ec.getMonthShiShenGan(),
+      ec.getMonthHideGan(),
+      ec.getMonthNaYin(),
+      ec.getMonthDiShi(),
+      ec.getMonthXunKong(),
+    ),
+    day: toPillar(
+      'day',
+      ec.getDayGan(),
+      ec.getDayZhi(),
+      '日主',
+      ec.getDayHideGan(),
+      ec.getDayNaYin(),
+      ec.getDayDiShi(),
+      ec.getDayXunKong(),
+    ),
+    time: toPillar(
+      'time',
+      ec.getTimeGan(),
+      ec.getTimeZhi(),
+      ec.getTimeShiShenGan(),
+      ec.getTimeHideGan(),
+      ec.getTimeNaYin(),
+      ec.getTimeDiShi(),
+      ec.getTimeXunKong(),
+    ),
   }
 
   const shenSha = computeShenSha(pillars, ec.getDayXunKong())

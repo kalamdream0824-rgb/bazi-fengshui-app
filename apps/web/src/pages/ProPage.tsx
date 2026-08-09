@@ -24,8 +24,18 @@ export function ProPage() {
     <>
       <TopBar title="专业细盘" />
 
-      <div style={{ margin: '4px 14px 10px', fontSize: 12, color: 'var(--ink-3)', display: 'flex', justifyContent: 'space-between' }}>
-        <span>当前大运 <b style={{ color: 'var(--ink)' }}>{currentDaYun?.ganZhi ?? '—'}</b></span>
+      <div
+        style={{
+          margin: '4px 14px 10px',
+          fontSize: 12,
+          color: 'var(--ink-3)',
+          display: 'flex',
+          justifyContent: 'space-between',
+        }}
+      >
+        <span>
+          当前大运 <b style={{ color: 'var(--ink)' }}>{currentDaYun?.ganZhi ?? '—'}</b>
+        </span>
         <span>{result.currentYearGanZhi}</span>
       </div>
 
@@ -72,12 +82,26 @@ export function ProPage() {
             {(['year', 'month', 'day', 'time'] as const).map((key) => {
               const p = result.pillars[key]
               return (
-                <div key={key} style={{ textAlign: 'center', border: '1px solid var(--line)', borderRadius: 10, padding: '8px 2px', background: '#faf5e8' }}>
-                  <div className="meta-line">{key === 'year' ? '年' : key === 'month' ? '月' : key === 'day' ? '日' : '时'}柱 · {p.gan}{p.zhi}</div>
+                <div
+                  key={key}
+                  style={{
+                    textAlign: 'center',
+                    border: '1px solid var(--line)',
+                    borderRadius: 10,
+                    padding: '8px 2px',
+                    background: '#faf5e8',
+                  }}
+                >
+                  <div className="meta-line">
+                    {key === 'year' ? '年' : key === 'month' ? '月' : key === 'day' ? '日' : '时'}柱 · {p.gan}
+                    {p.zhi}
+                  </div>
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700, marginTop: 4 }}>
                     {p.shiShen}
                   </div>
-                  <div className="meta-line" style={{ marginTop: 4 }}>{WUXING_LABEL[GAN_WUXING[p.gan]]}</div>
+                  <div className="meta-line" style={{ marginTop: 4 }}>
+                    {WUXING_LABEL[GAN_WUXING[p.gan]]}
+                  </div>
                 </div>
               )
             })}
@@ -88,7 +112,9 @@ export function ProPage() {
       {panel === 'shensha' && (
         <>
           <Card>
-            <CardTitle hint="大运/流年干支对照原局 · 口径见设计文档">流年神煞（2026 · {result.currentLiuNian?.ganZhi ?? '—'}）</CardTitle>
+            <CardTitle hint="大运/流年干支对照原局 · 口径见设计文档">
+              流年神煞（2026 · {result.currentLiuNian?.ganZhi ?? '—'}）
+            </CardTitle>
             <div style={{ padding: '0 16px 14px', fontSize: 13 }}>
               {result.currentLiuNian?.shenSha.join('·') || '—'}
             </div>

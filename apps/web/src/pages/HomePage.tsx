@@ -41,7 +41,16 @@ export function HomePage() {
           八字排盘
         </div>
         <button className="icon-btn" aria-label="设置" onClick={() => toast('设置功能规划中')}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <circle cx="12" cy="12" r="3" />
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
           </svg>
@@ -49,7 +58,9 @@ export function HomePage() {
       </div>
 
       <div className="hero">
-        <div className="date">{day === 'today' ? '今日' : '明日'} · {info.dateText}</div>
+        <div className="date">
+          {day === 'today' ? '今日' : '明日'} · {info.dateText}
+        </div>
         <div className="gz">{info.ganZhi}</div>
         <SegControl
           two
@@ -63,10 +74,14 @@ export function HomePage() {
         />
         <div>
           {alm.yi.slice(0, 4).map((t) => (
-            <span key={t} className="chip">宜 {t}</span>
+            <span key={t} className="chip">
+              宜 {t}
+            </span>
           ))}
           {alm.ji.slice(0, 3).map((t) => (
-            <span key={t} className="chip no">忌 {t}</span>
+            <span key={t} className="chip no">
+              忌 {t}
+            </span>
           ))}
         </div>
         <div className="meta-line" style={{ marginTop: 8, color: 'rgba(255,246,232,.85)' }}>
@@ -100,7 +115,11 @@ export function HomePage() {
             />
           ))
         ) : (
-          <RecordRow title="暂无排盘记录" subtitle="去排一次，查看你的四柱八字" onClick={() => void navigate('/input')} />
+          <RecordRow
+            title="暂无排盘记录"
+            subtitle="去排一次，查看你的四柱八字"
+            onClick={() => void navigate('/input')}
+          />
         )}
       </Card>
 

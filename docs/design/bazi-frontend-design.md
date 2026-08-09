@@ -2,7 +2,7 @@
 
 | 项目 | 内容 |
 |---|---|
-| 文档版本 | v0.11（已实现：M0.5 + M0.8 + 表单组件 + 真太阳时 + A2 神煞 + A1 命书 PDF + A3 合婚规则完善 + A4a 本地历史 + B0 工程加固 + C1 + C2 真实黄历/运势文案） |
+| 文档版本 | v0.12（已实现：M0.5 + M0.8 + 表单组件 + 真太阳时 + A2-A4 + B0 + C1 + C2；工程：lint/prettier） |
 | 日期 | 2026-08-08 |
 | 适用范围 | 前端（apps/web）开发 |
 | 关联文档 | [产品图文档](/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/bazi-app-mockups.md)、[PRD](/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/bazi-fengshui-app-PRD.md)、[设计哲学](/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/design-philosophy.md) |
@@ -179,6 +179,13 @@ bazi-fengshui-app/
 - **合规红线（方案 A）**：文案一律"温和参考"语气，不出现绝对化预测（不写"大凶/必发财"）；保留"仅供传统文化研究参考"；无命盘时首页只显示黄历、不做个性化运势；不做医疗/投资/婚姻确定性建议。
 - 页面：首页宜忌 chips 换真实黄历（含冲煞）；每日运势页星级/宜忌/指引接真实数据，去掉"示例"标注。
 - 实现：`lib/almanac.ts` 取 lunar 黄历（宜/忌/冲/煞/值星/彭祖/福神方位）；`lib/dailyFortune.ts` 规则引擎（十神主题 + 五行基调 + 值星 + 生肖冲 + 彭祖 → 星级/文案/幸运色/方位）；首页与运势页接入，无命盘时仅黄历参考（测试 60/60）。
+
+## 15. 工程规范：ESLint + Prettier ✅ 已交付
+
+- ESLint 9 系 flat config（`eslint.config.js`）：`@eslint/js` + `typescript-eslint` + `react-hooks` + `react-refresh`，并挂 `eslint-config-prettier` 关闭冲突规则；`npm run lint` / `lint:fix`。
+- Prettier（`.prettierrc.json`：无分号、单引号、120 列、尾逗号 all）；`npm run format` / `format:check`。
+- **TypeScript 由 7.0.2 降至 6.0.3**：typescript-eslint 尚不支持 TS7（peer 上限 <6.1），为兼容主流工具链主动降级，代码与构建不受影响。
+- CI 增加 lint 步骤；`npm run lint` 当前 0 问题。
 
 - v0.1（2026-08-08）：建立前端技术设计基线。
 - v0.2（2026-08-08）：整合 M0.5/M0.8 实现状态——8 模块全部可走通；记录实际技术版本、领域逻辑（compRules/settings/getGanZhiFor）、样式偏差、测试与里程碑状态、剩余工作。

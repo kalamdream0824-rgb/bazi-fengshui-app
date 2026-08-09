@@ -66,20 +66,23 @@ export function ReportPage() {
             >
               命
             </div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: 30, fontWeight: 700, letterSpacing: 14 }}>命 书</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 30, fontWeight: 700, letterSpacing: 14 }}>
+              命 书
+            </div>
             <div style={{ marginTop: 12, fontSize: 12, opacity: 0.9 }}>
               {request?.name || '示例'} · <b>{request?.gender === 'male' ? '乾造' : '坤造'}</b>
             </div>
-            <div style={{ marginTop: 4, fontSize: 11, opacity: 0.75 }}>
-              {result.lunarText} · 共 12 页（示例）
-            </div>
+            <div style={{ marginTop: 4, fontSize: 11, opacity: 0.75 }}>{result.lunarText} · 共 12 页（示例）</div>
           </div>
 
           <Card>
             <CardTitle>目录</CardTitle>
             {TOC.map(([num, title, page]) => (
               <div className="row" key={num}>
-                <span className="k"><span style={{ color: 'var(--red)', fontWeight: 700, marginRight: 6 }}>{num}</span>{title}</span>
+                <span className="k">
+                  <span style={{ color: 'var(--red)', fontWeight: 700, marginRight: 6 }}>{num}</span>
+                  {title}
+                </span>
                 <span className="v">{page}</span>
               </div>
             ))}
@@ -87,10 +90,23 @@ export function ReportPage() {
 
           <Card>
             <CardTitle hint="真实排盘数据">样张预览 · 命盘概览</CardTitle>
-            <div style={{ margin: '0 16px 14px', fontSize: 12, color: 'var(--ink-2)', lineHeight: 1.9, background: '#faf5e8', borderRadius: 10, padding: '10px 12px' }}>
-              日主{result.pillars.day.gan}（{WUXING_LABEL[GAN_WUXING[result.pillars.day.gan]]}），
-              四柱 {result.pillars.year.gan}{result.pillars.year.zhi} {result.pillars.month.gan}{result.pillars.month.zhi} {result.pillars.day.gan}{result.pillars.day.zhi} {result.pillars.time.gan}{result.pillars.time.zhi}，
-              日柱纳音 {result.pillars.day.naYin}。完整解读见正式命书（示例版式）。
+            <div
+              style={{
+                margin: '0 16px 14px',
+                fontSize: 12,
+                color: 'var(--ink-2)',
+                lineHeight: 1.9,
+                background: '#faf5e8',
+                borderRadius: 10,
+                padding: '10px 12px',
+              }}
+            >
+              日主{result.pillars.day.gan}（{WUXING_LABEL[GAN_WUXING[result.pillars.day.gan]]}）， 四柱{' '}
+              {result.pillars.year.gan}
+              {result.pillars.year.zhi} {result.pillars.month.gan}
+              {result.pillars.month.zhi} {result.pillars.day.gan}
+              {result.pillars.day.zhi} {result.pillars.time.gan}
+              {result.pillars.time.zhi}， 日柱纳音 {result.pillars.day.naYin}。完整解读见正式命书（示例版式）。
             </div>
           </Card>
 
