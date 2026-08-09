@@ -1,19 +1,6 @@
-server:
-  port: 8080
-
 spring:
-  datasource:
-    url: jdbc:h2:mem:bazi;MODE=MySQL;DB_CLOSE_DELAY=-1
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: ""
-  sql:
-    init:
-      mode: always
-      schema-locations: classpath:schema.sql
-  h2:
-    console:
-      enabled: true
+  profiles:
+    default: dev
 
 mybatis-plus:
   configuration:
@@ -21,5 +8,11 @@ mybatis-plus:
 
 app:
   jwt:
-    secret: "dev-secret-change-me-0123456789abcdef0123456789abcdef"
-    expire-hours: 720
+    secret: ${APP_JWT_SECRET:dev-secret-change-me-0123456789abcdef0123456789abcdef}
+    expire-hours: ${APP_JWT_EXPIRE_HOURS:720}
+  security:
+    login:
+      max-attempts: ${APP_LOGIN_MAX_ATTEMPTS:5}
+      lock-minutes: ${APP_LOGIN_LOCK_MINUTES:5}
+  cors:
+    allowed-origins: ${APP_CORS_ORIGINS:http://localhost:5173}

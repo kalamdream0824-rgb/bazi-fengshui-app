@@ -2,7 +2,7 @@
 
 | 项目 | 内容 |
 |---|---|
-| 版本 | v0.3（账号 + 云同步已交付） |
+| 版本 | v0.4（P0 安全与测试加固已交付） |
 | 日期 | 2026-08-09 |
 | 关联 | 契约 `contracts/openapi.yaml`；前端 `frontend-design.md`；文档索引 `README.md` |
 
@@ -11,6 +11,7 @@
 - ✅ 排盘 API：lunar-java 出盘，响应与前端 `PaipanResult` 字段对应（camelCase）；**fixtures 一致性测试通过**（lunar-java vs lunar-javascript 关键字段一致）。
 - ✅ 历史记录存储：`bazi_record` 表 + POST/GET/GET-by-id 接口。
 - ✅ 账号体系：注册/登录（BCrypt 密码哈希 + JWT），记录按用户隔离（`user_id`），创建去重，支持 DELETE。
+- ✅ **P0 加固**：配置分层（dev/prod profile，JWT secret 环境变量注入，prod 必填）；CORS 可配置；登录失败限流（5 次锁 5 分钟，429）；MockMvc 集成测试覆盖认证/去重/隔离/删除全链路。
 - ✅ 环境：Maven 3.9.11 已装；开发库 H2（MySQL 切换仅改 datasource 配置）。
 - ⚠️ 神煞 / 真太阳时：**后端第一版不实现**——前端 `HttpBaziApi` 用与 Mock 同一套规则补充（`enrichResult` / `adjustRequestForTrueSolar`），保持结果一致；后续需要可下沉。
 - ⏸️ 合婚 / 运势文案：前端保留，不在本端实现。
@@ -90,6 +91,7 @@ CREATE TABLE bazi_user (
 
 ## 8. 变更日志
 
+- v0.4（2026-08-09）：P0 交付——配置分层与安全底线（secret 环境变量、CORS 可配置、MySQL 驱动）、登录防爆破、控制器集成测试（后端测试 8/8）。
 - v0.3.1（2026-08-09）：标记会员/支付为待办（资质前置），当前不实现支付通道。
 - v0.3（2026-08-09）：账号 + 云同步交付——注册/登录（JWT + BCrypt）、记录按用户隔离与去重、DELETE 接口；前端登录页与历史云同步（后端测试 5/5，前端 64/64）。
 - v0.2（2026-08-09）：骨架交付——排盘服务 + 记录接口 + fixtures 一致性测试通过；明确神煞/真太阳时由前端补充。

@@ -28,6 +28,12 @@ public class GlobalExceptionHandler {
     return Map.of("code", "BAD_REQUEST", "message", e.getMessage());
   }
 
+  @ExceptionHandler(TooManyRequestsException.class)
+  @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+  public Map<String, String> handleTooManyRequests(TooManyRequestsException e) {
+    return Map.of("code", "RATE_LIMITED", "message", e.getMessage());
+  }
+
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public Map<String, String> handleGeneric(Exception e) {
