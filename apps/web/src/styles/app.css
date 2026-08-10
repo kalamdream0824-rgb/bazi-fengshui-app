@@ -740,6 +740,13 @@ select.input-box {
   padding: 6px 16px 2px;
   letter-spacing: 1px;
 }
+.share-img {
+  display: block;
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  margin-bottom: 4px;
+}
 .note {
   font-size: 11px;
   color: var(--ink-3);

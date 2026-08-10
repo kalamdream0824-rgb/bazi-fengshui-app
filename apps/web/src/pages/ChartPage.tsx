@@ -1,19 +1,20 @@
+import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { Button, ButtonRow } from '@/components/Button'
 import { Card, CardTitle } from '@/components/Card'
 import { BaziTable } from '@/components/BaziTable'
 import { FooterNote } from '@/components/FooterNote'
+import { ShareSheet } from '@/components/ShareSheet'
 import { TopBar } from '@/components/TopBar'
 import { WuxingBar } from '@/components/WuxingBar'
-import { downloadImage, shareBazi } from '@/lib/share'
+import { prepareShare, type PreparedShare } from '@/lib/share'
 import { useBaziStore } from '@/store/useBaziStore'
-import { useToastStore } from '@/store/useToastStore'
 
 export function ChartPage() {
   const navigate = useNavigate()
-  const toast = useToastStore((s) => s.show)
   const request = useBaziStore((s) => s.request)
   const result = useBaziStore((s) => s.result)
+  const [share, setShare] = useState<PreparedShare | null>(null)
 
   if (!request || !result) {
     return <Navigate to="/input" replace />
@@ -31,15 +32,7 @@ export function ChartPage() {
             className="icon-btn"
             aria-label="分享"
             onClick={async () => {
-              const res = await shareBazi(request, result)
-              if (res.mode === 'native') {
-                toast('已唤起系统分享')
-              } else if (res.mode === 'copy' && res.imageUrl) {
-                downloadImage(res.imageUrl, `排盘-${request.name || '示例'}.jpg`)
-                toast('文案已复制，分享卡片图已保存')
-              } else {
-                toast('分享卡片图已生成，可保存')
-              }
+              setShare(await prepareShare(request, result))
             }}
           >
             <svg
@@ -120,6 +113,13 @@ export function ChartPage() {
         <Button onClick={() => navigate('/comp')}>合婚</Button>
         <Button onClick={() => navigate('/daily')}>每日运势</Button>
       </ButtonRow>
+      <ShareSheet
+        open={Boolean(share)}
+        imageUrl={share?.imageUrl ?? ''}
+        text={share?.text ?? ''}
+        filename={`排盘-${request.name || '示例'}.jpg`}
+        onClose={() => setShare(null)}
+      />
       <FooterNote>排盘数据仅供传统文化研究参考</FooterNote>
     </>
   )

@@ -84,22 +84,41 @@ export async function copyText(text: string): Promise<boolean> {
   }
 }
 
-export async function shareBazi(
-  request: PaipanRequest,
-  result: PaipanResult,
-): Promise<{ mode: 'native' | 'copy' | 'image'; imageUrl?: string }> {
-  const text = buildShareText(request, result)
-  if (typeof navigator.share === 'function') {
-    try {
-      await navigator.share({ title: '八字排盘', text })
-      return { mode: 'native' }
-    } catch {
-      // 用户取消或系统不支持，走兜底
-    }
+export interface PreparedShare {
+  text: string
+  imageUrl: string
+}
+
+export async function prepareShare(request: PaipanRequest, result: PaipanResult): Promise<PreparedShare> {
+  return {
+    text: buildShareText(request, result),
+    imageUrl: await generateShareImage(request, result),
   }
-  const copied = await copyText(text)
-  const imageUrl = await generateShareImage(request, result)
-  return { mode: copied ? 'copy' : 'image', imageUrl }
+}
+
+export async function dataUrlToFile(dataUrl: string, filename: string): Promise<File> {
+  const blob = await (await fetch(dataUrl)).blob()
+  return new File([blob], filename, { type: 'image/jpeg' })
+}
+
+export async function shareImageFile(imageUrl: string, filename: string): Promise<boolean> {
+  if (typeof navigator.share !== 'function') {
+    return false
+  }
+  try {
+    const file = await dataUrlToFile(imageUrl, filename)
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file] })
+      return true
+    }
+  } catch {
+    // 用户取消或不支持文件分享
+  }
+  return false
+}
+
+export function hasNativeShare(): boolean {
+  return typeof navigator.share === 'function'
 }
 
 export async function downloadShareImage(request: PaipanRequest, result: PaipanResult): Promise<void> {
