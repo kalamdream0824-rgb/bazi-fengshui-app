@@ -22,6 +22,8 @@ describe('ProfilePage 我的命盘', () => {
     await clearHistory()
     renderPage()
     expect(await screen.findByText('还没有命盘')).toBeInTheDocument()
+    expect(screen.getByText('会员状态')).toBeInTheDocument()
+    expect(screen.getByText('登录后可用')).toBeInTheDocument()
   })
 
   it('有历史记录时显示最近命盘', async () => {

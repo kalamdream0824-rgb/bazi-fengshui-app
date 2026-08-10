@@ -38,6 +38,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
+  /me:
+    get:
+      summary: 当前用户与会员状态（需 Bearer token）
+      responses:
+        '200':
+          description: 会员信息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MembershipInfo'
+  /redeem:
+    post:
+      summary: 兑换码开通/延长会员（需 Bearer token）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RedeemRequest'
+      responses:
+        '200':
+          description: 会员信息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MembershipInfo'
   /records:
     # 需 Authorization: Bearer <token>
     post:
@@ -98,6 +124,26 @@ components:
         token:
           type: string
         username:
+          type: string
+    MembershipInfo:
+      type: object
+      properties:
+        username:
+          type: string
+        plan:
+          type: string
+          nullable: true
+        memberExpireAt:
+          type: string
+          format: date-time
+          nullable: true
+        isMember:
+          type: boolean
+    RedeemRequest:
+      type: object
+      required: [code]
+      properties:
+        code:
           type: string
     PaipanRequest:
       type: object

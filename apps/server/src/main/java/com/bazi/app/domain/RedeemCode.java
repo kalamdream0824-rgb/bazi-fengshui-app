@@ -5,15 +5,16 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.LocalDateTime;
 
-@TableName("bazi_user")
-public class User {
+@TableName("bazi_redeem_code")
+public class RedeemCode {
 
   @TableId(type = IdType.AUTO)
   private Long id;
-  private String username;
-  private String passwordHash;
+  private String code;
   private String plan;
-  private LocalDateTime memberExpireAt;
+  private Integer durationDays;
+  private Long usedBy;
+  private LocalDateTime usedAt;
   private LocalDateTime createdAt;
 
   public Long getId() {
@@ -24,20 +25,12 @@ public class User {
     this.id = id;
   }
 
-  public String getUsername() {
-    return username;
+  public String getCode() {
+    return code;
   }
 
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public String getPasswordHash() {
-    return passwordHash;
-  }
-
-  public void setPasswordHash(String passwordHash) {
-    this.passwordHash = passwordHash;
+  public void setCode(String code) {
+    this.code = code;
   }
 
   public String getPlan() {
@@ -48,12 +41,28 @@ public class User {
     this.plan = plan;
   }
 
-  public LocalDateTime getMemberExpireAt() {
-    return memberExpireAt;
+  public Integer getDurationDays() {
+    return durationDays;
   }
 
-  public void setMemberExpireAt(LocalDateTime memberExpireAt) {
-    this.memberExpireAt = memberExpireAt;
+  public void setDurationDays(Integer durationDays) {
+    this.durationDays = durationDays;
+  }
+
+  public Long getUsedBy() {
+    return usedBy;
+  }
+
+  public void setUsedBy(Long usedBy) {
+    this.usedBy = usedBy;
+  }
+
+  public LocalDateTime getUsedAt() {
+    return usedAt;
+  }
+
+  public void setUsedAt(LocalDateTime usedAt) {
+    this.usedAt = usedAt;
   }
 
   public LocalDateTime getCreatedAt() {

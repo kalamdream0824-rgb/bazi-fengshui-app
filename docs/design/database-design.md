@@ -53,6 +53,19 @@ CREATE INDEX idx_record_user_created ON bazi_record (user_id, created_at DESC);
 | provider_trade_no | VARCHAR(64) NULL | 渠道交易号（回调对账用） |
 | created_at / paid_at | TIMESTAMP | 创建/支付时间 |
 
+### 1.4 兑换码 bazi_redeem_code（会员权益 P2 已加）
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| id | BIGINT PK AUTO_INCREMENT | 主键 |
+| code | VARCHAR(32) NOT NULL UNIQUE | 兑换码（大写） |
+| plan | VARCHAR(32) NOT NULL | 套餐标识（如 `member_3m`） |
+| duration_days | INT NOT NULL | 时长（天） |
+| used_by | BIGINT NULL | 使用用户（NULL=未用） |
+| used_at / created_at | TIMESTAMP | 使用/创建时间 |
+
+兑换逻辑：校验码有效且未用 → 会员到期时间在"当前与已有到期时间取大者"上顺延 duration_days → 写入 `bazi_order`（`provider=redeem, status=paid, amount=0`）→ 标记码已用。
+
 ## 2. 设计约定
 
 - 命名：表 snake_case + `bazi_` 前缀；主键统一 `BIGINT AUTO_INCREMENT`。
@@ -76,4 +89,5 @@ CREATE INDEX idx_record_user_created ON bazi_record (user_id, created_at DESC);
 
 ## 5. 变更日志
 
+- v0.2（2026-08-10）：会员权益落地——bazi_user 增加 plan/member_expire_at；新增 bazi_redeem_code 与 bazi_order 表。
 - v0.1（2026-08-09）：建立数据库设计文档（用户/记录表 + 订单预留 + 约定/迁移/安全）。

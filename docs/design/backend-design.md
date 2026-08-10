@@ -2,7 +2,7 @@
 
 | 项目 | 内容 |
 |---|---|
-| 版本 | v0.5（P1：MySQL 正式化 + 请求日志已交付） |
+| 版本 | v0.6（会员权益 + 兑换码已交付） |
 | 日期 | 2026-08-09 |
 | 关联 | 契约 `contracts/openapi.yaml`；前端 `frontend-design.md`；文档索引 `README.md` |
 
@@ -13,6 +13,7 @@
 - ✅ 账号体系：注册/登录（BCrypt 密码哈希 + JWT），记录按用户隔离（`user_id`），创建去重，支持 DELETE。
 - ✅ **P0 加固**：配置分层（dev/prod profile，JWT secret 环境变量注入，prod 必填）；CORS 可配置；登录失败限流（5 次锁 5 分钟，429）；MockMvc 集成测试覆盖认证/去重/隔离/删除全链路。
 - ✅ **P1**：MySQL 正式化——`docker-compose.yml`（mysql:8.4，自动建表）+ `application-mysql.yml` 本地 MySQL profile（prod 用 `application-prod.yml` + 环境变量）；统一请求日志过滤器（方法/URI/状态/耗时/用户，慢请求 >500ms 单独 WARN）。
+- ✅ **P2-会员权益 + 兑换码已交付**：`bazi_redeem_code` 兑换码表 + `bazi_user` 增加 `plan/member_expire_at`；`GET /api/v1/me` 会员状态、`POST /api/v1/redeem` 兑换（大小写不敏感、顺延到期、记录订单 `provider=redeem`）；前端"我的-会员状态"卡接入；支付通道待资质，订单模型已预留。
 - ✅ 环境：Maven 3.9.11 已装；开发库 H2（MySQL 切换仅改 datasource 配置）。
 - ⚠️ 神煞 / 真太阳时：**后端第一版不实现**——前端 `HttpBaziApi` 用与 Mock 同一套规则补充（`enrichResult` / `adjustRequestForTrueSolar`），保持结果一致；后续需要可下沉。
 - ⏸️ 合婚 / 运势文案：前端保留，不在本端实现。
@@ -102,6 +103,7 @@ CREATE TABLE bazi_user (
 
 ## 8. 变更日志
 
+- v0.6（2026-08-10）：会员权益 + 兑换码交付——兑换码表/用户会员字段、/me 与 /redeem 接口、前端会员卡与兑换输入（后端测试 12/12，前端 77/77）。
 - v0.5（2026-08-09）：P1 交付——MySQL（Docker Compose + mysql profile）、请求日志过滤器（后端测试 8/8）。
 - v0.4.1（2026-08-09）：解耦最小修正——新增 `BusinessException` 业务异常体系、去重/保存下沉 `RecordService`（Controller 瘦身）、五行常量归入 `domain/constants`；立"分层与耦合规范"为后续强制约定。
 - v0.4（2026-08-09）：P0 交付——配置分层与安全底线（secret 环境变量、CORS 可配置、MySQL 驱动）、登录防爆破、控制器集成测试（后端测试 8/8）。

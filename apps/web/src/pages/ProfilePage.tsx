@@ -1,13 +1,17 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
+import { Button } from '@/components/Button'
 import { Card, CardTitle } from '@/components/Card'
 import { RecordRow } from '@/components/RecordRow'
 import { Switch } from '@/components/Switch'
 import { useHistory } from '@/hooks/useHistory'
+import { getMe, redeemCode } from '@/services/membershipApi'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useBaziStore } from '@/store/useBaziStore'
 import { useSettingsStore } from '@/store/useSettingsStore'
 import { useToastStore } from '@/store/useToastStore'
+import type { MembershipInfo } from '@/types/bazi'
 
 export function ProfilePage() {
   const navigate = useNavigate()
@@ -18,9 +22,39 @@ export function ProfilePage() {
   const toggleTrueSolar = useSettingsStore((s) => s.toggleTrueSolarDefault)
   const username = useAuthStore((s) => s.username)
   const clearAuth = useAuthStore((s) => s.clear)
+  const token = useAuthStore((s) => s.token)
+  const [membership, setMembership] = useState<MembershipInfo | null>(null)
+  const [code, setCode] = useState('')
+  const [redeeming, setRedeeming] = useState(false)
   const { data: records = [] } = useHistory()
   const latest = records[0] ?? null
   const myResult = result ?? latest?.result ?? null
+
+  useEffect(() => {
+    if (import.meta.env.VITE_API_MODE === 'http' && token) {
+      getMe()
+        .then(setMembership)
+        .catch(() => undefined)
+    }
+  }, [token])
+
+  const handleRedeem = async () => {
+    if (!code.trim()) {
+      toast('请输入兑换码')
+      return
+    }
+    setRedeeming(true)
+    try {
+      const info = await redeemCode(code.trim())
+      setMembership(info)
+      setCode('')
+      toast('兑换成功')
+    } catch (err) {
+      toast((err as Error).message || '兑换失败')
+    } finally {
+      setRedeeming(false)
+    }
+  }
 
   return (
     <>
@@ -95,6 +129,32 @@ export function ProfilePage() {
       </Card>
 
       <Card>
+        <CardTitle>会员状态</CardTitle>
+        {import.meta.env.VITE_API_MODE === 'http' && token ? (
+          <>
+            <RecordRow
+              title={membership?.isMember ? `会员 · ${membership?.plan ?? ''}` : '未开通会员'}
+              subtitle={
+                membership?.isMember && membership.memberExpireAt
+                  ? `到期时间 ${new Date(membership.memberExpireAt).toLocaleDateString('zh-CN')}`
+                  : '使用兑换码开通会员'
+              }
+            />
+            <div className="field" style={{ paddingTop: 4 }}>
+              <input className="input-box" value={code} placeholder="输入兑换码" onChange={(e) => setCode(e.target.value)} />
+            </div>
+            <div style={{ padding: '0 16px 14px' }}>
+              <Button block onClick={handleRedeem} disabled={redeeming}>
+                {redeeming ? '兑换中…' : '兑换'}
+              </Button>
+            </div>
+          </>
+        ) : (
+          <RecordRow title="登录后可用" subtitle="http 联调模式接入会员体系" onClick={() => navigate('/auth')} />
+        )}
+      </Card>
+
+      <Card>
         <CardTitle>设置</CardTitle>
         <Switch
           checked={trueSolarDefault}
@@ -111,10 +171,6 @@ export function ProfilePage() {
 
       <Card>
         <CardTitle>其他</CardTitle>
-        <div className="row" onClick={() => toast('会员开通流程规划中')}>
-          <span className="k">会员中心</span>
-          <span className="arrow">›</span>
-        </div>
         <Link className="row" to="/history">
           <span className="k">历史记录</span>
           <span className="arrow">›</span>

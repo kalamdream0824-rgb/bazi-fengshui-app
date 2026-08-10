@@ -59,6 +59,13 @@ export interface AuthResponse {
   username: string
 }
 
+export interface MembershipInfo {
+  username: string
+  plan: string | null
+  memberExpireAt: string | null
+  isMember: boolean
+}
+
 export interface PaipanResult {
   solarText: string
   lunarText: string
