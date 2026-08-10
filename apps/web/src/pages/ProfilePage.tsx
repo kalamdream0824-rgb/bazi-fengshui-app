@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Card, CardTitle } from '@/components/Card'
 import { RecordRow } from '@/components/RecordRow'
 import { Switch } from '@/components/Switch'
+import { useHistory } from '@/hooks/useHistory'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useBaziStore } from '@/store/useBaziStore'
 import { useSettingsStore } from '@/store/useSettingsStore'
@@ -11,11 +12,15 @@ import { useToastStore } from '@/store/useToastStore'
 export function ProfilePage() {
   const navigate = useNavigate()
   const result = useBaziStore((s) => s.result)
+  const setResult = useBaziStore((s) => s.setResult)
   const toast = useToastStore((s) => s.show)
   const trueSolarDefault = useSettingsStore((s) => s.trueSolarDefault)
   const toggleTrueSolar = useSettingsStore((s) => s.toggleTrueSolarDefault)
   const username = useAuthStore((s) => s.username)
   const clearAuth = useAuthStore((s) => s.clear)
+  const { data: records = [] } = useHistory()
+  const latest = records[0] ?? null
+  const myResult = result ?? latest?.result ?? null
 
   return (
     <>
@@ -44,11 +49,16 @@ export function ProfilePage() {
 
       <Card>
         <CardTitle>我的命盘</CardTitle>
-        {result ? (
+        {myResult ? (
           <RecordRow
-            title={result.lunarText}
-            subtitle={`${result.solarText} · 生肖 ${result.shengXiao}`}
-            onClick={() => navigate('/chart')}
+            title={myResult.lunarText}
+            subtitle={`${myResult.solarText} · 生肖 ${myResult.shengXiao}`}
+            onClick={() => {
+              if (latest) {
+                setResult(latest.request, latest.result)
+              }
+              navigate('/chart')
+            }}
           />
         ) : (
           <RecordRow title="还没有命盘" subtitle="先去排一次盘" onClick={() => navigate('/input')} />
