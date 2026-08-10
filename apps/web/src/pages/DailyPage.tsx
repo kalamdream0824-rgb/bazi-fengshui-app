@@ -1,16 +1,12 @@
 import { useState } from 'react'
-import { Button } from '@/components/Button'
 import { Card, CardTitle } from '@/components/Card'
 import { FooterNote } from '@/components/FooterNote'
-import { ShareSheet } from '@/components/ShareSheet'
 import { SegControl } from '@/components/SegControl'
 import { TopBar } from '@/components/TopBar'
 import { getAlmanacFor } from '@/lib/almanac'
 import { getGanZhiFor } from '@/lib/baziMapper'
 import { dailyFortune } from '@/lib/dailyFortune'
-import { copyText, prepareShare, type PreparedShare } from '@/lib/share'
 import { useBaziStore } from '@/store/useBaziStore'
-import { useToastStore } from '@/store/useToastStore'
 
 const TODAY = getGanZhiFor(0)
 const TOMORROW = getGanZhiFor(1)
@@ -20,10 +16,7 @@ const ALM_TOMORROW = getAlmanacFor(1)
 type DayKey = 'today' | 'tomorrow'
 
 export function DailyPage() {
-  const toast = useToastStore((s) => s.show)
   const result = useBaziStore((s) => s.result)
-  const request = useBaziStore((s) => s.request)
-  const [share, setShare] = useState<PreparedShare | null>(null)
   const [day, setDay] = useState<DayKey>('today')
 
   const info = day === 'today' ? TODAY : TOMORROW
@@ -130,29 +123,6 @@ export function DailyPage() {
         </div>
       </Card>
 
-      <div style={{ padding: '0 14px 12px' }}>
-        <Button
-          variant="primary"
-          block
-          onClick={async () => {
-            if (request && result) {
-              setShare(await prepareShare(request, result))
-              return
-            }
-            const copied = await copyText(`今日黄历 ${TODAY.ganZhi}（仅供传统文化研究参考）`)
-            toast(copied ? '今日黄历已复制' : '复制失败，请重试')
-          }}
-        >
-          分享今日运势
-        </Button>
-      </div>
-      <ShareSheet
-        open={Boolean(share)}
-        imageUrl={share?.imageUrl ?? ''}
-        text={share?.text ?? ''}
-        filename="今日运势.jpg"
-        onClose={() => setShare(null)}
-      />
       <FooterNote>运势内容仅供传统文化研究参考</FooterNote>
     </>
   )

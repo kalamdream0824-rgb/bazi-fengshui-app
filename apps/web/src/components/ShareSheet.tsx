@@ -38,13 +38,13 @@ export function ShareSheet({ open, imageUrl, text, filename, onClose }: ShareShe
       <div className="picker-panel" onClick={(e) => e.stopPropagation()}>
         <div className="picker-head">
           <button type="button" onClick={onClose}>关闭</button>
-          <span>分享排盘卡片</span>
+          <span>保存命盘 / 求解读</span>
           <span style={{ width: 28 }} />
         </div>
         <div style={{ padding: '10px 20px 4px' }}>
           <img className="share-img" src={imageUrl} alt="排盘分享卡片" />
           <div className="meta-line" style={{ textAlign: 'center', marginBottom: 12 }}>
-            手机可长按图片保存，或使用下方按钮
+            保存图片发给懂行的人求解读，或复制含生辰的文案
           </div>
         </div>
         <ButtonRow>

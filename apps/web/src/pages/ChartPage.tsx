@@ -30,7 +30,7 @@ export function ChartPage() {
         right={
           <button
             className="icon-btn"
-            aria-label="分享"
+            aria-label="保存命盘"
             onClick={async () => {
               setShare(await prepareShare(request, result))
             }}
