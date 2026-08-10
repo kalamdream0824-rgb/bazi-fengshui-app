@@ -7,6 +7,7 @@ import { TopBar } from '@/components/TopBar'
 import { getAlmanacFor } from '@/lib/almanac'
 import { getGanZhiFor } from '@/lib/baziMapper'
 import { dailyFortune } from '@/lib/dailyFortune'
+import { copyText, shareBazi } from '@/lib/share'
 import { useBaziStore } from '@/store/useBaziStore'
 import { useToastStore } from '@/store/useToastStore'
 
@@ -20,6 +21,7 @@ type DayKey = 'today' | 'tomorrow'
 export function DailyPage() {
   const toast = useToastStore((s) => s.show)
   const result = useBaziStore((s) => s.result)
+  const request = useBaziStore((s) => s.request)
   const [day, setDay] = useState<DayKey>('today')
 
   const info = day === 'today' ? TODAY : TOMORROW
@@ -127,7 +129,19 @@ export function DailyPage() {
       </Card>
 
       <div style={{ padding: '0 14px 12px' }}>
-        <Button variant="primary" block onClick={() => toast('分享功能规划中')}>
+        <Button
+          variant="primary"
+          block
+          onClick={async () => {
+            if (request && result) {
+              const res = await shareBazi(request, result)
+              toast(res.mode === 'native' ? '已唤起系统分享' : '已复制并生成分享卡片图')
+              return
+            }
+            const copied = await copyText(`今日黄历 ${TODAY.ganZhi}（仅供传统文化研究参考）`)
+            toast(copied ? '今日黄历已复制' : '复制失败，请重试')
+          }}
+        >
           分享今日运势
         </Button>
       </div>

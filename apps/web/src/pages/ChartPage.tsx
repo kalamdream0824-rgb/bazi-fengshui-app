@@ -5,6 +5,7 @@ import { BaziTable } from '@/components/BaziTable'
 import { FooterNote } from '@/components/FooterNote'
 import { TopBar } from '@/components/TopBar'
 import { WuxingBar } from '@/components/WuxingBar'
+import { downloadImage, shareBazi } from '@/lib/share'
 import { useBaziStore } from '@/store/useBaziStore'
 import { useToastStore } from '@/store/useToastStore'
 
@@ -26,7 +27,21 @@ export function ChartPage() {
         title="排盘结果"
         onBack={() => navigate('/input')}
         right={
-          <button className="icon-btn" aria-label="分享" onClick={() => toast('分享功能规划中')}>
+          <button
+            className="icon-btn"
+            aria-label="分享"
+            onClick={async () => {
+              const res = await shareBazi(request, result)
+              if (res.mode === 'native') {
+                toast('已唤起系统分享')
+              } else if (res.mode === 'copy' && res.imageUrl) {
+                downloadImage(res.imageUrl, `排盘-${request.name || '示例'}.jpg`)
+                toast('文案已复制，分享卡片图已保存')
+              } else {
+                toast('分享卡片图已生成，可保存')
+              }
+            }}
+          >
             <svg
               width="15"
               height="15"
