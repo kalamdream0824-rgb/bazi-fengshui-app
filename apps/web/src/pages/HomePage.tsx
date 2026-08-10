@@ -18,6 +18,7 @@ const ALM_TOMORROW = getAlmanacFor(1)
 const QUICK = [
   { to: '/input', label: '八字排盘' },
   { to: '/comp', label: '八字合婚' },
+  { to: '/day-picker', label: '择日' },
   { to: '/daily', label: '每日运势' },
   { to: '/report', label: '命书' },
 ]

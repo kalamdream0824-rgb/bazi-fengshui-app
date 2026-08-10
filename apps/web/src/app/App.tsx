@@ -10,6 +10,7 @@ const InputPage = lazy(() => import('@/pages/InputPage').then((m) => ({ default:
 const ChartPage = lazy(() => import('@/pages/ChartPage').then((m) => ({ default: m.ChartPage })))
 const ProPage = lazy(() => import('@/pages/ProPage').then((m) => ({ default: m.ProPage })))
 const CompPage = lazy(() => import('@/pages/CompPage').then((m) => ({ default: m.CompPage })))
+const DayPickerPage = lazy(() => import('@/pages/DayPickerPage').then((m) => ({ default: m.DayPickerPage })))
 const DailyPage = lazy(() => import('@/pages/DailyPage').then((m) => ({ default: m.DailyPage })))
 const ReportPage = lazy(() => import('@/pages/ReportPage').then((m) => ({ default: m.ReportPage })))
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then((m) => ({ default: m.ProfilePage })))
@@ -30,6 +31,7 @@ function Shell() {
           <Route path="/chart" element={<ChartPage />} />
           <Route path="/chart/pro" element={<ProPage />} />
           <Route path="/comp" element={<CompPage />} />
+          <Route path="/day-picker" element={<DayPickerPage />} />
           <Route path="/daily" element={<DailyPage />} />
           <Route path="/report" element={<ReportPage />} />
           <Route path="/profile" element={<ProfilePage />} />
