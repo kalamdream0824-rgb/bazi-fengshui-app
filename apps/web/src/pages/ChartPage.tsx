@@ -7,13 +7,12 @@ import { FooterNote } from '@/components/FooterNote'
 import { ShareSheet } from '@/components/ShareSheet'
 import { TopBar } from '@/components/TopBar'
 import { WuxingBar } from '@/components/WuxingBar'
+import { useBaziWithFallback } from '@/hooks/useBaziWithFallback'
 import { prepareShare, type PreparedShare } from '@/lib/share'
-import { useBaziStore } from '@/store/useBaziStore'
 
 export function ChartPage() {
   const navigate = useNavigate()
-  const request = useBaziStore((s) => s.request)
-  const result = useBaziStore((s) => s.result)
+  const { request, result } = useBaziWithFallback()
   const [share, setShare] = useState<PreparedShare | null>(null)
 
   if (!request || !result) {

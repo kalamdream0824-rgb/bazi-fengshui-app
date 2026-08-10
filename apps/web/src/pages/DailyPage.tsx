@@ -6,7 +6,7 @@ import { TopBar } from '@/components/TopBar'
 import { getAlmanacFor } from '@/lib/almanac'
 import { getGanZhiFor } from '@/lib/baziMapper'
 import { dailyFortune } from '@/lib/dailyFortune'
-import { useBaziStore } from '@/store/useBaziStore'
+import { useBaziWithFallback } from '@/hooks/useBaziWithFallback'
 
 const TODAY = getGanZhiFor(0)
 const TOMORROW = getGanZhiFor(1)
@@ -16,7 +16,7 @@ const ALM_TOMORROW = getAlmanacFor(1)
 type DayKey = 'today' | 'tomorrow'
 
 export function DailyPage() {
-  const result = useBaziStore((s) => s.result)
+  const { result } = useBaziWithFallback()
   const [day, setDay] = useState<DayKey>('today')
 
   const info = day === 'today' ? TODAY : TOMORROW

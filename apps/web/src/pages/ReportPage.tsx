@@ -6,7 +6,7 @@ import { FooterNote } from '@/components/FooterNote'
 import { TopBar } from '@/components/TopBar'
 import { GAN_WUXING, WUXING_LABEL } from '@/lib/wuxing'
 import { exportMingshuPdf } from '@/lib/reportPdf'
-import { useBaziStore } from '@/store/useBaziStore'
+import { useBaziWithFallback } from '@/hooks/useBaziWithFallback'
 import { useToastStore } from '@/store/useToastStore'
 
 const TOC = [
@@ -20,8 +20,7 @@ const TOC = [
 export function ReportPage() {
   const toast = useToastStore((s) => s.show)
   const [exporting, setExporting] = useState(false)
-  const request = useBaziStore((s) => s.request)
-  const result = useBaziStore((s) => s.result)
+  const { request, result } = useBaziWithFallback()
 
   const handleExport = async () => {
     if (!request || !result || exporting) return

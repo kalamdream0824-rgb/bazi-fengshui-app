@@ -9,7 +9,7 @@ import { TopBar } from '@/components/TopBar'
 import { computeCompatibility } from '@/lib/compRules'
 import { WUXING_LABEL } from '@/lib/wuxing'
 import { getBaziApi } from '@/services/baziApi'
-import { useBaziStore } from '@/store/useBaziStore'
+import { useBaziWithFallback } from '@/hooks/useBaziWithFallback'
 import { useToastStore } from '@/store/useToastStore'
 import type { Gender, PaipanRequest, PaipanResult, WuxingKey } from '@/types/bazi'
 
@@ -41,7 +41,7 @@ function PillarsRow({ result, color }: { result: PaipanResult; color: string }) 
 
 export function CompPage() {
   const toast = useToastStore((s) => s.show)
-  const personA = useBaziStore((s) => s.result)
+  const { result: personA } = useBaziWithFallback()
   const api = getBaziApi()
 
   const [bGender, setBGender] = useState<Gender>('female')

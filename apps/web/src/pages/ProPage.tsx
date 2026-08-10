@@ -6,12 +6,12 @@ import { FooterNote } from '@/components/FooterNote'
 import { SegControl } from '@/components/SegControl'
 import { TopBar } from '@/components/TopBar'
 import { GAN_WUXING, WUXING_LABEL } from '@/lib/wuxing'
-import { useBaziStore } from '@/store/useBaziStore'
+import { useBaziWithFallback } from '@/hooks/useBaziWithFallback'
 
 type Panel = 'yun' | 'liu' | 'ss' | 'shensha'
 
 export function ProPage() {
-  const result = useBaziStore((s) => s.result)
+  const { result } = useBaziWithFallback()
   const [panel, setPanel] = useState<Panel>('yun')
 
   if (!result) {
