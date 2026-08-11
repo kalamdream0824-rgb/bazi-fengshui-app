@@ -2,7 +2,7 @@
 
 | 项目 | 内容 |
 |---|---|
-| 版本 | v0.1（与后端 v0.5 对齐） |
+| 版本 | v0.3（订单落账 + 模拟支付 · 与后端 v0.7 对齐） |
 | 日期 | 2026-08-09 |
 | 目标库 | MySQL 8.x（utf8mb4）；开发/测试用 H2（`MODE=MySQL` 兼容） |
 | DDL 单一来源 | `apps/server/src/main/resources/schema.sql`（幂等，`IF NOT EXISTS`） |
@@ -38,20 +38,32 @@ CREATE INDEX idx_record_user_created ON bazi_record (user_id, created_at DESC);
 
 去重说明：当前按 `(user_id, request_json)` `selectCount` 查重；记录量上来后可加唯一索引，或对 `request_json` 做哈希列（`request_hash CHAR(64)` + 唯一索引）提升性能。
 
-### 1.3 预留：orders（订单）
-
-支付待办（需企业资质）后创建：
+### 1.3 bazi_order（订单，已启用）
 
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | id | BIGINT PK AUTO_INCREMENT | 订单号（对外可加业务单号） |
 | user_id | BIGINT NOT NULL | 下单用户 |
-| plan | VARCHAR(32) NOT NULL | 套餐/商品标识（如 `report_full` / `member_3m`） |
+| plan | VARCHAR(32) NOT NULL | 套餐标识（`member_1m` / `member_3m`） |
 | amount_cents | INT NOT NULL | 金额（分） |
-| status | VARCHAR(16) NOT NULL | `pending / paid / refunded` |
-| provider | VARCHAR(16) NULL | 支付渠道（wechat / alipay） |
-| provider_trade_no | VARCHAR(64) NULL | 渠道交易号（回调对账用） |
+| status | VARCHAR(16) NOT NULL | `pending → paid`（`refunded` 预留） |
+| provider | VARCHAR(16) NULL | 支付渠道（`mock` / `redeem`，未来 `wechat` / `alipay`） |
+| provider_trade_no | VARCHAR(64) NULL | 渠道交易号（回调对账与幂等判断用） |
 | created_at / paid_at | TIMESTAMP | 创建/支付时间 |
+
+状态机与幂等：
+
+- 创建订单：`status=pending`、`provider=NULL`、`amount_cents` 由后端套餐常量定价。
+- 模拟支付回调：校验订单归属与状态 → CAS 条件更新（`WHERE id=? AND status='pending'`）置为 `paid` + `provider='mock'` + `provider_trade_no='MOCK-<id>'` + `paid_at` → 开通会员。**重复回调不重复顺延**（状态已 paid 直接返回当前会员状态）。
+- 兑换码：落账 `provider='redeem'`、`provider_trade_no=兑换码`、`amount=0`。
+- 真实渠道接入后复用同一订单表：回调更新订单 → 调 `MembershipService` 开通逻辑，无需改表。
+
+索引建议：
+
+```sql
+CREATE INDEX idx_order_user_created ON bazi_order (user_id, created_at DESC);
+CREATE INDEX idx_order_paid_idem ON bazi_order (provider, provider_trade_no, status);
+```
 
 ### 1.4 兑换码 bazi_redeem_code（会员权益 P2 已加）
 
@@ -89,5 +101,6 @@ CREATE INDEX idx_record_user_created ON bazi_record (user_id, created_at DESC);
 
 ## 5. 变更日志
 
+- v0.3（2026-08-11）：订单表由预留转正式——明确状态机 `pending → paid`、模拟支付 CAS 幂等更新、`provider=mock/redeem` 与索引建议（与后端 v0.7 对齐）。
 - v0.2（2026-08-10）：会员权益落地——bazi_user 增加 plan/member_expire_at；新增 bazi_redeem_code 与 bazi_order 表。
 - v0.1（2026-08-09）：建立数据库设计文档（用户/记录表 + 订单预留 + 约定/迁移/安全）。

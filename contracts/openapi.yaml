@@ -62,8 +62,52 @@ paths:
           description: 会员信息
           content:
             application/json:
+            schema:
+              $ref: '#/components/schemas/MembershipInfo'
+  /orders:
+    post:
+      summary: 创建会员套餐订单（需 Bearer token；金额由后端套餐常量定价）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '200':
+          description: 创建的待支付订单
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderInfo'
+  /pay/mock-success/{orderId}:
+    post:
+      summary: 模拟支付成功回调（仅非生产环境，需 Bearer token；幂等，不重复顺延）
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 开通后的会员信息
+          content:
+            application/json:
               schema:
                 $ref: '#/components/schemas/MembershipInfo'
+  /pay/callback:
+    post:
+      summary: 真实支付渠道回调占位（无需 token；待资质接入后启用）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PayCallbackRequest'
+      responses:
+        '400':
+          description: 当前不可用（PAY_CALLBACK_NOT_READY）
   /records:
     # 需 Authorization: Bearer <token>
     post:
@@ -144,6 +188,47 @@ components:
       required: [code]
       properties:
         code:
+          type: string
+    CreateOrderRequest:
+      type: object
+      required: [plan]
+      properties:
+        plan:
+          type: string
+          description: 套餐标识，member_1m / member_3m
+    OrderInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+        plan:
+          type: string
+        amountCents:
+          type: integer
+        status:
+          type: string
+        provider:
+          type: string
+          nullable: true
+        providerTradeNo:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        paidAt:
+          type: string
+          format: date-time
+          nullable: true
+    PayCallbackRequest:
+      type: object
+      required: [orderId, provider, providerTradeNo]
+      properties:
+        orderId:
+          type: integer
+        provider:
+          type: string
+        providerTradeNo:
           type: string
     PaipanRequest:
       type: object

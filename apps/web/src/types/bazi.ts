@@ -66,6 +66,17 @@ export interface MembershipInfo {
   isMember: boolean
 }
 
+export interface OrderInfo {
+  id: number
+  plan: string
+  amountCents: number
+  status: string
+  provider: string | null
+  providerTradeNo: string | null
+  createdAt: string
+  paidAt: string | null
+}
+
 export interface PaipanResult {
   solarText: string
   lunarText: string

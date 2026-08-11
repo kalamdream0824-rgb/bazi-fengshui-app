@@ -19,3 +19,5 @@ app:
     secret: ${APP_JWT_SECRET}
   cors:
     allowed-origins: ${APP_CORS_ORIGINS}
+  pay:
+    mock-enabled: false

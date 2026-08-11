@@ -592,6 +592,71 @@ button {
 .field {
   padding: 0 16px 12px;
 }
+
+/* 会员套餐选择 */
+.plan-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 12px 16px 0;
+}
+.plan-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  background: #faf5e8;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  transition:
+    border-color 0.12s ease,
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+.plan-card:active {
+  transform: scale(0.97);
+}
+.plan-card.active {
+  border-color: var(--red);
+  background: #fdf3ea;
+  box-shadow: 0 0 0 1px var(--red) inset;
+}
+.plan-label {
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.plan-tag {
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 500;
+  color: #fff6e8;
+  background: var(--red);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+.plan-price {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--red);
+}
+.member-or {
+  margin: 0 16px 8px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+.member-or::before,
+.member-or::after {
+  content: '—';
+  margin: 0 6px;
+  color: var(--line);
+}
 .field .lbl {
   font-size: 12px;
   color: var(--ink-2);

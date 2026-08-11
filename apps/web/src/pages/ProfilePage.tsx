@@ -7,11 +7,17 @@ import { RecordRow } from '@/components/RecordRow'
 import { Switch } from '@/components/Switch'
 import { useHistory } from '@/hooks/useHistory'
 import { getMe, redeemCode } from '@/services/membershipApi'
+import { createOrder, mockPay } from '@/services/payApi'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useBaziStore } from '@/store/useBaziStore'
 import { useSettingsStore } from '@/store/useSettingsStore'
 import { useToastStore } from '@/store/useToastStore'
 import type { MembershipInfo } from '@/types/bazi'
+
+const PLANS = [
+  { code: 'member_1m', label: '30 天', price: '¥29.9' },
+  { code: 'member_3m', label: '90 天', price: '¥68', tag: '推荐' },
+] as const
 
 export function ProfilePage() {
   const navigate = useNavigate()
@@ -26,6 +32,8 @@ export function ProfilePage() {
   const [membership, setMembership] = useState<MembershipInfo | null>(null)
   const [code, setCode] = useState('')
   const [redeeming, setRedeeming] = useState(false)
+  const [plan, setPlan] = useState<string>('member_3m')
+  const [paying, setPaying] = useState(false)
   const { data: records = [] } = useHistory()
   const latest = records[0] ?? null
   const myResult = result ?? latest?.result ?? null
@@ -53,6 +61,20 @@ export function ProfilePage() {
       toast((err as Error).message || '兑换失败')
     } finally {
       setRedeeming(false)
+    }
+  }
+
+  const handleBuy = async () => {
+    setPaying(true)
+    try {
+      const order = await createOrder(plan)
+      const info = await mockPay(order.id)
+      setMembership(info)
+      toast('支付成功，会员已开通')
+    } catch (err) {
+      toast((err as Error).message || '支付失败')
+    } finally {
+      setPaying(false)
     }
   }
 
@@ -137,9 +159,31 @@ export function ProfilePage() {
               subtitle={
                 membership?.isMember && membership.memberExpireAt
                   ? `到期时间 ${new Date(membership.memberExpireAt).toLocaleDateString('zh-CN')}`
-                  : '使用兑换码开通会员'
+                  : '选择套餐，支付后即时开通'
               }
             />
+            <div className="plan-grid">
+              {PLANS.map((p) => (
+                <button
+                  key={p.code}
+                  type="button"
+                  className={`plan-card${plan === p.code ? ' active' : ''}`}
+                  onClick={() => setPlan(p.code)}
+                >
+                  <span className="plan-label">
+                    {p.label}
+                    {'tag' in p && p.tag ? <em className="plan-tag">{p.tag}</em> : null}
+                  </span>
+                  <span className="plan-price">{p.price}</span>
+                </button>
+              ))}
+            </div>
+            <div style={{ padding: '0 16px 14px' }}>
+              <Button block onClick={handleBuy} disabled={paying}>
+                {paying ? '支付中…' : membership?.isMember ? '续费' : '立即开通'}
+              </Button>
+            </div>
+            <div className="member-or">或使用兑换码开通</div>
             <div className="field" style={{ paddingTop: 4 }}>
               <input className="input-box" value={code} placeholder="输入兑换码" onChange={(e) => setCode(e.target.value)} />
             </div>

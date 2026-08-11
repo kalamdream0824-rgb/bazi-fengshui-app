@@ -16,3 +16,5 @@ app:
       lock-minutes: ${APP_LOGIN_LOCK_MINUTES:5}
   cors:
     allowed-origins: ${APP_CORS_ORIGINS:http://localhost:5173}
+  pay:
+    mock-enabled: ${APP_PAY_MOCK_ENABLED:true}
