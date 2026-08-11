@@ -657,6 +657,61 @@ button {
   margin: 0 6px;
   color: var(--line);
 }
+
+/* 新人解读卡 */
+.explain-overview {
+  padding: 2px 16px 4px;
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--ink-2);
+}
+.explain-overview p + p {
+  margin-top: 6px;
+}
+.explain-overview p:last-child {
+  font-size: 11px;
+  color: var(--ink-3);
+}
+.explain-block {
+  border-top: 1px solid var(--line);
+}
+.explain-block summary {
+  padding: 11px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.explain-block summary::after {
+  content: '›';
+  color: var(--ink-3);
+  font-size: 15px;
+  transition: transform 0.15s ease;
+}
+.explain-block[open] summary::after {
+  transform: rotate(90deg);
+}
+.explain {
+  padding: 0 16px 12px;
+}
+.explain-row {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+.explain-row + .explain-row {
+  margin-top: 8px;
+}
+.explain-label {
+  color: var(--ink);
+  font-weight: 600;
+}
 .field .lbl {
   font-size: 12px;
   color: var(--ink-2);

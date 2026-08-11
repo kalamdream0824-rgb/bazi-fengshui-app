@@ -1,13 +1,8 @@
 import { useState } from 'react'
 import type { Pillar, PillarKey } from '@/types/bazi'
+import { SHISHEN_TIP, TERM_TIPS } from '@/lib/explainer'
 
-const TIPS: Record<string, string> = {
-  主星: '十神是日主与其他干支关系的称谓：生我、克我、我生、我克、同我，各分正偏共十种。',
-  藏干: '地支内藏天干，代表气机层次，如申中藏庚金、壬水、戊土。',
-  纳音: '纳音是六十甲子配五行的古法称谓，用于象意参考。',
-  星运: '十二长生描述五行能量在十二地支中的旺衰状态，如长生、帝旺、墓、绝。',
-  神煞: '神煞源自星命术的吉凶星曜体系，需结合全局论断。',
-}
+const TIPS = TERM_TIPS
 
 const KEYS: PillarKey[] = ['year', 'month', 'day', 'time']
 const LABELS: Record<PillarKey, string> = { year: '年柱', month: '月柱', day: '日柱', time: '时柱' }
@@ -42,7 +37,11 @@ export function BaziTable({ pillars }: BaziTableProps) {
                 <td key={k}>
                   <span
                     className={`ss ${k === 'day' ? 'owner' : 'tipable'}`}
-                    onClick={k === 'day' ? undefined : () => setTip({ title: pillars[k].shiShen, text: TIPS['主星'] })}
+                    onClick={
+                      k === 'day'
+                        ? undefined
+                        : () => setTip({ title: pillars[k].shiShen, text: SHISHEN_TIP[pillars[k].shiShen] ?? TIPS['主星'] })
+                    }
                   >
                     {pillars[k].shiShen}
                   </span>
@@ -50,18 +49,32 @@ export function BaziTable({ pillars }: BaziTableProps) {
               ))}
             </tr>
             <tr>
-              <td className="label">天干</td>
+              <td className="label tipable" onClick={() => setTip({ title: '天干', text: TIPS['天干'] })}>
+                天干
+              </td>
               {KEYS.map((k) => (
                 <td key={k}>
-                  <span className={`gz ${k === 'day' ? 'day' : ''}`}>{pillars[k].gan}</span>
+                  <span
+                    className={`gz tipable ${k === 'day' ? 'day' : ''}`}
+                    onClick={() => setTip({ title: pillars[k].gan, text: TIPS['天干'] })}
+                  >
+                    {pillars[k].gan}
+                  </span>
                 </td>
               ))}
             </tr>
             <tr>
-              <td className="label">地支</td>
+              <td className="label tipable" onClick={() => setTip({ title: '地支', text: TIPS['地支'] })}>
+                地支
+              </td>
               {KEYS.map((k) => (
                 <td key={k}>
-                  <span className={`gz ${k === 'day' ? 'day' : ''}`}>{pillars[k].zhi}</span>
+                  <span
+                    className={`gz tipable ${k === 'day' ? 'day' : ''}`}
+                    onClick={() => setTip({ title: pillars[k].zhi, text: TIPS['地支'] })}
+                  >
+                    {pillars[k].zhi}
+                  </span>
                 </td>
               ))}
             </tr>
@@ -120,7 +133,7 @@ export function BaziTable({ pillars }: BaziTableProps) {
           </tbody>
         </table>
       </div>
-      <div className="hint">点击 十神 / 藏干 / 纳音 / 星运 查看释义</div>
+      <div className="hint">点击 十神 / 天干 / 地支 / 藏干 / 纳音 / 星运 查看释义</div>
 
       <div className={`sheet ${tip ? 'show' : ''}`}>
         <button className="close" aria-label="关闭" onClick={() => setTip(null)}>

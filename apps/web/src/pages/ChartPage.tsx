@@ -3,11 +3,13 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { Button, ButtonRow } from '@/components/Button'
 import { Card, CardTitle } from '@/components/Card'
 import { BaziTable } from '@/components/BaziTable'
+import { ExplainCard } from '@/components/ExplainCard'
 import { FooterNote } from '@/components/FooterNote'
 import { ShareSheet } from '@/components/ShareSheet'
 import { TopBar } from '@/components/TopBar'
 import { WuxingBar } from '@/components/WuxingBar'
 import { useBaziWithFallback } from '@/hooks/useBaziWithFallback'
+import { explain } from '@/lib/explainer'
 import { prepareShare, type PreparedShare } from '@/lib/share'
 
 export function ChartPage() {
@@ -20,6 +22,7 @@ export function ChartPage() {
   }
 
   const genderLabel = request.gender === 'male' ? '乾造' : '坤造'
+  const explanation = explain(result)
 
   return (
     <>
@@ -88,6 +91,8 @@ export function ChartPage() {
           </span>
         </div>
       </Card>
+
+      <ExplainCard explanation={explanation} />
 
       <div className="seg two" style={{ margin: '0 14px 12px', padding: 0 }}>
         <button type="button" className="opt active">

@@ -2,11 +2,13 @@ import { useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { Card, CardTitle } from '@/components/Card'
 import { DaYunList } from '@/components/DaYunList'
+import { ExplainCard } from '@/components/ExplainCard'
 import { FooterNote } from '@/components/FooterNote'
 import { SegControl } from '@/components/SegControl'
 import { TopBar } from '@/components/TopBar'
 import { GAN_WUXING, WUXING_LABEL } from '@/lib/wuxing'
 import { useBaziWithFallback } from '@/hooks/useBaziWithFallback'
+import { explain } from '@/lib/explainer'
 
 type Panel = 'yun' | 'liu' | 'ss' | 'shensha'
 
@@ -19,6 +21,7 @@ export function ProPage() {
   }
 
   const currentDaYun = result.daYun.find((d) => d.isCurrent)
+  const explanation = explain(result)
 
   return (
     <>
@@ -52,65 +55,65 @@ export function ProPage() {
       />
 
       {panel === 'yun' && (
-        <Card>
-          <CardTitle hint="十年一运">大运</CardTitle>
-          <DaYunList daYun={result.daYun} />
-        </Card>
+        <>
+          <ExplainCard explanation={explanation} blockKey="dayun" />
+          <Card>
+            <CardTitle hint="十年一运">大运</CardTitle>
+            <DaYunList daYun={result.daYun} />
+          </Card>
+        </>
       )}
 
       {panel === 'liu' && (
         <>
+          <ExplainCard explanation={explanation} blockKey="liunian" />
           <Card>
-            <CardTitle hint="丙午 · 示例">2026 流年</CardTitle>
-            <div style={{ padding: '0 16px 14px', fontSize: 12, color: 'var(--ink-2)', lineHeight: 1.9 }}>
-              流年解读将在后端实现后输出（当前为示例占位）。今日干支：{result.currentYearGanZhi}。
-            </div>
-          </Card>
-          <Card>
-            <CardTitle hint="2027 · 示例">明年预告</CardTitle>
-            <div style={{ padding: '0 16px 14px', fontSize: 12, color: 'var(--ink-2)', lineHeight: 1.9 }}>
-              丁未年正财与日主相合（示例），感情与合作机会增多，事业压力与机遇并存。
-            </div>
+            <CardTitle hint="十年一运">大运参考</CardTitle>
+            <DaYunList daYun={result.daYun} />
           </Card>
         </>
       )}
 
       {panel === 'ss' && (
-        <Card>
-          <CardTitle hint="以日主为原点">十神分布</CardTitle>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, padding: '4px 16px 16px' }}>
-            {(['year', 'month', 'day', 'time'] as const).map((key) => {
-              const p = result.pillars[key]
-              return (
-                <div
-                  key={key}
-                  style={{
-                    textAlign: 'center',
-                    border: '1px solid var(--line)',
-                    borderRadius: 10,
-                    padding: '8px 2px',
-                    background: '#faf5e8',
-                  }}
-                >
-                  <div className="meta-line">
-                    {key === 'year' ? '年' : key === 'month' ? '月' : key === 'day' ? '日' : '时'}柱 · {p.gan}
-                    {p.zhi}
+        <>
+          <ExplainCard explanation={explanation} blockKey="shishen" />
+          <Card>
+            <CardTitle hint="以日主为原点">十神分布</CardTitle>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, padding: '4px 16px 16px' }}>
+              {(['year', 'month', 'day', 'time'] as const).map((key) => {
+                const p = result.pillars[key]
+                return (
+                  <div
+                    key={key}
+                    style={{
+                      textAlign: 'center',
+                      border: '1px solid var(--line)',
+                      borderRadius: 10,
+                      padding: '8px 2px',
+                      background: '#faf5e8',
+                    }}
+                  >
+                    <div className="meta-line">
+                      {key === 'year' ? '年' : key === 'month' ? '月' : key === 'day' ? '日' : '时'}柱 · {p.gan}
+                      {p.zhi}
+                    </div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700, marginTop: 4 }}>
+                      {p.shiShen}
+                    </div>
+                    <div className="meta-line" style={{ marginTop: 4 }}>
+                      {WUXING_LABEL[GAN_WUXING[p.gan]]}
+                    </div>
                   </div>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700, marginTop: 4 }}>
-                    {p.shiShen}
-                  </div>
-                  <div className="meta-line" style={{ marginTop: 4 }}>
-                    {WUXING_LABEL[GAN_WUXING[p.gan]]}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </Card>
+                )
+              })}
+            </div>
+          </Card>
+        </>
       )}
 
       {panel === 'shensha' && (
         <>
+          <ExplainCard explanation={explanation} blockKey="shensha" />
           <Card>
             <CardTitle hint="大运/流年干支对照原局 · 口径见设计文档">
               流年神煞（2026 · {result.currentLiuNian?.ganZhi ?? '—'}）
