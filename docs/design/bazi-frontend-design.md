@@ -23,7 +23,7 @@ Vite 8 + React 19 + TS 6.0.3（strict）+ react-router 7 + TanStack Query + zust
 
 ## 4. 路由
 
-`/` 首页 · `/input` 排盘输入 · `/history` 历史 · `/chart` 基本排盘 · `/chart/pro` 专业细盘 · `/comp` 合婚 · `/daily` 每日运势 · `/report` 命书 · `/profile` 我的 · `/membership` 会员中心；底部导航仅 首页/排盘/我的。
+`/` 首页 · `/input` 排盘输入 · `/history` 历史 · `/chart` 基本排盘 · `/chart/pro` 专业细盘 · `/comp` 合婚 · `/daily` 每日运势 · `/report` 命书 · `/profile` 我的 · `/membership` 会员中心；底部导航（首页/排盘/我的）在主页面与「我的」二级页（会员中心/历史/命书）保留，登录页隐藏。
 
 ## 5. 领域逻辑（lib/，均有测试）
 
@@ -60,6 +60,7 @@ Vite 8 + React 19 + TS 6.0.3（strict）+ react-router 7 + TanStack Query + zust
 
 ## 10. 变更日志
 
+- v0.19.2（2026-08-11）：底部导航在「我的」二级页保留——/membership、/history、/report 显示底部页签（登录页仍隐藏），新增 App 级路由测试。测试 86/86。
 - v0.19.1（2026-08-11）：统一登录态失效处理——新增 `services/http.ts` 的 `authFetch`（注入 token；401 清本地登录态并提示"登录已过期，请重新登录"），payApi / membershipApi / httpBaziApi 统一接入；会员购买遇到无效 token（如 mock 残留 token 切 http 模式）不再透出原始错误。测试 84/84。
 - v0.19（2026-08-11）：会员中心独立页交付——「我的-会员状态」卡收敛为状态摘要 + 会员中心入口（任何登录态可见），新增 `/membership`（套餐选择/购买续费/兑换码，mock 模式明确提示演示、http 模式走模拟支付）。测试 83/83。
 - v0.18.1（2026-08-11）：修复会员状态卡登录状态同步——会员卡改为由 `token` 驱动（已登录即显示会员状态；mock 模式显示"未开通会员 · 演示模式"，http 模式显示购买/兑换；未登录才显示登录引导）。测试 80/80。
