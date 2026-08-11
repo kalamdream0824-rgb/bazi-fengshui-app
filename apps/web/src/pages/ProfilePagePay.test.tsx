@@ -111,4 +111,16 @@ describe('ProfilePage 会员购买（http 联调模式）', () => {
     fireEvent.click(screen.getByText('立即开通'))
     expect(await screen.findByText('未开通会员')).toBeInTheDocument()
   })
+
+  it('mock 模式下已登录：会员卡同步登录状态，显示演示模式而非登录引导', async () => {
+    vi.stubEnv('VITE_API_MODE', 'mock')
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+
+    renderPage()
+
+    expect(await screen.findByText('未开通会员')).toBeInTheDocument()
+    expect(screen.queryByText('登录后可用')).not.toBeInTheDocument()
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
 })

@@ -152,8 +152,9 @@ export function ProfilePage() {
 
       <Card>
         <CardTitle>会员状态</CardTitle>
-        {import.meta.env.VITE_API_MODE === 'http' && token ? (
-          <>
+        {token ? (
+          import.meta.env.VITE_API_MODE === 'http' ? (
+            <>
             <RecordRow
               title={membership?.isMember ? `会员 · ${membership?.plan ?? ''}` : '未开通会员'}
               subtitle={
@@ -192,9 +193,12 @@ export function ProfilePage() {
                 {redeeming ? '兑换中…' : '兑换'}
               </Button>
             </div>
-          </>
+            </>
+          ) : (
+            <RecordRow title="未开通会员" subtitle="当前为演示模式（mock），http 联调模式下可购买/兑换" />
+          )
         ) : (
-          <RecordRow title="登录后可用" subtitle="http 联调模式接入会员体系" onClick={() => navigate('/auth')} />
+          <RecordRow title="登录后可用" subtitle="登录后可查看会员状态" onClick={() => navigate('/auth')} />
         )}
       </Card>
 
