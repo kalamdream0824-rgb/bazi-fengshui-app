@@ -14,6 +14,7 @@ const DayPickerPage = lazy(() => import('@/pages/DayPickerPage').then((m) => ({ 
 const DailyPage = lazy(() => import('@/pages/DailyPage').then((m) => ({ default: m.DailyPage })))
 const ReportPage = lazy(() => import('@/pages/ReportPage').then((m) => ({ default: m.ReportPage })))
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then((m) => ({ default: m.ProfilePage })))
+const MembershipPage = lazy(() => import('@/pages/MembershipPage').then((m) => ({ default: m.MembershipPage })))
 
 const TAB_PATHS = ['/', '/input', '/profile']
 
@@ -35,6 +36,7 @@ function Shell() {
           <Route path="/daily" element={<DailyPage />} />
           <Route path="/report" element={<ReportPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/membership" element={<MembershipPage />} />
           <Route path="*" element={<HomePage />} />
         </Routes>
       </Suspense>
