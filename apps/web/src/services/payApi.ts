@@ -1,13 +1,8 @@
-import { useAuthStore } from '@/store/useAuthStore'
 import type { MembershipInfo, OrderInfo } from '@/types/bazi'
+import { authFetch } from './http'
 
 function isHttpMode(): boolean {
   return import.meta.env.VITE_API_MODE === 'http'
-}
-
-function authHeaders(): Record<string, string> {
-  const token = useAuthStore.getState().token
-  return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
 async function readError(res: Response, fallback: string): Promise<Error> {
@@ -20,9 +15,8 @@ export async function createOrder(plan: string): Promise<OrderInfo> {
   if (!isHttpMode()) {
     throw new Error('联调模式不支持购买')
   }
-  const res = await fetch('/api/v1/orders', {
+  const res = await authFetch('/api/v1/orders', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify({ plan }),
   })
   if (!res.ok) {
@@ -36,9 +30,8 @@ export async function mockPay(orderId: number): Promise<MembershipInfo> {
   if (!isHttpMode()) {
     throw new Error('联调模式不支持支付')
   }
-  const res = await fetch(`/api/v1/pay/mock-success/${orderId}`, {
+  const res = await authFetch(`/api/v1/pay/mock-success/${orderId}`, {
     method: 'POST',
-    headers: authHeaders(),
   })
   if (!res.ok) {
     throw await readError(res, '支付失败')

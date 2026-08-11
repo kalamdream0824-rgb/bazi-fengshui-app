@@ -3,6 +3,7 @@ package com.bazi.app.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.bazi.app.config.BusinessException;
+import com.bazi.app.config.UnauthorizedException;
 import com.bazi.app.domain.constants.MemberPlans;
 import com.bazi.app.domain.constants.MemberPlans.MemberPlan;
 import com.bazi.app.domain.Order;
@@ -30,8 +31,7 @@ public class MembershipService {
   }
 
   public MembershipInfoDto me(Long userId) {
-    User user = userMapper.selectById(userId);
-    return toDto(user);
+    return toDto(requireUser(userId));
   }
 
   @Transactional
@@ -71,7 +71,7 @@ public class MembershipService {
         .eq("provider_trade_no", providerTradeNo)
         .eq("status", "paid"));
     if (alreadyPaid > 0) {
-      return toDto(userMapper.selectById(userId));
+      return toDto(requireUser(userId));
     }
 
     extendMembership(userId, plan);
@@ -87,12 +87,13 @@ public class MembershipService {
     order.setPaidAt(at);
     orderMapper.insert(order);
 
-    return toDto(userMapper.selectById(userId));
+    return toDto(requireUser(userId));
   }
 
   /** 模拟支付回调落账：CAS 将 pending 置为 paid（幂等，重复回调不重复顺延），随后开通会员。 */
   @Transactional
   public MembershipInfoDto payOrder(Long userId, Long orderId) {
+    User user = requireUser(userId);
     Order order = orderMapper.selectById(orderId);
     if (order == null || !userId.equals(order.getUserId())) {
       throw new BusinessException("ORDER_NOT_FOUND", "订单不存在");
@@ -109,18 +110,18 @@ public class MembershipService {
     if (rows == 0) {
       Order after = orderMapper.selectById(orderId);
       if (after != null && "paid".equals(after.getStatus())) {
-        return toDto(userMapper.selectById(userId)); // 幂等：已支付不重复顺延
+        return toDto(user); // 幂等：已支付不重复顺延
       }
       throw new BusinessException("ORDER_STATUS_INVALID", "订单状态异常");
     }
 
     extendMembership(userId, order.getPlan());
-    return toDto(userMapper.selectById(userId));
+    return toDto(requireUser(userId));
   }
 
   private void extendMembership(Long userId, String plan) {
     MemberPlan memberPlan = MemberPlans.of(plan);
-    User user = userMapper.selectById(userId);
+    User user = requireUser(userId);
     LocalDateTime now = LocalDateTime.now();
     LocalDateTime base = user.getMemberExpireAt() != null && user.getMemberExpireAt().isAfter(now)
         ? user.getMemberExpireAt()
@@ -128,6 +129,14 @@ public class MembershipService {
     user.setPlan(plan);
     user.setMemberExpireAt(base.plusDays(memberPlan.days()));
     userMapper.updateById(user);
+  }
+
+  private User requireUser(Long userId) {
+    User user = userMapper.selectById(userId);
+    if (user == null) {
+      throw new UnauthorizedException();
+    }
+    return user;
   }
 
   private MembershipInfoDto toDto(User user) {

@@ -96,4 +96,28 @@ describe('MembershipPage 会员中心', () => {
     renderPage()
     expect(await screen.findByText('登录后可用')).toBeInTheDocument()
   })
+
+  it('购买时 401：清除本地登录态并提示重新登录', async () => {
+    vi.stubEnv('VITE_API_MODE', 'http')
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input)
+      if (url === '/api/v1/me') {
+        return ok({ username: 'tester', plan: null, memberExpireAt: null, isMember: false })
+      }
+      return new Response(JSON.stringify({ code: 'UNAUTHORIZED', message: '未登录或登录已过期' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    renderPage()
+    expect(await screen.findByText('未开通会员')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByText('立即开通'))
+
+    expect(await screen.findByText('登录后可用')).toBeInTheDocument()
+    expect(useToastStore.getState().message).toContain('登录已过期')
+    expect(useAuthStore.getState().token).toBeNull()
+  })
 })

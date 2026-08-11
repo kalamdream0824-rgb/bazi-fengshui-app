@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.bazi.app.config.BusinessException;
+import com.bazi.app.config.UnauthorizedException;
 import com.bazi.app.domain.Order;
 import com.bazi.app.domain.RedeemCode;
 import com.bazi.app.domain.User;
@@ -144,5 +145,25 @@ class MembershipServiceTest {
         .eq("provider_trade_no", "TXN-1")
         .eq("status", "paid"));
     assertEquals(1, count);
+  }
+
+  @Test
+  @Transactional
+  void unknownUserRejectedWithUnauthorized() {
+    assertThrows(UnauthorizedException.class, () -> membershipService.me(99999L));
+  }
+
+  @Test
+  @Transactional
+  void payOrderForMissingUserRejectedWithUnauthorized() {
+    Order order = new Order();
+    order.setUserId(99999L);
+    order.setPlan(MemberPlans.MEMBER_1M);
+    order.setAmountCents(2990);
+    order.setStatus("pending");
+    order.setCreatedAt(LocalDateTime.now());
+    orderMapper.insert(order);
+
+    assertThrows(UnauthorizedException.class, () -> membershipService.payOrder(99999L, order.getId()));
   }
 }
