@@ -41,7 +41,7 @@ describe('explainer 新人解读引擎', () => {
   })
 
   it('术语词库覆盖核心术语与十神', () => {
-    for (const term of ['天干', '地支', '五行', '日主', '大运', '流年', '主星', '藏干', '纳音', '星运', '神煞']) {
+    for (const term of ['天干', '地支', '五行', '日主', '大运', '流年', '主星', '藏干', '副星', '空亡', '胎元', '命宫', '身宫', '纳音', '星运', '神煞']) {
       expect(TERM_TIPS[term]).toBeTruthy()
     }
     expect(SHISHEN_TIP['正财']).toBeTruthy()

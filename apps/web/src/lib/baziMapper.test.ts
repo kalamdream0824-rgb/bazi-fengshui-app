@@ -11,7 +11,10 @@ interface FixtureCase {
   expected: {
     lunarText: string
     shengXiao: string
-    pillars: Record<PillarKey, { ganZhi: string; shiShen: string }>
+    taiYuan: string
+    mingGong: string
+    shenGong: string
+    pillars: Record<PillarKey, { ganZhi: string; shiShen: string; hideGanShiShen: string[] }>
   }
 }
 
@@ -26,18 +29,50 @@ describe('baziMapper.paipan 对照夹具', () => {
 
       expect(result.lunarText).toBe(fixture.expected.lunarText)
       expect(result.shengXiao).toBe(fixture.expected.shengXiao)
+      expect(result.taiYuan).toBe(fixture.expected.taiYuan)
+      expect(result.mingGong).toBe(fixture.expected.mingGong)
+      expect(result.shenGong).toBe(fixture.expected.shenGong)
 
       for (const key of ['year', 'month', 'day', 'time'] as const) {
         expect(`${result.pillars[key].gan}${result.pillars[key].zhi}`, `${key} 柱干支`).toBe(
           fixture.expected.pillars[key].ganZhi,
         )
         expect(result.pillars[key].shiShen, `${key} 柱十神`).toBe(fixture.expected.pillars[key].shiShen)
+        expect(result.pillars[key].hideGan.map((h) => h.shiShen), `${key} 柱副星`).toEqual(
+          fixture.expected.pillars[key].hideGanShiShen,
+        )
       }
     })
   }
 })
 
 describe('baziMapper.paipan 结构完整性', () => {
+  it('四柱含副星（藏干十神）且顺序与藏干一致', () => {
+    const result = paipan({ gender: 'male', solarDateTime: '1995-10-08T14:30:00', trueSolarTime: false })
+    expect(result.pillars.year.hideGan.map((h) => h.gan)).toEqual(['壬', '甲'])
+    expect(result.pillars.year.hideGan.map((h) => h.shiShen)).toEqual(['比肩', '食神'])
+    expect(result.pillars.time.hideGan.map((h) => h.shiShen)).toEqual(['正官', '正财', '伤官'])
+  })
+
+  it('返回胎元/命宫/身宫及纳音', () => {
+    const result = paipan({ gender: 'male', solarDateTime: '1995-10-08T14:30:00', trueSolarTime: false })
+    expect(result.taiYuan).toBe('丙子')
+    expect(result.taiYuanNaYin).toBe('涧下水')
+    expect(result.mingGong).toBe('己丑')
+    expect(result.mingGongNaYin).toBe('霹雳火')
+    expect(result.shenGong).toBe('辛巳')
+    expect(result.shenGongNaYin).toBe('白蜡金')
+  })
+
+  it('四柱旬空完整且日柱旬空不含日支', () => {
+    const result = paipan({ gender: 'male', solarDateTime: '1995-10-08T14:30:00', trueSolarTime: false })
+    expect(result.pillars.year.xunKong).toBe('申酉')
+    expect(result.pillars.month.xunKong).toBe('午未')
+    expect(result.pillars.day.xunKong).toBe('戌亥')
+    expect(result.pillars.time.xunKong).toBe('寅卯')
+    expect(result.pillars.day.xunKong).not.toContain(result.pillars.day.zhi)
+  })
+
   it('返回完整的五行计数（天干+地支本气，共 8）', () => {
     const result = paipan({ gender: 'male', solarDateTime: '1995-10-08T14:30:00', trueSolarTime: false })
     const total = Object.values(result.wuXing).reduce((sum, n) => sum + n, 0)

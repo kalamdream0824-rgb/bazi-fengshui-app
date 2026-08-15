@@ -62,10 +62,15 @@ export function buildReportHtml(request: PaipanRequest, result: PaipanResult): s
           ${pillarRow('天干', (k) => result.pillars[k].gan)}
           ${pillarRow('地支', (k) => result.pillars[k].zhi)}
           ${pillarRow('藏干', (k) => result.pillars[k].hideGan.map((h) => h.gan).join(' '))}
+          ${pillarRow('副星', (k) => result.pillars[k].hideGan.map((h) => h.shiShen).join(' '))}
+          ${pillarRow('空亡', (k) => result.pillars[k].xunKong)}
           ${pillarRow('纳音', (k) => result.pillars[k].naYin)}
           ${pillarRow('星运', (k) => result.pillars[k].diShi)}
           ${pillarRow('神煞', (k) => result.pillars[k].shenSha.join('·') || '—')}
         </table>
+        ${result.taiYuan ? `<div style="margin-top:14px;font-size:13px;color:${C.ink}">
+          胎元 ${result.taiYuan}（${result.taiYuanNaYin}） · 命宫 ${result.mingGong}（${result.mingGongNaYin}） · 身宫 ${result.shenGong}（${result.shenGongNaYin}）
+        </div>` : ''}
         <div style="font-size:14px;font-weight:bold;margin:22px 0 8px">五行占比（本气计数）</div>
         <table style="width:100%;border-collapse:collapse"><tr>${wuxingRow}</tr></table>
         ${result.trueSolar ? `<div style="margin-top:16px;font-size:12px;color:${C.ink2}">真太阳时校正：${result.trueSolar.original} → ${result.trueSolar.adjusted}（经度 ${result.trueSolar.longitude}°E）</div>` : ''}

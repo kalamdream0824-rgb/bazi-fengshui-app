@@ -1,4 +1,4 @@
 package com.bazi.app.dto;
 
-public record HideGanDto(String gan, String wuxing) {
+public record HideGanDto(String gan, String shiShen, String wuxing) {
 }

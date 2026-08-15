@@ -15,6 +15,8 @@ export interface PaipanRequest {
 
 export interface HideGan {
   gan: string
+  /** 藏干对应日主的十神（副星） */
+  shiShen: string
   wuxing: WuxingKey
 }
 
@@ -83,6 +85,12 @@ export interface PaipanResult {
   shengXiao: string
   timeZhi: string
   pillars: Record<PillarKey, Pillar>
+  taiYuan: string
+  taiYuanNaYin: string
+  mingGong: string
+  mingGongNaYin: string
+  shenGong: string
+  shenGongNaYin: string
   wuXing: Record<WuxingKey, number>
   daYun: DaYun[]
   currentYearGanZhi: string

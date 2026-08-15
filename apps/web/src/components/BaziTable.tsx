@@ -13,6 +13,7 @@ interface BaziTableProps {
 
 export function BaziTable({ pillars }: BaziTableProps) {
   const [tip, setTip] = useState<{ title: string; text: string } | null>(null)
+  const dayKong = pillars.day.xunKong
 
   return (
     <>
@@ -97,6 +98,36 @@ export function BaziTable({ pillars }: BaziTableProps) {
               ))}
             </tr>
             <tr>
+              <td className="label tipable" onClick={() => setTip({ title: '副星', text: TIPS['副星'] })}>
+                副星
+              </td>
+              {KEYS.map((k) => (
+                <td key={k} className="fuxing">
+                  {pillars[k].hideGan.map((hg) => (
+                    <span
+                      key={hg.gan}
+                      className="tipable"
+                      onClick={() => setTip({ title: hg.shiShen, text: SHISHEN_TIP[hg.shiShen] ?? TIPS['副星'] })}
+                    >
+                      {hg.shiShen || '—'}
+                    </span>
+                  ))}
+                </td>
+              ))}
+            </tr>
+            <tr>
+              <td className="label tipable" onClick={() => setTip({ title: '空亡', text: TIPS['空亡'] })}>
+                空亡
+              </td>
+              {KEYS.map((k) => (
+                <td key={k}>
+                  <span className={`kong${dayKong.includes(pillars[k].zhi) ? ' hit' : ''}`}>
+                    {pillars[k].xunKong || '—'}
+                  </span>
+                </td>
+              ))}
+            </tr>
+            <tr>
               <td className="label tipable" onClick={() => setTip({ title: '纳音', text: TIPS['纳音'] })}>
                 纳音
               </td>
@@ -133,7 +164,7 @@ export function BaziTable({ pillars }: BaziTableProps) {
           </tbody>
         </table>
       </div>
-      <div className="hint">点击 十神 / 天干 / 地支 / 藏干 / 纳音 / 星运 查看释义</div>
+      <div className="hint">点击 十神 / 天干 / 地支 / 藏干 / 副星 / 空亡 / 纳音 / 星运 查看释义</div>
 
       <div className={`sheet ${tip ? 'show' : ''}`}>
         <button className="close" aria-label="关闭" onClick={() => setTip(null)}>

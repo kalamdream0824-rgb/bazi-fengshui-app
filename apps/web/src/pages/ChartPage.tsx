@@ -105,6 +105,23 @@ export function ChartPage() {
 
       <BaziTable pillars={result.pillars} />
 
+      {result.taiYuan && (
+        <div className="gong-info">
+          <span className="gong-item">
+            胎元 <b>{result.taiYuan}</b>
+            <i>{result.taiYuanNaYin}</i>
+          </span>
+          <span className="gong-item">
+            命宫 <b>{result.mingGong}</b>
+            <i>{result.mingGongNaYin}</i>
+          </span>
+          <span className="gong-item">
+            身宫 <b>{result.shenGong}</b>
+            <i>{result.shenGongNaYin}</i>
+          </span>
+        </div>
+      )}
+
       <Card>
         <CardTitle hint="本气计数">五行占比</CardTitle>
         <WuxingBar wuXing={result.wuXing} />

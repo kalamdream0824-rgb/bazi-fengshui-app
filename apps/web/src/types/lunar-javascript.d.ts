@@ -36,6 +36,7 @@ declare module 'lunar-javascript' {
     getYearZhi(): string
     getYearHideGan(): string[]
     getYearShiShenGan(): string
+    getYearShiShenZhi(): string[]
     getYearNaYin(): string
     getYearDiShi(): string
     getYearXunKong(): string
@@ -43,6 +44,7 @@ declare module 'lunar-javascript' {
     getMonthZhi(): string
     getMonthHideGan(): string[]
     getMonthShiShenGan(): string
+    getMonthShiShenZhi(): string[]
     getMonthNaYin(): string
     getMonthDiShi(): string
     getMonthXunKong(): string
@@ -50,6 +52,7 @@ declare module 'lunar-javascript' {
     getDayZhi(): string
     getDayHideGan(): string[]
     getDayShiShenGan(): string
+    getDayShiShenZhi(): string[]
     getDayNaYin(): string
     getDayDiShi(): string
     getDayXunKong(): string
@@ -57,11 +60,16 @@ declare module 'lunar-javascript' {
     getTimeZhi(): string
     getTimeHideGan(): string[]
     getTimeShiShenGan(): string
+    getTimeShiShenZhi(): string[]
     getTimeNaYin(): string
     getTimeDiShi(): string
     getTimeXunKong(): string
     getTaiYuan(): string
+    getTaiYuanNaYin(): string
+    getMingGong(): string
+    getMingGongNaYin(): string
     getShenGong(): string
+    getShenGongNaYin(): string
     getYun(gender: number): Yun
   }
 

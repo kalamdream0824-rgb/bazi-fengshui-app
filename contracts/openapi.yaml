@@ -256,6 +256,9 @@ components:
           type: string
         shengXiao:
           type: string
+        timeZhi:
+          type: string
+          description: 时支（如"午"）
         pillars:
           type: object
           properties:
@@ -263,6 +266,21 @@ components:
             month: { $ref: '#/components/schemas/Pillar' }
             day: { $ref: '#/components/schemas/Pillar' }
             time: { $ref: '#/components/schemas/Pillar' }
+        taiYuan:
+          type: string
+          description: 胎元干支（月干进一、月支进三）
+        taiYuanNaYin:
+          type: string
+        mingGong:
+          type: string
+          description: 命宫干支（月支+时支反推）
+        mingGongNaYin:
+          type: string
+        shenGong:
+          type: string
+          description: 身宫干支
+        shenGongNaYin:
+          type: string
         wuXing:
           type: object
           properties:
@@ -277,6 +295,10 @@ components:
             $ref: '#/components/schemas/DaYun'
         currentYearGanZhi:
           type: string
+        currentLiuNian:
+          $ref: '#/components/schemas/LiuNianInfo'
+        trueSolar:
+          $ref: '#/components/schemas/TrueSolarInfo'
     Pillar:
       type: object
       properties:
@@ -295,6 +317,9 @@ components:
             type: object
             properties:
               gan: { type: string }
+              shiShen:
+                type: string
+                description: 藏干对应日主的十神（副星）
               wuxing:
                 type: string
                 enum: [jin, mu, shui, huo, tu]
@@ -318,4 +343,36 @@ components:
         yearRange:
           type: string
         isCurrent:
+          type: boolean
+        shenSha:
+          type: array
+          items:
+            type: string
+    LiuNianInfo:
+      type: object
+      properties:
+        ganZhi:
+          type: string
+        shenSha:
+          type: array
+          items:
+            type: string
+    TrueSolarInfo:
+      type: object
+      properties:
+        original:
+          type: string
+        adjusted:
+          type: string
+        offsetMinutes:
+          type: number
+        eotMinutes:
+          type: number
+        longitude:
+          type: number
+        originalShichen:
+          type: string
+        adjustedShichen:
+          type: string
+        boundaryChanged:
           type: boolean

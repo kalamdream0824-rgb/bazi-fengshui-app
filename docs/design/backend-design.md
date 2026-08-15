@@ -16,6 +16,7 @@
 - ✅ **P2-会员权益 + 兑换码已交付**：`bazi_redeem_code` 兑换码表 + `bazi_user` 增加 `plan/member_expire_at`；`GET /api/v1/me` 会员状态、`POST /api/v1/redeem` 兑换（大小写不敏感、顺延到期、记录订单 `provider=redeem`）；前端"我的-会员状态"卡接入。
 - ✅ **P2-模拟支付打通全流程已交付**：`POST /api/v1/orders` 创建 pending 订单（套餐校验 + 金额来自 `MemberPlans` 常量，业务侧示例价 30 天 ¥29.9 / 90 天 ¥68）→ `POST /api/v1/pay/mock-success/{orderId}` 模拟支付回调（仅非生产环境，`app.pay.mock-enabled` 控制；**幂等**：订单已 paid 不重复顺延到期）→ 会员即时开通。`POST /api/v1/pay/callback` 为真实渠道回调占位（当前明确拒绝：`PAY_CALLBACK_NOT_READY`），资质就绪后接入微信/支付宝，订单与会员逻辑无需改动。
 - ✅ 环境：Maven 3.9.11 已装；开发库 H2（MySQL 切换仅改 datasource 配置）。
+- ✅ **v0.8 排盘响应补齐问真口径字段已交付**——`hideGan[].shiShen`（副星/藏干十神）与 `taiYuan/taiYuanNaYin/mingGong/mingGongNaYin/shenGong/shenGongNaYin`（lunar-java 1.7.4 `getXxxShiShenZhi`/`getTaiYuan`/`getMingGong`/`getShenGong` 同源 API 直接提供），fixtures 同步扩展（6 组用例全断言），后端测试 21/21。
 - ⚠️ 神煞 / 真太阳时：**后端第一版不实现**——前端 `HttpBaziApi` 用与 Mock 同一套规则补充（`enrichResult` / `adjustRequestForTrueSolar`），保持结果一致；后续需要可下沉。
 - ⏸️ 合婚 / 运势文案：前端保留，不在本端实现。
 - ✅ 账号 / 云同步：已交付（v0.3）。
@@ -116,6 +117,7 @@ CREATE TABLE bazi_user (
 
 ## 8. 变更日志
 
+- v0.8（2026-08-15）：排盘响应补齐问真口径——HideGanDto 增加 shiShen（副星）、PaipanResultDto 增加胎元/命宫/身宫及纳音；fixtures 6 组用例全部断言新字段；集成测试补 jsonPath 断言；后端测试 21/21。
 - v0.7.1（2026-08-11）：登录态一致性补强——会员服务对「JWT 有效但用户不存在」（库重置/换库后旧 token）统一返回 401，支付/开通路径不再 NPE 500；`payOrder` 开通后返回最新会员状态。后端测试 21/21。
 - v0.7（2026-08-11）：模拟支付打通全流程交付——订单创建 + 模拟支付回调 + 幂等开通会员（30/90 天套餐常量、`/orders`、`/pay/mock-success/{orderId}`、`/pay/callback` 占位；后端测试 19/19）。
 - v0.6（2026-08-10）：会员权益 + 兑换码交付——兑换码表/用户会员字段、/me 与 /redeem 接口、前端会员卡与兑换输入（后端测试 12/12，前端 77/77）。

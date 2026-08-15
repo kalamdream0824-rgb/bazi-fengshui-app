@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { paipan } from './baziMapper'
 import { buildReportHtml, reportFileName } from './reportPdf'
+import type { PaipanResult } from '@/types/bazi'
 
 describe('reportPdf', () => {
   const request = { name: '测试', gender: 'male' as const, solarDateTime: '1995-10-08T14:30:00', trueSolarTime: false }
@@ -21,6 +22,33 @@ describe('reportPdf', () => {
     expect(html).toContain('壬申')
     expect(html).toContain('剑锋金')
     expect(html).toContain('甲申')
+  })
+
+  it('副星/空亡行与胎元命宫身宫信息写入', () => {
+    const html = buildReportHtml(request, result)
+    expect(html).toContain('比肩')
+    expect(html).toContain('食神')
+    expect(html).toContain('戌亥')
+    expect(html).toContain('胎元 丙子（涧下水）')
+    expect(html).toContain('命宫 己丑（霹雳火）')
+    expect(html).toContain('身宫 辛巳（白蜡金）')
+  })
+
+  it('旧快照（缺胎元/命宫/身宫字段）仍可导出且不渲染空字段', () => {
+    const legacy = JSON.parse(
+      JSON.stringify({
+        ...result,
+        taiYuan: undefined,
+        taiYuanNaYin: undefined,
+        mingGong: undefined,
+        mingGongNaYin: undefined,
+        shenGong: undefined,
+        shenGongNaYin: undefined,
+      }),
+    ) as PaipanResult
+    const html = buildReportHtml(request, legacy)
+    expect(html).not.toContain('胎元 undefined')
+    expect(html).toContain('二、大运与参考')
   })
 
   it('文件名包含姓名与日期', () => {

@@ -366,6 +366,42 @@ button {
   line-height: 1.5;
   font-weight: 500;
 }
+.bazi-table .fuxing span {
+  display: block;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.bazi-table .kong {
+  font-size: 11.5px;
+  color: var(--ink-2);
+}
+.bazi-table .kong.hit {
+  color: var(--red);
+  font-weight: 600;
+}
+.gong-info {
+  display: flex;
+  justify-content: space-around;
+  margin: 0 14px;
+  padding: 12px 10px;
+  background: #faf5e8;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.gong-item b {
+  margin: 0 2px 0 4px;
+  color: var(--ink);
+  font-family: var(--font-display);
+}
+.gong-item i {
+  margin-left: 2px;
+  font-size: 11px;
+  font-style: normal;
+  color: var(--red);
+}
 .bazi-table .ny,
 .bazi-table .xy {
   font-size: 12px;

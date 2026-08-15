@@ -7,9 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.bazi.app.dto.PaipanRequest;
 import com.bazi.app.dto.PaipanResultDto;
 import com.bazi.app.service.BaziService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.file.Path;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class BaziServiceTest {
@@ -36,6 +38,9 @@ class BaziServiceTest {
 
       assertEquals(expected.get("lunarText").asText(), result.lunarText(), c.get("id").asText() + " lunarText");
       assertEquals(expected.get("shengXiao").asText(), result.shengXiao(), c.get("id").asText() + " shengXiao");
+      assertEquals(expected.get("taiYuan").asText(), result.taiYuan(), c.get("id").asText() + " taiYuan");
+      assertEquals(expected.get("mingGong").asText(), result.mingGong(), c.get("id").asText() + " mingGong");
+      assertEquals(expected.get("shenGong").asText(), result.shenGong(), c.get("id").asText() + " shenGong");
 
       for (String key : new String[] {"year", "month", "day", "time"}) {
         String ganZhi = result.pillars().get(key).gan() + result.pillars().get(key).zhi();
@@ -44,6 +49,12 @@ class BaziServiceTest {
             expected.get("pillars").get(key).get("shiShen").asText(),
             result.pillars().get(key).shiShen(),
             c.get("id").asText() + " " + key + " 十神");
+        assertEquals(
+            om.convertValue(
+                expected.get("pillars").get(key).get("hideGanShiShen"),
+                new TypeReference<List<String>>() {}),
+            result.pillars().get(key).hideGan().stream().map(h -> h.shiShen()).toList(),
+            c.get("id").asText() + " " + key + " 副星");
       }
 
       int wuXingTotal = result.wuXing().values().stream().mapToInt(Integer::intValue).sum();

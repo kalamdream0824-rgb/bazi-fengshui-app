@@ -10,11 +10,14 @@
       "expected": {
         "lunarText": "一九九五年闰八月十四",
         "shengXiao": "猪",
+        "taiYuan": "丙子",
+        "mingGong": "己丑",
+        "shenGong": "辛巳",
         "pillars": {
-          "year": { "ganZhi": "乙亥", "shiShen": "伤官" },
-          "month": { "ganZhi": "乙酉", "shiShen": "伤官" },
-          "day": { "ganZhi": "壬申", "shiShen": "日主" },
-          "time": { "ganZhi": "丁未", "shiShen": "正财" }
+          "year": { "ganZhi": "乙亥", "shiShen": "伤官", "hideGanShiShen": ["比肩", "食神"] },
+          "month": { "ganZhi": "乙酉", "shiShen": "伤官", "hideGanShiShen": ["正印"] },
+          "day": { "ganZhi": "壬申", "shiShen": "日主", "hideGanShiShen": ["偏印", "比肩", "七杀"] },
+          "time": { "ganZhi": "丁未", "shiShen": "正财", "hideGanShiShen": ["正官", "正财", "伤官"] }
         }
       }
     },
@@ -25,11 +28,14 @@
       "expected": {
         "lunarText": "一九九六年正月廿九",
         "shengXiao": "鼠",
+        "taiYuan": "壬午",
+        "mingGong": "丁酉",
+        "shenGong": "丁酉",
         "pillars": {
-          "year": { "ganZhi": "丙子", "shiShen": "食神" },
-          "month": { "ganZhi": "辛卯", "shiShen": "正官" },
-          "day": { "ganZhi": "甲寅", "shiShen": "日主" },
-          "time": { "ganZhi": "己巳", "shiShen": "正财" }
+          "year": { "ganZhi": "丙子", "shiShen": "食神", "hideGanShiShen": ["正印"] },
+          "month": { "ganZhi": "辛卯", "shiShen": "正官", "hideGanShiShen": ["劫财"] },
+          "day": { "ganZhi": "甲寅", "shiShen": "日主", "hideGanShiShen": ["比肩", "食神", "偏财"] },
+          "time": { "ganZhi": "己巳", "shiShen": "正财", "hideGanShiShen": ["食神", "七杀", "偏财"] }
         }
       }
     },
@@ -40,11 +46,14 @@
       "expected": {
         "lunarText": "二〇二三年腊月廿五",
         "shengXiao": "兔",
+        "taiYuan": "丙辰",
+        "mingGong": "庚申",
+        "shenGong": "壬戌",
         "pillars": {
-          "year": { "ganZhi": "癸卯", "shiShen": "正财" },
-          "month": { "ganZhi": "乙丑", "shiShen": "正官" },
-          "day": { "ganZhi": "戊戌", "shiShen": "日主" },
-          "time": { "ganZhi": "庚申", "shiShen": "食神" }
+          "year": { "ganZhi": "癸卯", "shiShen": "正财", "hideGanShiShen": ["正官"] },
+          "month": { "ganZhi": "乙丑", "shiShen": "正官", "hideGanShiShen": ["劫财", "正财", "伤官"] },
+          "day": { "ganZhi": "戊戌", "shiShen": "日主", "hideGanShiShen": ["比肩", "伤官", "正印"] },
+          "time": { "ganZhi": "庚申", "shiShen": "食神", "hideGanShiShen": ["食神", "偏财", "比肩"] }
         }
       }
     },
@@ -55,11 +64,14 @@
       "expected": {
         "lunarText": "二〇二三年腊月廿五",
         "shengXiao": "兔",
+        "taiYuan": "丁巳",
+        "mingGong": "庚午",
+        "shenGong": "丙子",
         "pillars": {
-          "year": { "ganZhi": "甲辰", "shiShen": "七杀" },
-          "month": { "ganZhi": "丙寅", "shiShen": "偏印" },
-          "day": { "ganZhi": "戊戌", "shiShen": "日主" },
-          "time": { "ganZhi": "辛酉", "shiShen": "伤官" }
+          "year": { "ganZhi": "甲辰", "shiShen": "七杀", "hideGanShiShen": ["比肩", "正官", "正财"] },
+          "month": { "ganZhi": "丙寅", "shiShen": "偏印", "hideGanShiShen": ["七杀", "偏印", "比肩"] },
+          "day": { "ganZhi": "戊戌", "shiShen": "日主", "hideGanShiShen": ["比肩", "伤官", "正印"] },
+          "time": { "ganZhi": "辛酉", "shiShen": "伤官", "hideGanShiShen": ["伤官"] }
         }
       }
     },
@@ -70,11 +82,14 @@
       "expected": {
         "lunarText": "二〇二三年闰二月初一",
         "shengXiao": "兔",
+        "taiYuan": "丙午",
+        "mingGong": "辛酉",
+        "shenGong": "辛酉",
         "pillars": {
-          "year": { "ganZhi": "癸卯", "shiShen": "偏财" },
-          "month": { "ganZhi": "乙卯", "shiShen": "七杀" },
-          "day": { "ganZhi": "己卯", "shiShen": "日主" },
-          "time": { "ganZhi": "己巳", "shiShen": "比肩" }
+          "year": { "ganZhi": "癸卯", "shiShen": "偏财", "hideGanShiShen": ["七杀"] },
+          "month": { "ganZhi": "乙卯", "shiShen": "七杀", "hideGanShiShen": ["七杀"] },
+          "day": { "ganZhi": "己卯", "shiShen": "日主", "hideGanShiShen": ["七杀"] },
+          "time": { "ganZhi": "己巳", "shiShen": "比肩", "hideGanShiShen": ["正印", "伤官", "劫财"] }
         }
       }
     },
@@ -85,11 +100,14 @@
       "expected": {
         "lunarText": "一九八九年腊月初五",
         "shengXiao": "蛇",
+        "taiYuan": "丁卯",
+        "mingGong": "己巳",
+        "shenGong": "丁丑",
         "pillars": {
-          "year": { "ganZhi": "己巳", "shiShen": "伤官" },
-          "month": { "ganZhi": "丙子", "shiShen": "比肩" },
-          "day": { "ganZhi": "丙寅", "shiShen": "日主" },
-          "time": { "ganZhi": "庚子", "shiShen": "偏财" }
+          "year": { "ganZhi": "己巳", "shiShen": "伤官", "hideGanShiShen": ["比肩", "偏财", "食神"] },
+          "month": { "ganZhi": "丙子", "shiShen": "比肩", "hideGanShiShen": ["正官"] },
+          "day": { "ganZhi": "丙寅", "shiShen": "日主", "hideGanShiShen": ["偏印", "比肩", "食神"] },
+          "time": { "ganZhi": "庚子", "shiShen": "偏财", "hideGanShiShen": ["正官"] }
         }
       }
     }

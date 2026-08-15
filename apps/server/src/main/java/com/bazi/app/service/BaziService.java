@@ -38,10 +38,10 @@ public class BaziService {
     EightChar ec = lunar.getEightChar();
 
     Map<String, PillarDto> pillars = new LinkedHashMap<>();
-    pillars.put("year", pillar("year", ec.getYearGan(), ec.getYearZhi(), ec.getYearShiShenGan(), ec.getYearHideGan(), ec.getYearNaYin(), ec.getYearDiShi(), ec.getYearXunKong()));
-    pillars.put("month", pillar("month", ec.getMonthGan(), ec.getMonthZhi(), ec.getMonthShiShenGan(), ec.getMonthHideGan(), ec.getMonthNaYin(), ec.getMonthDiShi(), ec.getMonthXunKong()));
-    pillars.put("day", pillar("day", ec.getDayGan(), ec.getDayZhi(), "日主", ec.getDayHideGan(), ec.getDayNaYin(), ec.getDayDiShi(), ec.getDayXunKong()));
-    pillars.put("time", pillar("time", ec.getTimeGan(), ec.getTimeZhi(), ec.getTimeShiShenGan(), ec.getTimeHideGan(), ec.getTimeNaYin(), ec.getTimeDiShi(), ec.getTimeXunKong()));
+    pillars.put("year", pillar("year", ec.getYearGan(), ec.getYearZhi(), ec.getYearShiShenGan(), ec.getYearHideGan(), ec.getYearShiShenZhi(), ec.getYearNaYin(), ec.getYearDiShi(), ec.getYearXunKong()));
+    pillars.put("month", pillar("month", ec.getMonthGan(), ec.getMonthZhi(), ec.getMonthShiShenGan(), ec.getMonthHideGan(), ec.getMonthShiShenZhi(), ec.getMonthNaYin(), ec.getMonthDiShi(), ec.getMonthXunKong()));
+    pillars.put("day", pillar("day", ec.getDayGan(), ec.getDayZhi(), "日主", ec.getDayHideGan(), ec.getDayShiShenZhi(), ec.getDayNaYin(), ec.getDayDiShi(), ec.getDayXunKong()));
+    pillars.put("time", pillar("time", ec.getTimeGan(), ec.getTimeZhi(), ec.getTimeShiShenGan(), ec.getTimeHideGan(), ec.getTimeShiShenZhi(), ec.getTimeNaYin(), ec.getTimeDiShi(), ec.getTimeXunKong()));
 
     Map<String, Integer> wuXing = new LinkedHashMap<>();
     wuXing.put("jin", 0);
@@ -84,6 +84,12 @@ public class BaziService {
         lunar.getYearShengXiao(),
         lunar.getTimeZhi(),
         pillars,
+        ec.getTaiYuan(),
+        ec.getTaiYuanNaYin(),
+        ec.getMingGong(),
+        ec.getMingGongNaYin(),
+        ec.getShenGong(),
+        ec.getShenGongNaYin(),
         wuXing,
         daYun,
         currentYearGanZhi,
@@ -91,11 +97,13 @@ public class BaziService {
         null);
   }
 
-  private PillarDto pillar(String label, String gan, String zhi, String shiShen, List<String> hideGan, String naYin, String diShi, String xunKong) {
+  private PillarDto pillar(String label, String gan, String zhi, String shiShen, List<String> hideGan, List<String> hideGanShiShen, String naYin, String diShi, String xunKong) {
     List<HideGanDto> hideGanDtos = new ArrayList<>();
     if (hideGan != null) {
-      for (String g : hideGan) {
-        hideGanDtos.add(new HideGanDto(g, WuXingConstants.GAN_WUXING.getOrDefault(g, "tu")));
+      for (int i = 0; i < hideGan.size(); i++) {
+        String g = hideGan.get(i);
+        String shiShenOfGan = (hideGanShiShen != null && i < hideGanShiShen.size()) ? hideGanShiShen.get(i) : "";
+        hideGanDtos.add(new HideGanDto(g, shiShenOfGan, WuXingConstants.GAN_WUXING.getOrDefault(g, "tu")));
       }
     }
     return new PillarDto(label, gan, zhi, shiShen, hideGanDtos, naYin, diShi, xunKong, List.of());
