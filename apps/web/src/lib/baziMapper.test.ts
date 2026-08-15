@@ -16,7 +16,16 @@ interface FixtureCase {
     shenGong: string
     daYunFirst: { ganZhi: string; naYin: string; xunKong: string; shiShen: string; starFortune: string }
     yunStart: { year: number; forward: boolean }
-    liuNianFirst: { year: number; age: number; ganZhi: string; naYin: string; xunKong: string; starFortune: string }
+    liuNianFirst: {
+      year: number
+      age: number
+      ganZhi: string
+      naYin: string
+      xunKong: string
+      starFortune: string
+      liuYueFirst: { monthName: string; ganZhi: string; naYin: string; xunKong: string; shiShen: string }
+    }
+    xiaoYunFirst: { year: number; age: number; ganZhi: string; naYin: string; shiShen: string }
     pillars: Record<PillarKey, { ganZhi: string; shiShen: string; hideGanShiShen: string[]; ziZuo: string }>
   }
 }
@@ -48,6 +57,10 @@ describe('baziMapper.paipan 对照夹具', () => {
       expect(result.liuNianList[0].naYin).toBe(fixture.expected.liuNianFirst.naYin)
       expect(result.liuNianList[0].xunKong).toBe(fixture.expected.liuNianFirst.xunKong)
       expect(result.liuNianList[0].starFortune).toBe(fixture.expected.liuNianFirst.starFortune)
+      expect(result.liuNianList[0].liuYue[0]).toMatchObject(fixture.expected.liuNianFirst.liuYueFirst)
+      expect(result.xiaoYunList[0]).toMatchObject(fixture.expected.xiaoYunFirst)
+      expect(result.currentYearLiuYue.length).toBe(12)
+      expect(result.currentYearLiuYue[0].monthName).toMatch(/月$/)
 
       for (const key of ['year', 'month', 'day', 'time'] as const) {
         expect(`${result.pillars[key].gan}${result.pillars[key].zhi}`, `${key} 柱干支`).toBe(
@@ -122,6 +135,15 @@ describe('baziMapper.paipan 结构完整性', () => {
       starFortune: '沐浴',
       xunKong: '午未',
     })
+    expect(result.liuNianList[0].liuYue[0]).toMatchObject({
+      monthName: '正月',
+      ganZhi: '戊寅',
+      naYin: '城头土',
+      xunKong: '申酉',
+      shiShen: '七杀',
+    })
+    expect(result.xiaoYunList[0]).toMatchObject({ year: 2005, age: 11, ganZhi: '丙申', naYin: '山下火', shiShen: '偏财' })
+    expect(result.currentYearLiuYue.length).toBe(12)
     expect(result.liuNianList[0].shenSha.length).toBeGreaterThanOrEqual(0)
     expect(result.daYun[0]).toMatchObject({
       ganZhi: '甲申',

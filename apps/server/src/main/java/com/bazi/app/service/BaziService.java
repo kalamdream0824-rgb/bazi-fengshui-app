@@ -5,15 +5,19 @@ import com.nlf.calendar.Solar;
 import com.nlf.calendar.EightChar;
 import com.nlf.calendar.eightchar.DaYun;
 import com.nlf.calendar.eightchar.LiuNian;
+import com.nlf.calendar.eightchar.LiuYue;
+import com.nlf.calendar.eightchar.XiaoYun;
 import com.nlf.calendar.eightchar.Yun;
 import com.nlf.calendar.util.LunarUtil;
 import com.bazi.app.dto.DaYunDto;
 import com.bazi.app.dto.HideGanDto;
+import com.bazi.app.dto.LiuYueItemDto;
 import com.bazi.app.dto.LiuNianItemDto;
 import com.bazi.app.dto.LiuNianDto;
 import com.bazi.app.dto.PaipanRequest;
 import com.bazi.app.dto.PaipanResultDto;
 import com.bazi.app.dto.PillarDto;
+import com.bazi.app.dto.XiaoYunItemDto;
 import com.bazi.app.dto.YunStartDto;
 import com.bazi.app.domain.constants.WuXingConstants;
 import com.bazi.app.domain.constants.ZiZuoConstants;
@@ -92,6 +96,18 @@ public class BaziService {
       }
       for (LiuNian ln : dy.getLiuNian(10)) {
         String lgz = ln.getGanZhi();
+        List<LiuYueItemDto> liuYue = new ArrayList<>();
+        for (LiuYue ly : ln.getLiuYue()) {
+          String ygz = ly.getGanZhi();
+          liuYue.add(new LiuYueItemDto(
+              ly.getIndex(),
+              ly.getMonthInChinese() + "月",
+              ygz,
+              LunarUtil.NAYIN.getOrDefault(ygz, ""),
+              ly.getXunKong(),
+              LunarUtil.SHI_SHEN.getOrDefault(dayGan + ygz.substring(0, 1), ""),
+              List.of()));
+        }
         liuNianList.add(new LiuNianItemDto(
             ln.getYear(),
             ln.getAge(),
@@ -100,7 +116,52 @@ public class BaziService {
             LunarUtil.SHI_SHEN.getOrDefault(dayGan + lgz.substring(0, 1), ""),
             ZiZuoConstants.ziZuo(dayGan, lgz.substring(1, 2)),
             ln.getXunKong(),
+            liuYue,
             List.of()));
+      }
+      break;
+    }
+
+    List<XiaoYunItemDto> xiaoYunList = new ArrayList<>();
+    for (DaYun dy : yun.getDaYun()) {
+      String gz = dy.getGanZhi();
+      if (gz == null || gz.isEmpty()) {
+        continue;
+      }
+      for (XiaoYun xy : dy.getXiaoYun(10)) {
+        String xgz = xy.getGanZhi();
+        xiaoYunList.add(new XiaoYunItemDto(
+            xy.getYear(),
+            xy.getAge(),
+            xgz,
+            LunarUtil.NAYIN.getOrDefault(xgz, ""),
+            LunarUtil.SHI_SHEN.getOrDefault(dayGan + xgz.substring(0, 1), ""),
+            List.of()));
+      }
+      break;
+    }
+
+    List<LiuYueItemDto> currentYearLiuYue = new ArrayList<>();
+    int currentYear = LocalDate.now().getYear();
+    for (DaYun dy : yun.getDaYun(12)) {
+      if (dy.getStartYear() > currentYear || currentYear > dy.getEndYear()) {
+        continue;
+      }
+      for (LiuNian ln : dy.getLiuNian(30)) {
+        if (ln.getYear() == currentYear) {
+          for (LiuYue ly : ln.getLiuYue()) {
+            String ygz = ly.getGanZhi();
+            currentYearLiuYue.add(new LiuYueItemDto(
+                ly.getIndex(),
+                ly.getMonthInChinese() + "月",
+                ygz,
+                LunarUtil.NAYIN.getOrDefault(ygz, ""),
+                ly.getXunKong(),
+                LunarUtil.SHI_SHEN.getOrDefault(dayGan + ygz.substring(0, 1), ""),
+                List.of()));
+          }
+          break;
+        }
       }
       break;
     }
@@ -133,6 +194,8 @@ public class BaziService {
         daYun,
         yunStart,
         liuNianList,
+        xiaoYunList,
+        currentYearLiuYue,
         currentYearGanZhi,
         new LiuNianDto(yearGanZhi, List.of()),
         null);

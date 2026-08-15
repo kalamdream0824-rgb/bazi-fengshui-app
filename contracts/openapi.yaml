@@ -300,6 +300,16 @@ components:
           description: 起运后逐年流年（第一步大运内 10 年）
           items:
             $ref: '#/components/schemas/LiuNianItem'
+        xiaoYunList:
+          type: array
+          description: 起运后逐年小运（时柱起，第一步大运内 10 年）
+          items:
+            $ref: '#/components/schemas/XiaoYunItem'
+        currentYearLiuYue:
+          type: array
+          description: 当前公历年份的逐月流月（节气月 12 个）
+          items:
+            $ref: '#/components/schemas/LiuYueItem'
         currentYearGanZhi:
           type: string
         currentLiuNian:
@@ -405,11 +415,57 @@ components:
         xunKong:
           type: string
           description: 流年旬空
+        liuYue:
+          type: array
+          description: 该流年内逐月（节气月 12 个）
+          items:
+            $ref: '#/components/schemas/LiuYueItem'
         shenSha:
           type: array
           items:
             type: string
           description: 流年神煞（前端补充）
+    LiuYueItem:
+      type: object
+      properties:
+        index:
+          type: integer
+        monthName:
+          type: string
+          description: 节气月名（正月/二月…）
+        ganZhi:
+          type: string
+        naYin:
+          type: string
+        xunKong:
+          type: string
+        shiShen:
+          type: string
+          description: 流月天干对日主的十神（前端补充）
+        shenSha:
+          type: array
+          items:
+            type: string
+          description: 流月神煞（前端补充）
+    XiaoYunItem:
+      type: object
+      properties:
+        year:
+          type: integer
+        age:
+          type: integer
+        ganZhi:
+          type: string
+        naYin:
+          type: string
+        shiShen:
+          type: string
+          description: 小运天干对日主的十神（前端补充）
+        shenSha:
+          type: array
+          items:
+            type: string
+          description: 小运神煞（前端补充）
     LiuNianInfo:
       type: object
       properties:

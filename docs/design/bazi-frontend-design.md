@@ -2,7 +2,7 @@
 
 | 项目 | 内容 |
 |---|---|
-| 版本 | v0.25（农历输入 + 星运/旬空补齐已交付） |
+| 版本 | v0.26（流月面板 + 小运已交付） |
 | 日期 | 2026-08-09 |
 | 索引 | 见 `docs/design/README.md`；后端见 `backend-design.md` |
 
@@ -16,6 +16,7 @@
 - ✅ **v0.23 专业细盘第一批延伸已交付**——流年页签补真（起运后逐年列表：年/岁/干支/十神/纳音/神煞，高亮当前年）、大运增强（起运公历时间+顺逆+岁数、每步大运纳音/旬空/十神）、十神面板补副星（藏干十神+自坐）、新增五行页签（本气+含藏干加权，本气1/中气0.5/余气0.3 口径公示）；lunar 库 `getLiuNian/getXunKong/NAYIN/SHI_SHEN` 直接支持；契约/fixtures 同步，前端 114/114、后端 21/21。
 - ✅ **v0.24 专业细盘第二批已交付**——新增**格局**页签：月令格局（月支藏干透干优先、不透取本气，八正格命名）+ 日主旺衰粗判（得分制：得令+2/支生扶+1/干比劫+1印+0.5，≥4 偏强/≤1.5 偏弱/否则中和）；规则放前端 `lib/geJu.ts`（神煞模式不进契约），口径公示、温和参考；前端 121/121、lint 0、build 绿。
 - ✅ **v0.25 农历输入 + 星运/旬空补齐已交付**——输入页新增历法切换（公历/农历，农历滚轮含闰月，`Lunar.fromYmd` 闰月负数表示，实时公历预览）；`DaYun.starFortune`（大运地支对日主十二长生）、`LiuNianItem.starFortune/xunKong` 双端返回，大运/流年行展示；契约/fixtures 同步；前端 126/126、lint 0、build 绿、后端 21/21。
+- ✅ **v0.26 流月面板 + 小运已交付**——流年页签新增**小运**卡（起运后逐年：时柱起、年/岁/干支/十神/纳音/神煞，高亮当前年）与**流月**卡（今年 12 个节气月网格：月名/干支/十神/纳音/神煞）；`LiuNianItem.liuYue`、`xiaoYunList`、`currentYearLiuYue` 双端返回；lunar 库 `getLiuYue/getXiaoYun` 直接支持；契约/fixtures 同步；前端 126/126、lint 0、build 绿、后端 21/21。
 - 详细历史见 git log，不在本文档堆叠。
 
 ## 2. 架构
@@ -130,6 +131,7 @@ interface ChartExplanation {
 
 ## 10. 变更日志
 
+- v0.26（2026-08-15）：流月面板 + 小运交付——LiuNianItem.liuYue（流年内节气月）、xiaoYunList（起运后小运）、currentYearLiuYue（今年逐月）；lunar 类型声明补 LiuYue/XiaoYun；契约/fixtures 同步；前端 126/126、lint 0、build 绿、后端 21/21。
 - v0.25（2026-08-15）：农历输入交付——输入页历法切换（公历/农历含闰月，实时公历预览）；大运/流年星运（复用 ziZuoOf 日干太极）+ 流年旬空；lunar 类型声明补 LunarYear/LunarMonth/fromYmd/getSolar；契约/fixtures 同步；前端 126/126、lint 0、build 绿、后端 21/21。
 - v0.24（2026-08-15）：专业细盘第二批交付——格局页签（月令格局：透干取格/本气兜底；日主旺衰：得分制粗判）；新建 lib/geJu.ts（五行生克关系 + 格局 + 旺衰），口径公示；前端 121/121、lint 0、build 绿。
 - v0.23（2026-08-15）：专业细盘第一批延伸交付——流年页签逐年列表、大运起运信息+纳音/旬空/十神、十神面板补副星、五行页签（含藏干加权）；lunar 类型声明补齐 Yun/DaYun/LiuNian/LunarUtil；契约加 yunStart/liuNianList/daYun 扩展字段；前端 114/114、lint 0、build 绿。

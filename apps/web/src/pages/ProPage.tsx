@@ -116,6 +116,59 @@ export function ProPage() {
               <div className="empty">暂无流年数据</div>
             )}
           </Card>
+          <Card>
+            <CardTitle hint="时柱起 · 起运后逐年">小运</CardTitle>
+            {result.xiaoYunList && result.xiaoYunList.length > 0 ? (
+              result.xiaoYunList.map((xy) => (
+                <div className={`row ${xy.year === nowYear ? 'current' : ''}`} key={xy.year}>
+                  <span className="k">
+                    {xy.year} · {xy.age} 岁
+                  </span>
+                  <span className="gz">{xy.ganZhi}</span>
+                  <span className="v">{[xy.shiShen, xy.naYin, xy.shenSha.join('·')].filter(Boolean).join(' · ')}</span>
+                </div>
+              ))
+            ) : (
+              <div className="empty">暂无小运数据</div>
+            )}
+          </Card>
+          <Card>
+            <CardTitle hint={`今年（${nowYear}）逐月 · 节气月`}>流月</CardTitle>
+            {result.currentYearLiuYue && result.currentYearLiuYue.length > 0 ? (
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(4, 1fr)',
+                  gap: 8,
+                  padding: '4px 16px 16px',
+                }}
+              >
+                {result.currentYearLiuYue.map((ly) => (
+                  <div
+                    key={ly.index}
+                    style={{
+                      textAlign: 'center',
+                      border: '1px solid var(--line)',
+                      borderRadius: 10,
+                      padding: '8px 2px',
+                      background: '#faf5e8',
+                    }}
+                  >
+                    <div className="meta-line">{ly.monthName}</div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700, marginTop: 4 }}>
+                      {ly.ganZhi}
+                    </div>
+                    <div className="meta-line" style={{ marginTop: 4 }}>
+                      {ly.shiShen} · {ly.naYin}
+                    </div>
+                    <div className="meta-line">{ly.shenSha.length > 0 ? ly.shenSha.join('·') : ''}</div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="empty">暂无流月数据</div>
+            )}
+          </Card>
         </>
       )}
 

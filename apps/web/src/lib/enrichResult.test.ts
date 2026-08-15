@@ -32,8 +32,11 @@ describe('enrichResult', () => {
         naYin: '',
         shiShen: '',
         starFortune: '',
+        liuYue: ln.liuYue.map((ly) => ({ ...ly, naYin: '', shiShen: '', shenSha: [] })),
         shenSha: [],
       })),
+      xiaoYunList: base.xiaoYunList.map((xy) => ({ ...xy, naYin: '', shiShen: '', shenSha: [] })),
+      currentYearLiuYue: base.currentYearLiuYue.map((ly) => ({ ...ly, naYin: '', shiShen: '', shenSha: [] })),
     })
 
     expect(result.daYun[0].naYin).toBe('泉中水')
@@ -43,6 +46,12 @@ describe('enrichResult', () => {
     expect(result.liuNianList[0].shiShen).toBe('伤官')
     expect(result.liuNianList[0].starFortune).toBe('沐浴')
     expect(result.liuNianList[0].xunKong).toBe('午未')
+    expect(result.liuNianList[0].liuYue[0].naYin).toBe('城头土')
+    expect(result.liuNianList[0].liuYue[0].shiShen).toBe('七杀')
+    expect(result.xiaoYunList[0].naYin).toBe('山下火')
+    expect(result.xiaoYunList[0].shiShen).toBe('偏财')
+    expect(result.currentYearLiuYue[0].ganZhi).toBeTruthy()
+    expect(result.currentYearLiuYue[0].shenSha.length).toBeGreaterThanOrEqual(0)
     expect(result.liuNianList[0].shenSha.length).toBeGreaterThanOrEqual(0)
   })
 })

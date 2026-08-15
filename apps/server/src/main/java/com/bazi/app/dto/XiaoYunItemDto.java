@@ -2,14 +2,11 @@ package com.bazi.app.dto;
 
 import java.util.List;
 
-public record LiuNianItemDto(
+public record XiaoYunItemDto(
     int year,
     int age,
     String ganZhi,
     String naYin,
     String shiShen,
-    String starFortune,
-    String xunKong,
-    List<LiuYueItemDto> liuYue,
     List<String> shenSha) {
 }

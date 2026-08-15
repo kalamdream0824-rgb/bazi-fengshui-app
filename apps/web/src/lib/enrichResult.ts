@@ -44,6 +44,33 @@ export function enrichResult(result: PaipanResult): PaipanResult {
     if (!ln.starFortune) {
       ln.starFortune = ziZuoOf(result.pillars.day.gan, ln.ganZhi[1])
     }
+    ln.liuYue?.forEach((ly) => {
+      ly.shenSha = computeExternalShenSha(ref, ly.ganZhi)
+      if (!ly.naYin) {
+        ly.naYin = LunarUtil.NAYIN[ly.ganZhi] ?? ''
+      }
+      if (!ly.shiShen) {
+        ly.shiShen = LunarUtil.SHI_SHEN[result.pillars.day.gan + ly.ganZhi[0]] ?? ''
+      }
+    })
+  })
+  result.xiaoYunList?.forEach((xy) => {
+    xy.shenSha = computeExternalShenSha(ref, xy.ganZhi)
+    if (!xy.naYin) {
+      xy.naYin = LunarUtil.NAYIN[xy.ganZhi] ?? ''
+    }
+    if (!xy.shiShen) {
+      xy.shiShen = LunarUtil.SHI_SHEN[result.pillars.day.gan + xy.ganZhi[0]] ?? ''
+    }
+  })
+  result.currentYearLiuYue?.forEach((ly) => {
+    ly.shenSha = computeExternalShenSha(ref, ly.ganZhi)
+    if (!ly.naYin) {
+      ly.naYin = LunarUtil.NAYIN[ly.ganZhi] ?? ''
+    }
+    if (!ly.shiShen) {
+      ly.shiShen = LunarUtil.SHI_SHEN[result.pillars.day.gan + ly.ganZhi[0]] ?? ''
+    }
   })
   return result
 }

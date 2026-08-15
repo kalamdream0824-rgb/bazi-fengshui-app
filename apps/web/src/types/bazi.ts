@@ -64,6 +64,27 @@ export interface LiuNianItem {
   shiShen: string
   starFortune: string
   xunKong: string
+  liuYue: LiuYueItem[]
+  shenSha: string[]
+}
+
+export interface LiuYueItem {
+  index: number
+  /** 节气月名：正月/二月… */
+  monthName: string
+  ganZhi: string
+  naYin: string
+  xunKong: string
+  shiShen: string
+  shenSha: string[]
+}
+
+export interface XiaoYunItem {
+  year: number
+  age: number
+  ganZhi: string
+  naYin: string
+  shiShen: string
   shenSha: string[]
 }
 
@@ -122,6 +143,8 @@ export interface PaipanResult {
   daYun: DaYun[]
   yunStart: YunStart
   liuNianList: LiuNianItem[]
+  xiaoYunList: XiaoYunItem[]
+  currentYearLiuYue: LiuYueItem[]
   currentYearGanZhi: string
   currentLiuNian?: LiuNianInfo
   trueSolar?: TrueSolarInfo

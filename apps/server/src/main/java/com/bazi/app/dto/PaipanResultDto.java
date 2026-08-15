@@ -19,6 +19,8 @@ public record PaipanResultDto(
     List<DaYunDto> daYun,
     YunStartDto yunStart,
     List<LiuNianItemDto> liuNianList,
+    List<XiaoYunItemDto> xiaoYunList,
+    List<LiuYueItemDto> currentYearLiuYue,
     String currentYearGanZhi,
     LiuNianDto currentLiuNian,
     TrueSolarDto trueSolar) {

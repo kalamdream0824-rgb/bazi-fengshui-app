@@ -121,6 +121,7 @@ declare module 'lunar-javascript' {
     getGanZhi(): string
     getXunKong(): string
     getLiuNian(n: number): LiuNian[]
+    getXiaoYun(n: number): XiaoYun[]
   }
 
   export class LiuNian {
@@ -128,5 +129,19 @@ declare module 'lunar-javascript' {
     getAge(): number
     getGanZhi(): string
     getXunKong(): string
+    getLiuYue(): LiuYue[]
+  }
+
+  export class LiuYue {
+    getIndex(): number
+    getMonthInChinese(): string
+    getGanZhi(): string
+    getXunKong(): string
+  }
+
+  export class XiaoYun {
+    getYear(): number
+    getAge(): number
+    getGanZhi(): string
   }
 }
