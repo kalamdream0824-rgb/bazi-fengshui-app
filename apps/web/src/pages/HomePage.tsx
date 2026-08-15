@@ -8,7 +8,6 @@ import { useHistory } from '@/hooks/useHistory'
 import { getAlmanacFor } from '@/lib/almanac'
 import { getGanZhiFor } from '@/lib/baziMapper'
 import { useBaziStore } from '@/store/useBaziStore'
-import { useToastStore } from '@/store/useToastStore'
 
 const TODAY = getGanZhiFor(0)
 const TOMORROW = getGanZhiFor(1)
@@ -25,7 +24,6 @@ const QUICK = [
 export function HomePage() {
   const navigate = useNavigate()
   const setResult = useBaziStore((s) => s.setResult)
-  const toast = useToastStore((s) => s.show)
   const { data: records = [] } = useHistory()
   const recent = records.slice(0, 3)
   const [day, setDay] = useState<'today' | 'tomorrow'>('today')
@@ -40,7 +38,7 @@ export function HomePage() {
           <span className="seal">命</span>
           八字排盘
         </div>
-        <button className="icon-btn" aria-label="设置" onClick={() => toast('设置功能规划中')}>
+        <button className="icon-btn" aria-label="设置" onClick={() => void navigate('/settings')}>
           <svg
             width="16"
             height="16"

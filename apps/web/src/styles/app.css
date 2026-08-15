@@ -1057,6 +1057,18 @@ select.input-box {
   font-size: 13px;
   line-height: 1.9;
 }
+
+/* 关于与合规 */
+.about-body {
+  padding: 4px 16px 14px;
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--ink-2);
+}
+.about-body p + p {
+  margin-top: 8px;
+}
+
 .footer-note {
   padding: 0 var(--space-page) 16px;
   text-align: center;

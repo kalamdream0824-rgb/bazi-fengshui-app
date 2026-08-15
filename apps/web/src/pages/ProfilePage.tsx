@@ -44,7 +44,7 @@ export function ProfilePage() {
           <span className="seal">命</span>
           我的
         </div>
-        <button className="icon-btn" aria-label="设置" onClick={() => toast('设置功能规划中')}>
+        <button className="icon-btn" aria-label="设置" onClick={() => void navigate('/settings')}>
           <svg
             width="16"
             height="16"
@@ -155,7 +155,7 @@ export function ProfilePage() {
           <span className="k">我的命书</span>
           <span className="arrow">›</span>
         </Link>
-        <div className="row" onClick={() => toast('关于与合规声明规划中')}>
+        <div className="row" onClick={() => void navigate('/settings')}>
           <span className="k">关于与合规声明</span>
           <span className="arrow">›</span>
         </div>

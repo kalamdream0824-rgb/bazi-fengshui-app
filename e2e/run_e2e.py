@@ -1,4 +1,4 @@
-"""八字排盘 App E2E 冒烟：注册登录 → 排盘 → 会员购买 → 分享 → 历史 → 刷新兜底 → 退出登录清空。
+"""八字排盘 App E2E 冒烟：注册登录 → 排盘 → 会员购买 → 分享 → 历史 → 刷新兜底 → 退出登录清空 → 设置-关于合规。
 
 前置：前端 VITE_API_MODE=http dev server（5173）+ 后端 mysql profile（8080）。
 运行：python3 e2e/run_e2e.py
@@ -81,10 +81,17 @@ def main() -> int:
         hist_after = page.inner_text("body")
         check("登出后本地历史清空", "暂无排盘记录" in hist_after)
 
+        # 8. 设置-关于与合规（首页齿轮入口）
+        page.goto(f"{BASE}/", wait_until="networkidle")
+        page.locator('button[aria-label="设置"]').first.click()
+        page.wait_for_selector("text=关于与合规", timeout=10000)
+        settings_body = page.inner_text("body")
+        check("设置-关于与合规", "仅供娱乐与参考" in settings_body and "版本" in settings_body)
+
         browser.close()
 
-    passed = 7 - len(failures)
-    print(f"\n结果: {passed}/7 通过" + (f"，失败: {failures}" if failures else ""))
+    passed = 8 - len(failures)
+    print(f"\n结果: {passed}/8 通过" + (f"，失败: {failures}" if failures else ""))
     return 1 if failures else 0
 
 
