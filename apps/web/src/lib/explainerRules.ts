@@ -3,12 +3,16 @@ import { computeWangShuai } from './geJu'
 import type { ExplainBlockKey, ExplainPoint } from './explainer'
 import {
   BLOCK_REFERENCE,
+  CHONG_TIP,
   CHANG_SHENG_TIP,
+  HE_TIP,
   PILLAR_ROLE,
   SHISHEN_COMBO_TIP,
   SHISHEN_TIP,
+  TERM_TIPS,
   WANG_SHUAI_TIP,
 } from './explainerDictionary'
+import { LunarUtil } from 'lunar-javascript'
 
 /**
  * 解读规则层（组合型解读）
@@ -170,6 +174,53 @@ const shenShaPalaceRule: ExplainRule = {
   },
 }
 
+/** 地支 0-based 序（与 lunar 库一致：子0 … 亥11） */
+const ZHI_INDEX: Record<string, number> = { 子: 0, 丑: 1, 寅: 2, 卯: 3, 辰: 4, 巳: 5, 午: 6, 未: 7, 申: 8, 酉: 9, 戌: 10, 亥: 11 }
+
+/** 胎元/命宫/身宫进解读（pillars 块） */
+const sanYuanRule: ExplainRule = {
+  key: 'san-yuan',
+  weight: 60,
+  block: 'pillars',
+  match: (result) => Boolean(result.taiYuan && result.mingGong && result.shenGong),
+  build: (result) => ({
+    label: '胎元 · 命宫 · 身宫',
+    text: `胎元${result.taiYuan}（${result.taiYuanNaYin}），${TERM_TIPS['胎元']}；命宫${result.mingGong}（${result.mingGongNaYin}），${TERM_TIPS['命宫']}；身宫${result.shenGong}（${result.shenGongNaYin}），${TERM_TIPS['身宫']}，${BLOCK_REFERENCE}。`,
+  }),
+}
+
+/** 流年冲合：流年地支与四柱地支的六冲/六合（liunian 块，lunar CHONG/HE_ZHI_6 同源表） */
+const liuNianChongHeRule: ExplainRule = {
+  key: 'liunian-chonghe',
+  weight: 85,
+  block: 'liunian',
+  match: (result) => Boolean(result.currentLiuNian?.ganZhi),
+  build: (result) => {
+    const lnZhi = result.currentLiuNian!.ganZhi[1]
+    const idx = ZHI_INDEX[lnZhi]
+    const chongZhi = LunarUtil.CHONG[idx]
+    const heZhi = LunarUtil.HE_ZHI_6[idx]
+    const palaceOf: Record<string, string> = {}
+    for (const key of ['year', 'month', 'day', 'time'] as const) {
+      palaceOf[result.pillars[key].zhi] = key === 'year' ? '年支' : key === 'month' ? '月支' : key === 'day' ? '日支' : '时支'
+    }
+    const parts: string[] = []
+    if (palaceOf[chongZhi]) {
+      parts.push(`与${palaceOf[chongZhi]}${chongZhi}相冲，${CHONG_TIP}`)
+    }
+    if (palaceOf[heZhi]) {
+      parts.push(`与${palaceOf[heZhi]}${heZhi}相合，${HE_TIP}`)
+    }
+    return {
+      label: `流年冲合（${lnZhi}）`,
+      text:
+        parts.length > 0
+          ? `今年流年地支${lnZhi}${parts.join('；')}，${BLOCK_REFERENCE}。`
+          : `今年流年地支${lnZhi}与四柱地支无明显冲合关系，${BLOCK_REFERENCE}。`,
+    }
+  },
+}
+
 /** P0 规则集（后续 P1/P2 规则直接追加） */
 export const EXPLAIN_RULES: ExplainRule[] = [
   wangShuaiRule,
@@ -178,6 +229,8 @@ export const EXPLAIN_RULES: ExplainRule[] = [
   daYunShiShenRule,
   shiShenComboRule,
   shenShaPalaceRule,
+  sanYuanRule,
+  liuNianChongHeRule,
 ]
 
 /** 取某块命中的组合规则，按权重降序取前 n 条 */

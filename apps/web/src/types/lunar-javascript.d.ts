@@ -99,6 +99,8 @@ declare module 'lunar-javascript' {
     static SHI_SHEN: Record<string, string>
     static NAYIN: Record<string, string>
     static JIA_ZI: string[]
+    static CHONG: string[]
+    static HE_ZHI_6: string[]
   }
 
   export class Yun {

@@ -49,6 +49,24 @@ describe('explainerRules 组合型解读（P0）', () => {
     expect(palace.text).toMatch(/仅供参考/)
   })
 
+  it('胎元命宫身宫进解读：引用真实数据与词条', () => {
+    const ex = explain(result)
+    const point = ex.blocks.find((b) => b.key === 'pillars')!.points.find((p) => p.label.includes('胎元'))!
+    expect(point.text).toContain('丙子')
+    expect(point.text).toContain('己丑')
+    expect(point.text).toContain('辛巳')
+    expect(point.text).toMatch(/传统/)
+    expect(point.text).toContain('仅供参考')
+  })
+
+  it('流年冲合：输出冲/合或无明显冲合，且引用流年地支', () => {
+    const ex = explain(result)
+    const point = ex.blocks.find((b) => b.key === 'liunian')!.points.find((p) => p.label.includes('流年冲合'))!
+    expect(point.text).toContain(result.currentLiuNian!.ganZhi[1])
+    expect(point.text).toMatch(/相冲|相合|无明显冲合/)
+    expect(point.text).toContain('仅供参考')
+  })
+
   it('组合点按块取前 2，不刷屏', () => {
     for (const block of ['daymaster', 'pillars', 'dayun'] as const) {
       expect(matchedRules(result, block).length).toBeLessThanOrEqual(2)

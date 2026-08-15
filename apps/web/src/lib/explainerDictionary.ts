@@ -124,6 +124,10 @@ export const SHISHEN_COMBO_TIP: Record<string, string> = {
   枭神夺食: '传统称表达易受压抑，需注重自我调节',
 }
 
+/** 地支冲合词条（传统命理常见说法，仅供文化参考） */
+export const CHONG_TIP = '传统称相冲主变动、调整与重新平衡，遇事多留缓冲'
+export const HE_TIP = '传统称相合主互动、聚合与协调，多有人际或事务的牵动'
+
 export const PILLAR_ROLE: Record<PillarKey, string> = {
   year: '传统框架中多与祖上、早年环境相关',
   month: '传统框架中多与父母、成长环境相关',

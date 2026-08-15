@@ -152,7 +152,7 @@ export function explain(result: PaipanResult): ChartExplanation {
       { key: 'shishen', title: '十神性格', points: withRules('shishen', shiShenPoints) },
       { key: 'shensha', title: '神煞参考', points: withRules('shensha', shenShaPoints) },
       { key: 'dayun', title: '当前大运', points: withRules('dayun', dayunPoints) },
-      { key: 'liunian', title: '流年参考', points: liunianPoints },
+      { key: 'liunian', title: '流年参考', points: withRules('liunian', liunianPoints) },
     ],
   }
 }
