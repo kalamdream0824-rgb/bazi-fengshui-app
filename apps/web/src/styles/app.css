@@ -665,149 +665,53 @@ button {
   transform: translateX(-50%) translateY(0);
 }
 
-/* Hero 黄历签：纸底墨字浅签 */
+/* Hero 卡片（黄历） */
 .hero {
   margin: 4px var(--space-page) 12px;
   border-radius: var(--radius-card);
-  display: flex;
-  position: relative;
-  overflow: hidden;
-  background:
-    radial-gradient(120% 80% at 85% 0%, rgba(184, 144, 74, 0.14), transparent 55%),
-    radial-gradient(90% 70% at 10% 100%, rgba(169, 58, 44, 0.06), transparent 55%),
-    linear-gradient(170deg, #f8f1df, #efe5cb 78%);
-  border: 1px solid rgba(184, 144, 74, 0.4);
-  color: var(--ink);
-  box-shadow:
-    0 10px 26px rgba(47, 37, 28, 0.13),
-    0 2px 6px rgba(47, 37, 28, 0.06);
+  padding: 18px;
+  background: linear-gradient(180deg, #c24a3a, var(--red-deep));
+  color: #fff6e8;
+  box-shadow: 0 6px 16px rgba(176, 58, 46, 0.24);
 }
-.hero::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 76px;
-  width: 1px;
-  background: rgba(169, 58, 44, 0.28);
+.hero .date {
+  font-size: 11.5px;
+  opacity: 0.85;
+  letter-spacing: 1px;
 }
-.hero-left {
-  width: 76px;
-  padding: 16px 0 14px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.hero-glyph {
+.hero .gz {
   font-family: var(--font-glyph);
-  font-size: 27px;
-  font-weight: 700;
-  color: var(--ink);
-  writing-mode: vertical-rl;
-  letter-spacing: 4px;
-  line-height: 1.15;
-}
-.hero-stamp {
-  width: 28px;
-  height: 28px;
-  border-radius: 3px 7px 3px 7px;
-  background: var(--red);
-  color: #fbf3e2;
-  font-family: var(--font-display);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 28px;
-  text-align: center;
-  transform: rotate(-6deg);
-  box-shadow: 0 3px 8px rgba(169, 58, 44, 0.35);
-}
-.hero-right {
-  flex: 1;
-  padding: 14px 16px 13px;
-  position: relative;
-}
-.hero-top {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-}
-.hero-title {
-  font-family: var(--font-display);
-  font-size: 17px;
+  font-size: 23px;
   font-weight: 700;
   letter-spacing: 3px;
-  color: var(--ink);
+  text-indent: 3px;
+  margin: 8px 0 10px;
 }
 .hero .seg {
-  display: flex;
-  gap: 4px;
-  padding: 0;
+  padding: 0 0 10px;
 }
 .hero .opt {
-  background: transparent;
-  border: 0;
-  color: var(--ink-3);
-  padding: 3px 10px;
-  font-size: 12px;
-  border-radius: 999px;
+  background: rgba(255, 246, 232, 0.14);
+  border-color: rgba(255, 246, 232, 0.35);
+  color: #f7efe0;
 }
 .hero .opt.active {
-  background: rgba(169, 58, 44, 0.07);
-  color: var(--red);
-  border: 1px solid rgba(169, 58, 44, 0.28);
-  box-shadow: none;
-  font-weight: 600;
+  background: rgba(255, 246, 232, 0.95);
+  border-color: rgba(255, 246, 232, 0.95);
+  color: var(--red-deep);
 }
-.hero-yiji {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 13px;
-}
-.hero-yiji .yij {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
-  padding: 9px 11px;
-  background: rgba(255, 253, 246, 0.85);
-}
-.hero-yiji .k {
-  font-family: var(--font-display);
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--red);
-  letter-spacing: 2px;
-}
-.hero-yiji .v {
-  margin-top: 4px;
-  font-size: 12.5px;
-  color: var(--ink-2);
-  line-height: 1.5;
-}
-.hero-yiji .ji .k {
-  color: var(--ink-3);
-}
-.hero-foot {
-  margin-top: 13px;
-  padding-top: 10px;
-  border-top: 1px dashed var(--line);
-  display: flex;
-  gap: 16px;
+.chip {
+  display: inline-block;
   font-size: 11px;
-  color: var(--ink-3);
-  align-items: center;
+  padding: 4px 11px;
+  border-radius: var(--radius-pill);
+  margin: 0 6px 6px 0;
+  background: rgba(255, 246, 232, 0.16);
+  border: 1px solid rgba(255, 246, 232, 0.3);
 }
-.hero-foot b {
-  color: var(--red);
-  font-weight: 600;
-  font-family: var(--font-glyph);
-}
-.hero-foot .honesty {
-  margin-left: auto;
-  font-size: 10px;
-  letter-spacing: 1px;
+.chip.no {
+  background: rgba(0, 0, 0, 0.1);
+  border-color: rgba(255, 246, 232, 0.22);
 }
 
 /* 表单 */

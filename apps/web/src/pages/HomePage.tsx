@@ -58,42 +58,34 @@ export function HomePage() {
       </div>
 
       <div className="hero">
-        <div className="hero-left">
-          <div className="hero-glyph">{info.ganZhi}</div>
-          <div className="hero-stamp">宜</div>
+        <div className="date">
+          {day === 'today' ? '今日' : '明日'} · {info.dateText}
         </div>
-        <div className="hero-right">
-          <div className="hero-top">
-            <span className="hero-title">今日黄历</span>
-            <SegControl
-              two
-              options={[
-                { label: '今日', value: 'today' },
-                { label: '明日', value: 'tomorrow' },
-              ]}
-              value={day}
-              onChange={(v) => setDay(v as 'today' | 'tomorrow')}
-            />
-          </div>
-          <div className="hero-yiji">
-            <div className="yij">
-              <div className="k">宜</div>
-              <div className="v">{alm.yi.slice(0, 4).join(' · ')}</div>
-            </div>
-            <div className="yij ji">
-              <div className="k">忌</div>
-              <div className="v">{alm.ji.slice(0, 3).join(' · ')}</div>
-            </div>
-          </div>
-          <div className="hero-foot">
-            <span>
-              冲 <b>{alm.chongDesc.replace(/^冲/, '')}</b>
+        <div className="gz">{info.ganZhi}</div>
+        <SegControl
+          two
+          className="hero-seg"
+          options={[
+            { label: '今日', value: 'today' },
+            { label: '明日', value: 'tomorrow' },
+          ]}
+          value={day}
+          onChange={(v) => setDay(v as 'today' | 'tomorrow')}
+        />
+        <div>
+          {alm.yi.slice(0, 4).map((t) => (
+            <span key={t} className="chip">
+              宜 {t}
             </span>
-            <span>
-              煞 <b>{alm.sha}</b>
+          ))}
+          {alm.ji.slice(0, 3).map((t) => (
+            <span key={t} className="chip no">
+              忌 {t}
             </span>
-            <span className="honesty">传统黄历 · 供参考</span>
-          </div>
+          ))}
+        </div>
+        <div className="meta-line" style={{ marginTop: 8, color: 'rgba(255,246,232,.85)' }}>
+          冲煞：{alm.chongDesc} · 煞{alm.sha}
         </div>
       </div>
 
