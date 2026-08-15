@@ -66,6 +66,7 @@ export function buildReportHtml(request: PaipanRequest, result: PaipanResult): s
           ${pillarRow('空亡', (k) => result.pillars[k].xunKong)}
           ${pillarRow('纳音', (k) => result.pillars[k].naYin)}
           ${pillarRow('星运', (k) => result.pillars[k].diShi)}
+          ${pillarRow('自坐', (k) => result.pillars[k].ziZuo)}
           ${pillarRow('神煞', (k) => result.pillars[k].shenSha.join('·') || '—')}
         </table>
         ${result.taiYuan ? `<div style="margin-top:14px;font-size:13px;color:${C.ink}">

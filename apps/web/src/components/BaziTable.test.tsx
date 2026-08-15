@@ -25,10 +25,25 @@ describe('BaziTable 四柱表', () => {
     expect(hits[0].textContent).toBe('申酉')
   })
 
+  it('渲染自坐行（本柱天干太极点的十二长生）', () => {
+    render(<BaziTable pillars={result.pillars} />)
+    expect(screen.getByText('自坐')).toBeInTheDocument()
+    expect(screen.getByText('死')).toBeInTheDocument()
+    expect(screen.getByText('绝')).toBeInTheDocument()
+    expect(screen.getAllByText('长生').length).toBeGreaterThan(0)
+    expect(screen.getByText('冠带')).toBeInTheDocument()
+  })
+
   it('点击副星标签可查看释义', async () => {
     render(<BaziTable pillars={result.pillars} />)
     fireEvent.click(screen.getByText('副星'))
     expect(screen.getByText(/藏干对应日主的十神/)).toBeInTheDocument()
+  })
+
+  it('点击自坐标签可查看释义', () => {
+    render(<BaziTable pillars={result.pillars} />)
+    fireEvent.click(screen.getByText('自坐'))
+    expect(screen.getByText(/以本柱天干为太极点/)).toBeInTheDocument()
   })
 
   it('旧快照藏干缺副星字段时显示占位', () => {

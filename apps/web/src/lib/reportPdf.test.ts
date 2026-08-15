@@ -32,6 +32,8 @@ describe('reportPdf', () => {
     expect(html).toContain('胎元 丙子（涧下水）')
     expect(html).toContain('命宫 己丑（霹雳火）')
     expect(html).toContain('身宫 辛巳（白蜡金）')
+    expect(html).toContain('长生')
+    expect(html).toContain('冠带')
   })
 
   it('旧快照（缺胎元/命宫/身宫字段）仍可导出且不渲染空字段', () => {

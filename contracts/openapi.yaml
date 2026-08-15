@@ -311,6 +311,9 @@ components:
           type: string
         shiShen:
           type: string
+        ziZuo:
+          type: string
+          description: 自坐——本柱天干在本柱地支的十二长生（如"长生""帝旺"），与星运（日干为太极点）口径不同
         hideGan:
           type: array
           items:

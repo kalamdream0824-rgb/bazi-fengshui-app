@@ -12,6 +12,7 @@ import com.bazi.app.dto.PaipanRequest;
 import com.bazi.app.dto.PaipanResultDto;
 import com.bazi.app.dto.PillarDto;
 import com.bazi.app.domain.constants.WuXingConstants;
+import com.bazi.app.domain.constants.ZiZuoConstants;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -106,6 +107,6 @@ public class BaziService {
         hideGanDtos.add(new HideGanDto(g, shiShenOfGan, WuXingConstants.GAN_WUXING.getOrDefault(g, "tu")));
       }
     }
-    return new PillarDto(label, gan, zhi, shiShen, hideGanDtos, naYin, diShi, xunKong, List.of());
+    return new PillarDto(label, gan, zhi, shiShen, ZiZuoConstants.ziZuo(gan, zhi), hideGanDtos, naYin, diShi, xunKong, List.of());
   }
 }

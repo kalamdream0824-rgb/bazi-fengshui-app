@@ -7,6 +7,7 @@ public record PillarDto(
     String gan,
     String zhi,
     String shiShen,
+    String ziZuo,
     List<HideGanDto> hideGan,
     String naYin,
     String diShi,

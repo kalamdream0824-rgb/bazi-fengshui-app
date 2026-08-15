@@ -4,7 +4,7 @@ import { computeExternalShenSha, computeShenSha } from './shenSha'
 import type { Pillar, PillarKey } from '@/types/bazi'
 
 function fakePillar(gan: string, zhi: string): Pillar {
-  return { label: 'day', gan, zhi, shiShen: '', hideGan: [], naYin: '', diShi: '', xunKong: '', shenSha: [] }
+  return { label: 'day', gan, zhi, shiShen: '', ziZuo: '', hideGan: [], naYin: '', diShi: '', xunKong: '', shenSha: [] }
 }
 
 describe('shenSha.computeShenSha', () => {

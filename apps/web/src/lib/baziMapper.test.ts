@@ -14,7 +14,7 @@ interface FixtureCase {
     taiYuan: string
     mingGong: string
     shenGong: string
-    pillars: Record<PillarKey, { ganZhi: string; shiShen: string; hideGanShiShen: string[] }>
+    pillars: Record<PillarKey, { ganZhi: string; shiShen: string; hideGanShiShen: string[]; ziZuo: string }>
   }
 }
 
@@ -41,6 +41,7 @@ describe('baziMapper.paipan 对照夹具', () => {
         expect(result.pillars[key].hideGan.map((h) => h.shiShen), `${key} 柱副星`).toEqual(
           fixture.expected.pillars[key].hideGanShiShen,
         )
+        expect(result.pillars[key].ziZuo, `${key} 柱自坐`).toBe(fixture.expected.pillars[key].ziZuo)
       }
     })
   }
@@ -71,6 +72,25 @@ describe('baziMapper.paipan 结构完整性', () => {
     expect(result.pillars.day.xunKong).toBe('戌亥')
     expect(result.pillars.time.xunKong).toBe('寅卯')
     expect(result.pillars.day.xunKong).not.toContain(result.pillars.day.zhi)
+  })
+
+  it('自坐以本柱天干为太极点（与星运日干太极点口径不同）', () => {
+    const result = paipan({ gender: 'male', solarDateTime: '1995-10-08T14:30:00', trueSolarTime: false })
+    expect(result.pillars.year.ziZuo).toBe('死')
+    expect(result.pillars.month.ziZuo).toBe('绝')
+    expect(result.pillars.day.ziZuo).toBe('长生')
+    expect(result.pillars.time.ziZuo).toBe('冠带')
+    // 同年柱：星运以日干壬查亥支为临官，自坐以年干乙查亥支为死——证明太极点不同
+    expect(result.pillars.year.diShi).toBe('临官')
+    expect(result.pillars.year.ziZuo).not.toBe(result.pillars.year.diShi)
+  })
+
+  it('自坐与排盘软件示例一致：戊寅丙辰丁未乙巳 → 长生 冠带 冠带 沐浴', () => {
+    const result = paipan({ gender: 'female', solarDateTime: '1998-04-30T09:20:00', trueSolarTime: false })
+    expect(result.pillars.year.ziZuo).toBe('长生')
+    expect(result.pillars.month.ziZuo).toBe('冠带')
+    expect(result.pillars.day.ziZuo).toBe('冠带')
+    expect(result.pillars.time.ziZuo).toBe('沐浴')
   })
 
   it('返回完整的五行计数（天干+地支本气，共 8）', () => {

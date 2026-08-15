@@ -25,6 +25,8 @@ export interface Pillar {
   gan: string
   zhi: string
   shiShen: string
+  /** 自坐：本柱天干在本柱地支的十二长生（与星运的日干太极点口径不同） */
+  ziZuo: string
   hideGan: HideGan[]
   naYin: string
   diShi: string

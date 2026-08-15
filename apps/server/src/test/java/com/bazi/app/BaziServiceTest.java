@@ -55,6 +55,10 @@ class BaziServiceTest {
                 new TypeReference<List<String>>() {}),
             result.pillars().get(key).hideGan().stream().map(h -> h.shiShen()).toList(),
             c.get("id").asText() + " " + key + " 副星");
+        assertEquals(
+            expected.get("pillars").get(key).get("ziZuo").asText(),
+            result.pillars().get(key).ziZuo(),
+            c.get("id").asText() + " " + key + " 自坐");
       }
 
       int wuXingTotal = result.wuXing().values().stream().mapToInt(Integer::intValue).sum();

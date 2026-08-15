@@ -59,7 +59,8 @@ class BaziApiIntegrationTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.lunarText").value("一九九五年闰八月十四"))
         .andExpect(jsonPath("$.taiYuan").value("丙子"))
-        .andExpect(jsonPath("$.pillars.year.hideGan[0].shiShen").value("比肩"));
+        .andExpect(jsonPath("$.pillars.year.hideGan[0].shiShen").value("比肩"))
+        .andExpect(jsonPath("$.pillars.day.ziZuo").value("长生"));
 
     // 重复提交：去重后列表仍 1 条
     mvc.perform(post("/api/v1/records")

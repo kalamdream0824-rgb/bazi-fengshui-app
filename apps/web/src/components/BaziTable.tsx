@@ -152,6 +152,21 @@ export function BaziTable({ pillars }: BaziTableProps) {
               ))}
             </tr>
             <tr>
+              <td className="label tipable" onClick={() => setTip({ title: '自坐', text: TIPS['自坐'] })}>
+                自坐
+              </td>
+              {KEYS.map((k) => (
+                <td key={k}>
+                  <span
+                    className={`xy tipable${k === 'day' ? ' owner' : ''}`}
+                    onClick={() => setTip({ title: pillars[k].ziZuo, text: TIPS['自坐'] })}
+                  >
+                    {pillars[k].ziZuo}
+                  </span>
+                </td>
+              ))}
+            </tr>
+            <tr>
               <td className="label tipable" onClick={() => setTip({ title: '神煞', text: TIPS['神煞'] })}>
                 神煞
               </td>
@@ -164,7 +179,7 @@ export function BaziTable({ pillars }: BaziTableProps) {
           </tbody>
         </table>
       </div>
-      <div className="hint">点击 十神 / 天干 / 地支 / 藏干 / 副星 / 空亡 / 纳音 / 星运 查看释义</div>
+      <div className="hint">点击 十神 / 天干 / 地支 / 藏干 / 副星 / 空亡 / 纳音 / 星运 / 自坐 查看释义</div>
 
       <div className={`sheet ${tip ? 'show' : ''}`}>
         <button className="close" aria-label="关闭" onClick={() => setTip(null)}>

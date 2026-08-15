@@ -7,6 +7,23 @@ import { GAN_WUXING, ZHI_WUXING } from './wuxing'
 
 const YUN_GENDER = { male: 1, female: 0 } as const
 
+/** 十二长生（与 lunar-javascript LunarUtil.CHANG_SHENG 同表同口径） */
+const CHANG_SHENG_12 = ['长生', '沐浴', '冠带', '临官', '帝旺', '衰', '病', '死', '墓', '绝', '胎', '养']
+/** 天干长生起点（地支 0-based 序：子0 丑1 … 亥11），与 lunar 库 CHANG_SHENG_OFFSET 一致 */
+const CHANG_SHENG_OFFSET: Record<string, number> = { 甲: 1, 乙: 6, 丙: 10, 丁: 9, 戊: 10, 己: 9, 庚: 7, 辛: 0, 壬: 4, 癸: 3 }
+const ZHI_INDEX: Record<string, number> = { 子: 0, 丑: 1, 寅: 2, 卯: 3, 辰: 4, 巳: 5, 午: 6, 未: 7, 申: 8, 酉: 9, 戌: 10, 亥: 11 }
+
+/** 自坐：本柱天干为本柱地支的太极点，查十二长生（阳干顺行、阴干逆行） */
+export function ziZuoOf(gan: string, zhi: string): string {
+  const offset = CHANG_SHENG_OFFSET[gan] ?? 0
+  const zhiIndex = ZHI_INDEX[zhi] ?? 0
+  const yang = '甲丙戊庚壬'.includes(gan)
+  let index = offset + (yang ? zhiIndex : -zhiIndex)
+  if (index >= 12) index -= 12
+  if (index < 0) index += 12
+  return CHANG_SHENG_12[index]
+}
+
 function wuxingOfGan(gan: string): WuxingKey {
   return GAN_WUXING[gan] ?? 'tu'
 }
@@ -31,6 +48,7 @@ function toPillar(
     gan,
     zhi,
     shiShen,
+    ziZuo: ziZuoOf(gan, zhi),
     hideGan: hideGan.map((g, i) => ({
       gan: g,
       shiShen: hideGanShiShen[i] ?? '',
