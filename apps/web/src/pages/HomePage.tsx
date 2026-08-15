@@ -16,10 +16,10 @@ const ALM_TODAY = getAlmanacFor(0)
 const ALM_TOMORROW = getAlmanacFor(1)
 
 const QUICK = [
-  { to: '/input', glyph: '排', label: '八字排盘', desc: '看自己的盘' },
-  { to: '/comp', glyph: '合', label: '八字合婚', desc: '两人合不合' },
-  { to: '/daily', glyph: '运', label: '每日运势', desc: '今日提醒' },
-  { to: '/day-picker', glyph: '择', label: '择日', desc: '办事挑日子' },
+  { to: '/input', glyph: '排', label: '八字排盘' },
+  { to: '/comp', glyph: '合', label: '八字合婚' },
+  { to: '/daily', glyph: '运', label: '每日运势' },
+  { to: '/day-picker', glyph: '择', label: '择日' },
 ]
 
 export function HomePage() {
@@ -95,10 +95,7 @@ export function HomePage() {
           {QUICK.map((item) => (
             <Link key={item.to} to={item.to} className="opt">
               <span className="q-glyph">{item.glyph}</span>
-              <span>
-                <span className="q-t">{item.label}</span>
-                <span className="q-d">{item.desc}</span>
-              </span>
+              <span className="q-t">{item.label}</span>
             </Link>
           ))}
         </div>
