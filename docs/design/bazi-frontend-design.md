@@ -137,6 +137,7 @@ interface ChartExplanation {
 
 ## 10. 变更日志
 
+- v0.35（2026-08-16）：**「墨韵纸底」视觉落地（效果图 v7 定稿版）**——tokens 调整（纸 `#f3ecdc` / 卡 `#fffdf6` / 圆角收紧 / `--font-glyph` 干支宋体、界面统一苹方）；app.css：纸底墨韵晕染、卡片描金提白、暖墨底部导航、四柱表日柱列朱砂高亮、大运纵轴时间线、解读笺纸红格、首页黄历签（纸底墨字 + 竖排干支 + 朱砂章 + 宜忌双格 + 2×2 字形快捷宫格）；结构改动：HomePage Hero 重构、BaziTable 加 `day-col`、DaYunList 加 `dayun-axis`；前端 142/142、lint 0、build 绿、E2E 7/7、视觉断言 9/9。
 - v0.34（2026-08-16）：退出登录清空本地状态交付——登出时清空本地 IndexedDB 历史 + 当前命盘（useBaziStore.clear）+ 历史缓存失效（invalidate），云端记录保留（账号数据，重登可见）；修复「登出后排盘记录仍在」隐私 bug；交互测试 1 条；前端 142/142、lint 0、build 绿、E2E 7/7。
 - v0.33（2026-08-16）：历史页简化——导出/导入备份从主按钮行收进「数据管理」二级入口（未登录/换设备迁移仍可用），主行只留「去排盘 / 清空全部」；前端 141/141。
 - v0.32（2026-08-16）：历史一键清空交付——后端 DELETE /records 批量清空（按 user_id 隔离，集成测试）；前端 cloudSync.clearCloudRecords + HistoryPage 清空按钮（confirm + 双模式）；交互测试 2 条；前端 141/141、后端 22/22。
