@@ -80,6 +80,7 @@ public class BaziService {
           LunarUtil.NAYIN.getOrDefault(gz, ""),
           dy.getXunKong(),
           LunarUtil.SHI_SHEN.getOrDefault(dayGan + gz.substring(0, 1), ""),
+          ZiZuoConstants.ziZuo(dayGan, gz.substring(1, 2)),
           List.of()));
     }
 
@@ -97,6 +98,8 @@ public class BaziService {
             lgz,
             LunarUtil.NAYIN.getOrDefault(lgz, ""),
             LunarUtil.SHI_SHEN.getOrDefault(dayGan + lgz.substring(0, 1), ""),
+            ZiZuoConstants.ziZuo(dayGan, lgz.substring(1, 2)),
+            ln.getXunKong(),
             List.of()));
       }
       break;

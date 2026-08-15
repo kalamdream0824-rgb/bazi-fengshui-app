@@ -10,5 +10,6 @@ public record DaYunDto(
     String naYin,
     String xunKong,
     String shiShen,
+    String starFortune,
     List<String> shenSha) {
 }

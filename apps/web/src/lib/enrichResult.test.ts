@@ -26,14 +26,23 @@ describe('enrichResult', () => {
     const base = paipan({ gender: 'male', solarDateTime: '1995-10-08T14:30:00', trueSolarTime: false })
     const result = enrichResult({
       ...base,
-      daYun: base.daYun.map((d) => ({ ...d, naYin: '', shiShen: '', shenSha: [] })),
-      liuNianList: base.liuNianList.map((ln) => ({ ...ln, naYin: '', shiShen: '', shenSha: [] })),
+      daYun: base.daYun.map((d) => ({ ...d, naYin: '', shiShen: '', starFortune: '', shenSha: [] })),
+      liuNianList: base.liuNianList.map((ln) => ({
+        ...ln,
+        naYin: '',
+        shiShen: '',
+        starFortune: '',
+        shenSha: [],
+      })),
     })
 
     expect(result.daYun[0].naYin).toBe('泉中水')
     expect(result.daYun[0].shiShen).toBe('食神')
+    expect(result.daYun[0].starFortune).toBe('长生')
     expect(result.liuNianList[0].naYin).toBe('泉中水')
     expect(result.liuNianList[0].shiShen).toBe('伤官')
+    expect(result.liuNianList[0].starFortune).toBe('沐浴')
+    expect(result.liuNianList[0].xunKong).toBe('午未')
     expect(result.liuNianList[0].shenSha.length).toBeGreaterThanOrEqual(0)
   })
 })

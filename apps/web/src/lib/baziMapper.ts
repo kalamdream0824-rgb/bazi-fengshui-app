@@ -184,6 +184,7 @@ export function paipan(req: PaipanRequest): PaipanResult {
         naYin: LunarUtil.NAYIN[ganZhi] ?? '',
         xunKong: d.getXunKong(),
         shiShen: LunarUtil.SHI_SHEN[dayGan + ganZhi[0]] ?? '',
+        starFortune: ziZuoOf(dayGan, ganZhi[1]),
         shenSha: computeExternalShenSha(shenShaRef, ganZhi),
       }
     })
@@ -199,6 +200,8 @@ export function paipan(req: PaipanRequest): PaipanResult {
           ganZhi,
           naYin: LunarUtil.NAYIN[ganZhi] ?? '',
           shiShen: LunarUtil.SHI_SHEN[dayGan + ganZhi[0]] ?? '',
+          starFortune: ziZuoOf(dayGan, ganZhi[1]),
+          xunKong: ln.getXunKong(),
           shenSha: computeExternalShenSha(shenShaRef, ganZhi),
         }
       })

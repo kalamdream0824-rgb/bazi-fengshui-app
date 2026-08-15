@@ -14,9 +14,9 @@ interface FixtureCase {
     taiYuan: string
     mingGong: string
     shenGong: string
-    daYunFirst: { ganZhi: string; naYin: string; xunKong: string; shiShen: string }
+    daYunFirst: { ganZhi: string; naYin: string; xunKong: string; shiShen: string; starFortune: string }
     yunStart: { year: number; forward: boolean }
-    liuNianFirst: { year: number; age: number; ganZhi: string; naYin: string }
+    liuNianFirst: { year: number; age: number; ganZhi: string; naYin: string; xunKong: string; starFortune: string }
     pillars: Record<PillarKey, { ganZhi: string; shiShen: string; hideGanShiShen: string[]; ziZuo: string }>
   }
 }
@@ -39,12 +39,15 @@ describe('baziMapper.paipan 对照夹具', () => {
       expect(result.daYun[0].naYin).toBe(fixture.expected.daYunFirst.naYin)
       expect(result.daYun[0].xunKong).toBe(fixture.expected.daYunFirst.xunKong)
       expect(result.daYun[0].shiShen).toBe(fixture.expected.daYunFirst.shiShen)
+      expect(result.daYun[0].starFortune).toBe(fixture.expected.daYunFirst.starFortune)
       expect(result.yunStart.year).toBe(fixture.expected.yunStart.year)
       expect(result.yunStart.forward).toBe(fixture.expected.yunStart.forward)
       expect(result.liuNianList[0].year).toBe(fixture.expected.liuNianFirst.year)
       expect(result.liuNianList[0].age).toBe(fixture.expected.liuNianFirst.age)
       expect(result.liuNianList[0].ganZhi).toBe(fixture.expected.liuNianFirst.ganZhi)
       expect(result.liuNianList[0].naYin).toBe(fixture.expected.liuNianFirst.naYin)
+      expect(result.liuNianList[0].xunKong).toBe(fixture.expected.liuNianFirst.xunKong)
+      expect(result.liuNianList[0].starFortune).toBe(fixture.expected.liuNianFirst.starFortune)
 
       for (const key of ['year', 'month', 'day', 'time'] as const) {
         expect(`${result.pillars[key].gan}${result.pillars[key].zhi}`, `${key} 柱干支`).toBe(
@@ -110,9 +113,23 @@ describe('baziMapper.paipan 结构完整性', () => {
     const result = paipan({ gender: 'male', solarDateTime: '1995-10-08T14:30:00', trueSolarTime: false })
     expect(result.yunStart).toEqual({ year: 2005, month: 10, day: 28, hour: 14, forward: false })
     expect(result.liuNianList.length).toBe(10)
-    expect(result.liuNianList[0]).toMatchObject({ year: 2005, age: 11, ganZhi: '乙酉', naYin: '泉中水', shiShen: '伤官' })
+    expect(result.liuNianList[0]).toMatchObject({
+      year: 2005,
+      age: 11,
+      ganZhi: '乙酉',
+      naYin: '泉中水',
+      shiShen: '伤官',
+      starFortune: '沐浴',
+      xunKong: '午未',
+    })
     expect(result.liuNianList[0].shenSha.length).toBeGreaterThanOrEqual(0)
-    expect(result.daYun[0]).toMatchObject({ ganZhi: '甲申', naYin: '泉中水', xunKong: '午未', shiShen: '食神' })
+    expect(result.daYun[0]).toMatchObject({
+      ganZhi: '甲申',
+      naYin: '泉中水',
+      xunKong: '午未',
+      shiShen: '食神',
+      starFortune: '长生',
+    })
   })
 
   it('女命大运顺逆与起运时间不同', () => {

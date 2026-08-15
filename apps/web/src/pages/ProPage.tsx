@@ -105,7 +105,11 @@ export function ProPage() {
                     {ln.year} · {ln.age} 岁
                   </span>
                   <span className="gz">{ln.ganZhi}</span>
-                  <span className="v">{[ln.shiShen, ln.naYin, ln.shenSha.join('·')].filter(Boolean).join(' · ')}</span>
+                  <span className="v">
+                    {[ln.shiShen, ln.naYin, ln.starFortune, ln.xunKong ? `空${ln.xunKong}` : '', ln.shenSha.join('·')]
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </span>
                 </div>
               ))
             ) : (

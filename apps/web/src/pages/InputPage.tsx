@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/Button'
 import { Card, CardTitle } from '@/components/Card'
 import { DateTimePicker } from '@/components/DateTimePicker'
+import { LunarDatePicker } from '@/components/LunarDatePicker'
 import { FooterNote } from '@/components/FooterNote'
 import { SegControl } from '@/components/SegControl'
 import { RegionSelect } from '@/components/RegionSelect'
@@ -27,6 +28,7 @@ export function InputPage() {
   const [name, setName] = useState('')
   const [gender, setGender] = useState<Gender>('male')
   const [datetime, setDatetime] = useState('1995-10-08T14:30')
+  const [calendarMode, setCalendarMode] = useState<'solar' | 'lunar'>('solar')
   const [birthPlace, setBirthPlace] = useState('')
   const [trueSolar, setTrueSolar] = useState(trueSolarDefault)
 
@@ -91,8 +93,27 @@ export function InputPage() {
       <Card>
         <CardTitle>出生时间</CardTitle>
         <div className="field">
-          <div className="lbl">公历出生日期与时间</div>
-          <DateTimePicker value={datetime} onChange={setDatetime} />
+          <div className="lbl">历法</div>
+          <SegControl
+            two
+            options={[
+              { label: '公历', value: 'solar' },
+              { label: '农历', value: 'lunar' },
+            ]}
+            value={calendarMode}
+            onChange={(v) => setCalendarMode(v as 'solar' | 'lunar')}
+          />
+        </div>
+        <div className="field">
+          <div className="lbl">{calendarMode === 'solar' ? '公历出生日期与时间' : '农历出生日期与时间'}</div>
+          {calendarMode === 'solar' ? (
+            <DateTimePicker value={datetime} onChange={setDatetime} />
+          ) : (
+            <LunarDatePicker value={datetime} onChange={setDatetime} />
+          )}
+          {calendarMode === 'lunar' && (
+            <div className="note">对应公历：{datetime.replace('T', ' ')}</div>
+          )}
         </div>
         <div className="field">
           <div className="note">出生时间越精确，排盘与运势推算越准。</div>

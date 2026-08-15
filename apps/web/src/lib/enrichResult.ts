@@ -1,5 +1,6 @@
 import { LunarUtil } from 'lunar-javascript'
 import { timeToShichen } from './datePicker'
+import { ziZuoOf } from './baziMapper'
 import { computeExternalShenSha, computeShenSha, type ShenShaRef } from './shenSha'
 import { formatAdjusted, longitudeOf, trueSolarTime } from './trueSolarTime'
 import type { PaipanRequest, PaipanResult, TrueSolarInfo } from '@/types/bazi'
@@ -25,6 +26,9 @@ export function enrichResult(result: PaipanResult): PaipanResult {
     if (!d.shiShen) {
       d.shiShen = LunarUtil.SHI_SHEN[result.pillars.day.gan + d.ganZhi[0]] ?? ''
     }
+    if (!d.starFortune) {
+      d.starFortune = ziZuoOf(result.pillars.day.gan, d.ganZhi[1])
+    }
   })
   if (result.currentLiuNian) {
     result.currentLiuNian.shenSha = computeExternalShenSha(ref, result.currentLiuNian.ganZhi)
@@ -36,6 +40,9 @@ export function enrichResult(result: PaipanResult): PaipanResult {
     }
     if (!ln.shiShen) {
       ln.shiShen = LunarUtil.SHI_SHEN[result.pillars.day.gan + ln.ganZhi[0]] ?? ''
+    }
+    if (!ln.starFortune) {
+      ln.starFortune = ziZuoOf(result.pillars.day.gan, ln.ganZhi[1])
     }
   })
   return result

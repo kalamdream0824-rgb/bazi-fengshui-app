@@ -19,7 +19,7 @@ interface WheelProps {
   onChange: (value: string) => void
 }
 
-function Wheel({ options, value, label, onChange }: WheelProps) {
+export function Wheel({ options, value, label, onChange }: WheelProps) {
   const ref = useRef<HTMLDivElement>(null)
   const index = Math.max(options.indexOf(value), 0)
 

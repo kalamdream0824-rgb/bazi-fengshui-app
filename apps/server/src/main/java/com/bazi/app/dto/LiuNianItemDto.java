@@ -8,5 +8,7 @@ public record LiuNianItemDto(
     String ganZhi,
     String naYin,
     String shiShen,
+    String starFortune,
+    String xunKong,
     List<String> shenSha) {
 }

@@ -1,5 +1,6 @@
 declare module 'lunar-javascript' {
   export class Solar {
+    static fromYmd(year: number, month: number, day: number): Solar
     static fromYmdHms(year: number, month: number, day: number, hour: number, minute: number, second: number): Solar
     static fromDate(date: Date): Solar
     getLunar(): Lunar
@@ -12,7 +13,12 @@ declare module 'lunar-javascript' {
 
   export class Lunar {
     static fromDate(date: Date): Lunar
+    static fromYmd(year: number, month: number, day: number): Lunar
     next(days: number): Lunar
+    getSolar(): Solar
+    getYear(): number
+    getMonth(): number
+    getDay(): number
     getEightChar(): EightChar
     getYearShengXiao(): string
     getTimeZhi(): string
@@ -29,6 +35,18 @@ declare module 'lunar-javascript' {
     getPengZuZhi(): string
     getDayPositionFu(): string
     toString(): string
+  }
+
+  export class LunarYear {
+    static fromYear(year: number): LunarYear
+    getLeapMonth(): number
+    getMonth(month: number, isLeap?: boolean): LunarMonth
+  }
+
+  export class LunarMonth {
+    getMonth(): number
+    getDayCount(): number
+    isLeap(): boolean
   }
 
   export class EightChar {

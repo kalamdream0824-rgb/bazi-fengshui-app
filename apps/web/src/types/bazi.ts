@@ -43,6 +43,8 @@ export interface DaYun {
   xunKong: string
   /** 大运天干对日主的十神 */
   shiShen: string
+  /** 大运星运：大运地支对日主的十二长生（与四柱星运同口径） */
+  starFortune: string
   shenSha: string[]
 }
 
@@ -60,6 +62,8 @@ export interface LiuNianItem {
   ganZhi: string
   naYin: string
   shiShen: string
+  starFortune: string
+  xunKong: string
   shenSha: string[]
 }
 

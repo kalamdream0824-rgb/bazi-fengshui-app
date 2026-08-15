@@ -363,6 +363,9 @@ components:
         shiShen:
           type: string
           description: 大运天干对日主的十神（前端补充）
+        starFortune:
+          type: string
+          description: 大运星运——大运地支对日主的十二长生（与四柱星运同口径）
         shenSha:
           type: array
           items:
@@ -396,6 +399,12 @@ components:
         shiShen:
           type: string
           description: 流年天干对日主的十神（前端补充）
+        starFortune:
+          type: string
+          description: 流年星运——流年地支对日主的十二长生
+        xunKong:
+          type: string
+          description: 流年旬空
         shenSha:
           type: array
           items:
