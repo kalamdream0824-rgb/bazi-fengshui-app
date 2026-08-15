@@ -2,7 +2,7 @@
 
 | 项目 | 内容 |
 |---|---|
-| 版本 | v0.3（订单落账 + 模拟支付 · 与后端 v0.7 对齐） |
+| 版本 | v0.4（MySQL 持久化实测通过） |
 | 日期 | 2026-08-09 |
 | 目标库 | MySQL 8.x（utf8mb4）；开发/测试用 H2（`MODE=MySQL` 兼容） |
 | DDL 单一来源 | `apps/server/src/main/resources/schema.sql`（幂等，`IF NOT EXISTS`） |
@@ -101,6 +101,7 @@ CREATE INDEX idx_order_paid_idem ON bazi_order (provider, provider_trade_no, sta
 
 ## 5. 变更日志
 
+- v0.4（2026-08-16）：**MySQL 持久化实测通过**——docker compose 拉起 mysql:8.4（schema.sql 自动建 4 表），后端 `SPRING_PROFILES_ACTIVE=mysql` 连接；注册/排盘写入 MySQL，**重启后端后账号可登录、记录保留**（createdAt 不丢）；开发联调默认切 MySQL，H2 仅作测试。
 - v0.3（2026-08-11）：订单表由预留转正式——明确状态机 `pending → paid`、模拟支付 CAS 幂等更新、`provider=mock/redeem` 与索引建议（与后端 v0.7 对齐）。
 - v0.2（2026-08-10）：会员权益落地——bazi_user 增加 plan/member_expire_at；新增 bazi_redeem_code 与 bazi_order 表。
 - v0.1（2026-08-09）：建立数据库设计文档（用户/记录表 + 订单预留 + 约定/迁移/安全）。

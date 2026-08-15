@@ -15,7 +15,7 @@
 - ✅ **P1**：MySQL 正式化——`docker-compose.yml`（mysql:8.4，自动建表）+ `application-mysql.yml` 本地 MySQL profile（prod 用 `application-prod.yml` + 环境变量）；统一请求日志过滤器（方法/URI/状态/耗时/用户，慢请求 >500ms 单独 WARN）。
 - ✅ **P2-会员权益 + 兑换码已交付**：`bazi_redeem_code` 兑换码表 + `bazi_user` 增加 `plan/member_expire_at`；`GET /api/v1/me` 会员状态、`POST /api/v1/redeem` 兑换（大小写不敏感、顺延到期、记录订单 `provider=redeem`）；前端"我的-会员状态"卡接入。
 - ✅ **P2-模拟支付打通全流程已交付**：`POST /api/v1/orders` 创建 pending 订单（套餐校验 + 金额来自 `MemberPlans` 常量，业务侧示例价 30 天 ¥29.9 / 90 天 ¥68）→ `POST /api/v1/pay/mock-success/{orderId}` 模拟支付回调（仅非生产环境，`app.pay.mock-enabled` 控制；**幂等**：订单已 paid 不重复顺延到期）→ 会员即时开通。`POST /api/v1/pay/callback` 为真实渠道回调占位（当前明确拒绝：`PAY_CALLBACK_NOT_READY`），资质就绪后接入微信/支付宝，订单与会员逻辑无需改动。
-- ✅ 环境：Maven 3.9.11 已装；开发库 H2（MySQL 切换仅改 datasource 配置）。
+- ✅ 环境：Maven 3.9.11 已装；**开发库 MySQL 已实测**（docker compose mysql:8.4 + `SPRING_PROFILES_ACTIVE=mysql`，重启后数据持久化；H2 仅测试用）。
 - ✅ **v0.8 排盘响应补齐问真口径字段已交付**——`hideGan[].shiShen`（副星/藏干十神）与 `taiYuan/taiYuanNaYin/mingGong/mingGongNaYin/shenGong/shenGongNaYin`（lunar-java 1.7.4 `getXxxShiShenZhi`/`getTaiYuan`/`getMingGong`/`getShenGong` 同源 API 直接提供），fixtures 同步扩展（6 组用例全断言），后端测试 21/21。
 - ✅ **v0.9 自坐字段已交付**——Pillar 增加 `ziZuo`（本柱天干在本柱地支的十二长生）；lunar-java 未公开十二长生表，按前端同款口径新建 `domain/constants/ZiZuoConstants`（十二长生表 + 阴阳顺逆公式，与前端 `ziZuoOf` 同表同公式），fixtures 6 组用例全断言，后端测试 21/21。
 - ✅ **v0.10 专业细盘数据已交付**——`yunStart`（起运公历时间 + 顺逆）、`daYun[].naYin/xunKong/shiShen`、`liuNianList`（起运后逐年：year/age/ganZhi/naYin/shiShen/shenSha）；lunar-java `Yun/DaYun/LiuNian` + `LunarUtil.NAYIN/SHI_SHEN` 直接支持；fixtures 6 组用例全断言，后端测试 21/21。
@@ -121,6 +121,7 @@ CREATE TABLE bazi_user (
 
 ## 8. 变更日志
 
+- v0.13（2026-08-16）：MySQL 持久化实测通过——docker compose 拉起 mysql:8.4、schema.sql 自动建表、mysql profile 连接验证；注册/排盘写入 MySQL，重启后端数据保留；后端测试 21/21 不受影响。
 - v0.12（2026-08-15）：流月/小运交付——新增 LiuYueItemDto/XiaoYunItemDto；LiuNianItemDto.liuYue、PaipanResultDto.xiaoYunList/currentYearLiuYue；BaziService 用 lunar-java LiuYue/XiaoYun 填充；fixtures 断言；后端测试 21/21。
 - v0.11（2026-08-15）：DaYunDto/LiuNianItemDto 增加 starFortune/xunKong——大运/流年星运用 ZiZuoConstants.ziZuo（日干太极点）、流年旬空用 LiuNian.getXunKong；fixtures 断言；后端测试 21/21。
 - v0.10（2026-08-15）：专业细盘数据交付——PaipanResultDto 增加 yunStart/liuNianList；DaYunDto 增加 naYin/xunKong/shiShen；BaziService 用 lunar-java Yun/DaYun/LiuNian + LunarUtil.NAYIN/SHI_SHEN 填充；fixtures 断言首步大运/起运/首年流年；后端测试 21/21。
