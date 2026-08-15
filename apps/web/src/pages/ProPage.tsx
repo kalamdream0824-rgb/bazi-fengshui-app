@@ -9,8 +9,9 @@ import { TopBar } from '@/components/TopBar'
 import { GAN_WUXING, WUXING_LABEL, computeWuxingDetail } from '@/lib/wuxing'
 import { useBaziWithFallback } from '@/hooks/useBaziWithFallback'
 import { explain } from '@/lib/explainer'
+import { computeGeJu, computeWangShuai } from '@/lib/geJu'
 
-type Panel = 'yun' | 'liu' | 'ss' | 'wuxing' | 'shensha'
+type Panel = 'yun' | 'liu' | 'ss' | 'geju' | 'wuxing' | 'shensha'
 
 export function ProPage() {
   const { result } = useBaziWithFallback()
@@ -23,6 +24,8 @@ export function ProPage() {
   const currentDaYun = result.daYun.find((d) => d.isCurrent)
   const explanation = explain(result)
   const wuxingDetail = computeWuxingDetail(result)
+  const geJu = computeGeJu(result)
+  const wangShuai = computeWangShuai(result)
   const startAge = result.daYun[0] ? Number.parseInt(result.daYun[0].ageRange.split(' - ')[0], 10) : 0
   const nowYear = new Date().getFullYear()
 
@@ -46,11 +49,12 @@ export function ProPage() {
       </div>
 
       <SegControl
-        className="five"
+        className="six"
         options={[
           { label: '大运', value: 'yun' },
           { label: '流年', value: 'liu' },
           { label: '十神', value: 'ss' },
+          { label: '格局', value: 'geju' },
           { label: '五行', value: 'wuxing' },
           { label: '神煞', value: 'shensha' },
         ]}
@@ -165,6 +169,43 @@ export function ProPage() {
                 <span className="v">
                   本气 {d.stemCount} · 含藏干 {d.weightedCount}
                   {d.missing ? '（缺失）' : ''}
+                </span>
+              </div>
+            ))}
+          </Card>
+        </>
+      )}
+
+      {panel === 'geju' && (
+        <>
+          <Card>
+            <CardTitle hint="月支藏干透干优先，不透取本气 · 参考口径">月令格局</CardTitle>
+            <div className="row">
+              <span className="k">月柱</span>
+              <span className="v">{geJu.monthGanZhi}</span>
+            </div>
+            <div className="row">
+              <span className="k">取格</span>
+              <span className="v">
+                {geJu.trans ? `藏干 ${geJu.gan}（${geJu.shiShen}）透出取格` : `本气 ${geJu.gan}（${geJu.shiShen}）`}
+              </span>
+            </div>
+            <div className="row">
+              <span className="k">格局</span>
+              <span className="v" style={{ fontWeight: 700 }}>
+                {geJu.name}
+              </span>
+            </div>
+          </Card>
+          <Card>
+            <CardTitle hint={`得分 ${wangShuai.score} · 得令+2 / 支生扶+1 / 干比劫+1印+0.5 · 参考口径`}>
+              日主旺衰粗判 · {wangShuai.level}
+            </CardTitle>
+            {wangShuai.items.map((item) => (
+              <div className="row" key={item.label}>
+                <span className="k">{item.label}</span>
+                <span className="v">
+                  {item.score > 0 ? `+${item.score}` : item.score} · {item.note}
                 </span>
               </div>
             ))}

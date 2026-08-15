@@ -170,6 +170,9 @@ button {
 .seg.five {
   grid-template-columns: repeat(5, 1fr);
 }
+.seg.six {
+  grid-template-columns: repeat(6, 1fr);
+}
 .row.current {
   background: rgba(176, 58, 46, 0.06);
   box-shadow: inset 3px 0 0 var(--red);
