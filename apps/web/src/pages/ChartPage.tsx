@@ -14,9 +14,12 @@ import { prepareShare, type PreparedShare } from '@/lib/share'
 
 export function ChartPage() {
   const navigate = useNavigate()
-  const { request, result } = useBaziWithFallback()
+  const { request, result, loading } = useBaziWithFallback()
   const [share, setShare] = useState<PreparedShare | null>(null)
 
+  if (loading) {
+    return <div className="empty">正在读取命盘…</div>
+  }
   if (!request || !result) {
     return <Navigate to="/input" replace />
   }

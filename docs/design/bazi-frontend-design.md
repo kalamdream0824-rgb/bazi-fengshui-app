@@ -2,7 +2,7 @@
 
 | 项目 | 内容 |
 |---|---|
-| 版本 | v0.30（新人解读 P3：一句话档案 + 词库扩充已交付） |
+| 版本 | v0.31（E2E 冒烟 + 刷新兜底修复已交付） |
 | 日期 | 2026-08-09 |
 | 索引 | 见 `docs/design/README.md`；后端见 `backend-design.md` |
 
@@ -21,6 +21,7 @@
 - ✅ **v0.28 新人解读 P1 已交付**——十神组合检测（伤官配印/食神生财/杀印相生/官印相生/食神制杀/伤官生财/比劫夺财/枭神夺食，命局十神集合匹配，输出前 2）+ 神煞落宫（神煞×宫位按柱序输出前 2）；dictionary 补 8 条组合词条；每盘组合型解读 ≥5 条；前端 132/132、lint 0、build 绿。
 - ✅ **v0.29 新人解读 P2 已交付**——胎元/命宫/身宫进解读（pillars 块，引用真实数据 + TERM_TIPS 词条）+ 流年冲合（liunian 块，lunar `CHONG`/`HE_ZHI_6` 同源表检测流年地支与四柱的六冲/六合）；dictionary 补冲合词条；每盘组合型解读 ≥7 条；前端 134/134、lint 0、build 绿。
 - ✅ **v0.30 新人解读 P3 已交付**——总览首条新增"一句话档案"（`buildProfile`：日主·旺衰·现行大运，复用 computeWangShuai 与 daYun 字段，供分享卡/命书复用）；词库扩充地支意象 12 条 + 十神六亲 10 条（温和口径）；前端 136/136、lint 0、build 绿。
+- ✅ **v0.31 E2E 冒烟 + 刷新兜底修复已交付**——Playwright 全链路脚本 `e2e/run_e2e.py`（注册登录→排盘→会员购买→分享→历史→刷新，6/6 通过）；**修复真实 bug**：刷新后 /chart 立即跳回 /input（`useBaziWithFallback` 历史兜底异步加载时无 loading 状态，页面过早 `<Navigate>`），新增 loading 状态加载中不跳转，hook 回归测试 3 条；前端 139/139、lint 0、build 绿。
 - 详细历史见 git log，不在本文档堆叠。
 
 ## 2. 架构
@@ -135,6 +136,7 @@ interface ChartExplanation {
 
 ## 10. 变更日志
 
+- v0.31（2026-08-16）：E2E 冒烟交付——`e2e/run_e2e.py`（Playwright headless，6/6 通过）；修复刷新兜底 bug（useBaziWithFallback 加 loading，ChartPage/ProPage 加载中不跳转）；hook 回归测试；前端 139/139。
 - v0.30（2026-08-15）：新人解读 P3 交付——buildProfile 一句话档案（总览首条）；词库扩地支意象 12 + 十神六亲 10；前端 136/136、lint 0、build 绿。
 - v0.29（2026-08-15）：新人解读 P2 交付——胎元命宫身宫解读（pillars 块）+ 流年冲合（liunian 块，lunar CHONG/HE_ZHI_6 同源）；lunar 类型声明补冲合表；每盘组合型解读 ≥7 条；前端 134/134、lint 0、build 绿。
 - v0.28（2026-08-15）：新人解读 P1 交付——十神组合检测（8 经典组合，groups 每组任选其一语义）+ 神煞落宫（按柱序前 2）；dictionary 补 8 条组合词条；shishen/shensha 块接入组合规则；每盘组合型解读 ≥5 条；前端 132/132、lint 0、build 绿。

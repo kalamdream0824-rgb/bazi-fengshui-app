@@ -14,9 +14,12 @@ import { computeGeJu, computeWangShuai } from '@/lib/geJu'
 type Panel = 'yun' | 'liu' | 'ss' | 'geju' | 'wuxing' | 'shensha'
 
 export function ProPage() {
-  const { result } = useBaziWithFallback()
+  const { result, loading } = useBaziWithFallback()
   const [panel, setPanel] = useState<Panel>('yun')
 
+  if (loading) {
+    return <div className="empty">正在读取命盘…</div>
+  }
   if (!result) {
     return <Navigate to="/input" replace />
   }
