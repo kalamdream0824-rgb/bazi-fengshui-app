@@ -15,9 +15,9 @@ describe('explainerRules 组合型解读（P0）', () => {
   it('每盘至少 3 条组合型解读，且文本引用盘内证据', () => {
     const ex = explain(result)
     const combo = ex.blocks.flatMap((b) =>
-      b.points.filter((p) => /旺衰|自坐|藏干|大运主题/.test(p.label)),
+      b.points.filter((p) => /旺衰|自坐|藏干|大运主题|十神组合|神煞落宫/.test(p.label)),
     )
-    expect(combo.length).toBeGreaterThanOrEqual(3)
+    expect(combo.length).toBeGreaterThanOrEqual(5)
 
     const wangShuai = combo.find((p) => p.label.includes('旺衰'))!
     expect(wangShuai.text).toMatch(/分/)
@@ -31,6 +31,22 @@ describe('explainerRules 组合型解读（P0）', () => {
 
     const daYun = combo.find((p) => p.label.includes('大运主题'))!
     expect(daYun.text).toContain('比肩')
+  })
+
+  it('十神组合检测：1995-10-08 命中伤官配印与食神生财', () => {
+    const ex = explain(result)
+    const combo = ex.blocks.find((b) => b.key === 'shishen')!.points.find((p) => p.label === '十神组合')!
+    expect(combo.text).toContain('伤官配印')
+    expect(combo.text).toContain('食神生财')
+    expect(combo.text).toMatch(/传统称/)
+    expect(combo.text).toContain('仅供参考')
+  })
+
+  it('神煞落宫：按柱序输出前 2 个', () => {
+    const ex = explain(result)
+    const palace = ex.blocks.find((b) => b.key === 'shensha')!.points.find((p) => p.label === '神煞落宫')!
+    expect(palace.text).toMatch(/「亡神」落在年柱/)
+    expect(palace.text).toMatch(/仅供参考/)
   })
 
   it('组合点按块取前 2，不刷屏', () => {
