@@ -8,6 +8,7 @@
 | `backend-design.md` | 后端技术设计（技术栈/模块/API/表结构/一致性策略） | 后端开发会话 |
 | `database-design.md` | 数据库设计（表/字段/索引/迁移/约定） | 后端开发会话 |
 | `dev-checklist.md` | 开发自检清单（防复发：状态/交互/双模式/运行态/视觉/测试纪律） | **所有开发会话（提交前逐条自查）** |
+| `handover-summary.md` | 项目交接总结（仓库/完成度/约定/环境坑/待办/下一步） | **新对话恢复上下文第一入口** |
 | `../mockups/bazi-app-mockups.md` | 产品图、交互原型、设计系统规范 | 产品/UI 迭代会话 |
 | `../mockups/design-philosophy.md` | 视觉哲学「朱墨星图」 | UI 相关会话 |
 | `../../contracts/openapi.yaml` | 前后端共享 API 契约（**唯一真源**） | 前后端联调 |
