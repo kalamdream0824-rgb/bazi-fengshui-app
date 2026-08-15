@@ -1,5 +1,6 @@
 import type { PaipanResult, PillarKey, WuxingKey } from '@/types/bazi'
 import { GAN_WUXING, WUXING_LABEL } from './wuxing'
+import { computeWangShuai } from './geJu'
 import { matchedRules } from './explainerRules'
 import {
   BLOCK_REFERENCE,
@@ -68,6 +69,16 @@ function shenShaText(name: string): string {
   return SHEN_SHA_TIP[name] ?? `传统命理神煞之一（${name}），需结合全局论断，${BLOCK_REFERENCE}。`
 }
 
+/** 一句话档案：日主 · 旺衰 · 现行大运（供总览首条与后续分享卡/命书复用） */
+export function buildProfile(result: PaipanResult): string {
+  const dayGan = result.pillars.day.gan
+  const dayWuxing = WUXING_LABEL[GAN_WUXING[dayGan]]
+  const ws = computeWangShuai(result)
+  const dy = result.daYun.find((d) => d.isCurrent)
+  const daYunPart = dy ? ` · 现行${dy.ganZhi}大运（${dy.shiShen}主题）` : ''
+  return `档案：${dayGan}${dayWuxing}日主 · ${ws.level}${daYunPart}`
+}
+
 function uniqueShenSha(list: string[][]): string[] {
   return Array.from(new Set(list.flat().filter(Boolean)))
 }
@@ -77,6 +88,7 @@ export function explain(result: PaipanResult): ChartExplanation {
   const dayGan = result.pillars.day.gan
   const dayWuxing = WUXING_LABEL[GAN_WUXING[dayGan]]
   const overview = [
+    buildProfile(result),
     dayMasterText(result),
     `${balanceText(result)}${WUXING_TRAIT[GAN_WUXING[dayGan]]}。`,
     REFERENCE,

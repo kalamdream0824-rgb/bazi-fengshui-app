@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { paipan } from '@/lib/baziMapper'
-import { explain, explainBlock, SHISHEN_TIP, TERM_TIPS } from './explainer'
-import { CHANG_SHENG_TIP, WANG_SHUAI_TIP } from './explainerDictionary'
+import { buildProfile, explain, explainBlock, SHISHEN_TIP, TERM_TIPS } from './explainer'
+import { CHANG_SHENG_TIP, SHISHEN_SIX_RELATION, WANG_SHUAI_TIP, ZHI_IMAGE } from './explainerDictionary'
 
 const result = paipan({ gender: 'male' as const, solarDateTime: '1995-10-08T14:30:00', trueSolarTime: false })
 
@@ -14,6 +14,15 @@ describe('explainer 新人解读引擎', () => {
     expect(ex.overview[0]).toContain('日主')
     expect(ex.overview[0]).toContain(result.pillars.day.gan)
     expect(ex.blocks.map((b) => b.key)).toEqual(['daymaster', 'pillars', 'shishen', 'shensha', 'dayun', 'liunian'])
+  })
+
+  it('总览首条为一句话档案（日主·旺衰·现行大运）', () => {
+    const ex = explain(result)
+    expect(ex.overview[0]).toMatch(/^档案：/)
+    expect(ex.overview[0]).toContain('日主')
+    expect(ex.overview[0]).toMatch(/偏强|中和|偏弱/)
+    expect(ex.overview[0]).toContain('大运')
+    expect(buildProfile(result)).toBe(ex.overview[0])
   })
 
   it('文案保持温和参考、不含断言词', () => {
@@ -53,6 +62,14 @@ describe('explainer 新人解读引擎', () => {
     expect(Object.keys(CHANG_SHENG_TIP)).toHaveLength(12)
     expect(Object.keys(WANG_SHUAI_TIP)).toEqual(['偏强', '中和', '偏弱'])
     for (const text of [...Object.values(CHANG_SHENG_TIP), ...Object.values(WANG_SHUAI_TIP)]) {
+      expect(text).toMatch(/传统/)
+    }
+  })
+
+  it('P3 词库：地支意象 12 条与十神六亲 10 条', () => {
+    expect(Object.keys(ZHI_IMAGE)).toHaveLength(12)
+    expect(Object.keys(SHISHEN_SIX_RELATION)).toHaveLength(10)
+    for (const text of [...Object.values(ZHI_IMAGE), ...Object.values(SHISHEN_SIX_RELATION)]) {
       expect(text).toMatch(/传统/)
     }
   })
