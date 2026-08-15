@@ -35,7 +35,7 @@ export function BaziTable({ pillars }: BaziTableProps) {
                 主星
               </td>
               {KEYS.map((k) => (
-                <td key={k}>
+                <td key={k} className={k === 'day' ? 'day-col' : undefined}>
                   <span
                     className={`ss ${k === 'day' ? 'owner' : 'tipable'}`}
                     onClick={
@@ -54,7 +54,7 @@ export function BaziTable({ pillars }: BaziTableProps) {
                 天干
               </td>
               {KEYS.map((k) => (
-                <td key={k}>
+                <td key={k} className={k === 'day' ? 'day-col' : undefined}>
                   <span
                     className={`gz tipable ${k === 'day' ? 'day' : ''}`}
                     onClick={() => setTip({ title: pillars[k].gan, text: TIPS['天干'] })}
@@ -69,7 +69,7 @@ export function BaziTable({ pillars }: BaziTableProps) {
                 地支
               </td>
               {KEYS.map((k) => (
-                <td key={k}>
+                <td key={k} className={k === 'day' ? 'day-col' : undefined}>
                   <span
                     className={`gz tipable ${k === 'day' ? 'day' : ''}`}
                     onClick={() => setTip({ title: pillars[k].zhi, text: TIPS['地支'] })}
@@ -84,7 +84,7 @@ export function BaziTable({ pillars }: BaziTableProps) {
                 藏干
               </td>
               {KEYS.map((k) => (
-                <td key={k} className="hidegan">
+                <td key={k} className={k === 'day' ? 'day-col hidegan' : 'hidegan'}>
                   {pillars[k].hideGan.map((hg) => (
                     <span
                       key={hg.gan}
@@ -102,7 +102,7 @@ export function BaziTable({ pillars }: BaziTableProps) {
                 副星
               </td>
               {KEYS.map((k) => (
-                <td key={k} className="fuxing">
+                <td key={k} className={k === 'day' ? 'day-col fuxing' : 'fuxing'}>
                   {pillars[k].hideGan.map((hg) => (
                     <span
                       key={hg.gan}
@@ -120,7 +120,7 @@ export function BaziTable({ pillars }: BaziTableProps) {
                 空亡
               </td>
               {KEYS.map((k) => (
-                <td key={k}>
+                <td key={k} className={k === 'day' ? 'day-col' : undefined}>
                   <span className={`kong${dayKong.includes(pillars[k].zhi) ? ' hit' : ''}`}>
                     {pillars[k].xunKong || '—'}
                   </span>
@@ -132,7 +132,7 @@ export function BaziTable({ pillars }: BaziTableProps) {
                 纳音
               </td>
               {KEYS.map((k) => (
-                <td key={k}>
+                <td key={k} className={k === 'day' ? 'day-col' : undefined}>
                   <span className="ny tipable" onClick={() => setTip({ title: pillars[k].naYin, text: TIPS['纳音'] })}>
                     {pillars[k].naYin}
                   </span>
@@ -144,7 +144,7 @@ export function BaziTable({ pillars }: BaziTableProps) {
                 星运
               </td>
               {KEYS.map((k) => (
-                <td key={k}>
+                <td key={k} className={k === 'day' ? 'day-col' : undefined}>
                   <span className="xy tipable" onClick={() => setTip({ title: pillars[k].diShi, text: TIPS['星运'] })}>
                     {pillars[k].diShi}
                   </span>
@@ -156,7 +156,7 @@ export function BaziTable({ pillars }: BaziTableProps) {
                 自坐
               </td>
               {KEYS.map((k) => (
-                <td key={k}>
+                <td key={k} className={k === 'day' ? 'day-col' : undefined}>
                   <span
                     className={`xy tipable${k === 'day' ? ' owner' : ''}`}
                     onClick={() => setTip({ title: pillars[k].ziZuo, text: TIPS['自坐'] })}
@@ -171,7 +171,7 @@ export function BaziTable({ pillars }: BaziTableProps) {
                 神煞
               </td>
               {KEYS.map((k) => (
-                <td key={k}>
+                <td key={k} className={k === 'day' ? 'day-col' : undefined}>
                   <span className="shensha">{pillars[k].shenSha.length ? pillars[k].shenSha.join('·') : '—'}</span>
                 </td>
               ))}

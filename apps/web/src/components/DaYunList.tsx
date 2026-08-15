@@ -2,7 +2,7 @@ import type { DaYun } from '@/types/bazi'
 
 export function DaYunList({ daYun }: { daYun: DaYun[] }) {
   return (
-    <div>
+    <div className="dayun-axis">
       {daYun.map((dy) => (
         <div key={dy.ganZhi} className={`dy ${dy.isCurrent ? 'current' : ''}`}>
           <span className="age">{dy.ageRange}</span>

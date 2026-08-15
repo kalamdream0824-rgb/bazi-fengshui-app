@@ -16,11 +16,10 @@ const ALM_TODAY = getAlmanacFor(0)
 const ALM_TOMORROW = getAlmanacFor(1)
 
 const QUICK = [
-  { to: '/input', label: '八字排盘' },
-  { to: '/comp', label: '八字合婚' },
-  { to: '/day-picker', label: '择日' },
-  { to: '/daily', label: '每日运势' },
-  { to: '/report', label: '命书' },
+  { to: '/input', glyph: '排', label: '八字排盘', desc: '看自己的盘' },
+  { to: '/comp', glyph: '合', label: '八字合婚', desc: '两人合不合' },
+  { to: '/daily', glyph: '运', label: '每日运势', desc: '今日提醒' },
+  { to: '/day-picker', glyph: '择', label: '择日', desc: '办事挑日子' },
 ]
 
 export function HomePage() {
@@ -59,43 +58,55 @@ export function HomePage() {
       </div>
 
       <div className="hero">
-        <div className="date">
-          {day === 'today' ? '今日' : '明日'} · {info.dateText}
+        <div className="hero-left">
+          <div className="hero-glyph">{info.ganZhi}</div>
+          <div className="hero-stamp">宜</div>
         </div>
-        <div className="gz">{info.ganZhi}</div>
-        <SegControl
-          two
-          className="hero-seg"
-          options={[
-            { label: '今日', value: 'today' },
-            { label: '明日', value: 'tomorrow' },
-          ]}
-          value={day}
-          onChange={(v) => setDay(v as 'today' | 'tomorrow')}
-        />
-        <div>
-          {alm.yi.slice(0, 4).map((t) => (
-            <span key={t} className="chip">
-              宜 {t}
+        <div className="hero-right">
+          <div className="hero-top">
+            <span className="hero-title">今日黄历</span>
+            <SegControl
+              two
+              options={[
+                { label: '今日', value: 'today' },
+                { label: '明日', value: 'tomorrow' },
+              ]}
+              value={day}
+              onChange={(v) => setDay(v as 'today' | 'tomorrow')}
+            />
+          </div>
+          <div className="hero-yiji">
+            <div className="yij">
+              <div className="k">宜</div>
+              <div className="v">{alm.yi.slice(0, 4).join(' · ')}</div>
+            </div>
+            <div className="yij ji">
+              <div className="k">忌</div>
+              <div className="v">{alm.ji.slice(0, 3).join(' · ')}</div>
+            </div>
+          </div>
+          <div className="hero-foot">
+            <span>
+              冲 <b>{alm.chongDesc.replace(/^冲/, '')}</b>
             </span>
-          ))}
-          {alm.ji.slice(0, 3).map((t) => (
-            <span key={t} className="chip no">
-              忌 {t}
+            <span>
+              煞 <b>{alm.sha}</b>
             </span>
-          ))}
-        </div>
-        <div className="meta-line" style={{ marginTop: 8, color: 'rgba(255,246,232,.85)' }}>
-          冲煞：{alm.chongDesc} · 煞{alm.sha}
+            <span className="honesty">传统黄历 · 供参考</span>
+          </div>
         </div>
       </div>
 
       <Card>
-        <CardTitle hint="八点网格 · 等宽入口">快捷功能</CardTitle>
+        <CardTitle hint="选一件事开始">起盘</CardTitle>
         <div className="quick-grid">
           {QUICK.map((item) => (
             <Link key={item.to} to={item.to} className="opt">
-              {item.label}
+              <span className="q-glyph">{item.glyph}</span>
+              <span>
+                <span className="q-t">{item.label}</span>
+                <span className="q-d">{item.desc}</span>
+              </span>
             </Link>
           ))}
         </div>

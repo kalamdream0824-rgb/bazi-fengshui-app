@@ -1,6 +1,6 @@
 :root {
-  --paper: #f6f1e4;
-  --card: #fffcf4;
+  --paper: #f3ecdc;
+  --card: #fffdf6;
   --ink: #2f251c;
   --ink-2: #6f5d48;
   --ink-3: #a08b6d;
@@ -16,10 +16,12 @@
   --fire: #c8452c;
   --earth: #8a6d3f;
 
-  --radius-card: 16px;
-  --radius-btn: 12px;
+  --radius-card: 8px;
+  --radius-btn: 6px;
   --radius-pill: 999px;
   --space-page: 14px;
-  --font-display: 'Songti SC', 'STSong', 'SimSun', serif;
+  /* 界面统一苹方；干支等字形用 --font-glyph（宋体） */
+  --font-display: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
   --font-ui: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --font-glyph: 'Songti SC', 'STSong', 'SimSun', serif;
 }
