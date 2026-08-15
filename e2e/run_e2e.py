@@ -1,4 +1,4 @@
-"""八字排盘 App E2E 冒烟：注册登录 → 排盘 → 会员购买 → 分享 → 历史 → 刷新兜底。
+"""八字排盘 App E2E 冒烟：注册登录 → 排盘 → 会员购买 → 分享 → 历史 → 刷新兜底 → 退出登录清空。
 
 前置：前端 VITE_API_MODE=http dev server（5173）+ 后端 mysql profile（8080）。
 运行：python3 e2e/run_e2e.py
@@ -71,10 +71,20 @@ def main() -> int:
         page.wait_for_selector(".bazi-table", timeout=15000)
         check("刷新后排盘仍在", "档案：" in page.inner_text("body"))
 
+        # 7. 退出登录：本地历史与当前命盘清空（云端记录属于账号，重登仍可见）
+        page.goto(f"{BASE}/profile", wait_until="networkidle")
+        page.get_by_text("退出登录").click()
+        page.wait_for_selector("text=未登录", timeout=10000)
+        check("退出登录", "未登录" in page.inner_text("body"))
+        page.goto(f"{BASE}/history", wait_until="networkidle")
+        page.wait_for_timeout(1500)
+        hist_after = page.inner_text("body")
+        check("登出后本地历史清空", "暂无排盘记录" in hist_after)
+
         browser.close()
 
-    passed = 6 - len(failures)
-    print(f"\n结果: {passed}/6 通过" + (f"，失败: {failures}" if failures else ""))
+    passed = 7 - len(failures)
+    print(f"\n结果: {passed}/7 通过" + (f"，失败: {failures}" if failures else ""))
     return 1 if failures else 0
 
 

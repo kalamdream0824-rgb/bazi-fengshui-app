@@ -5,6 +5,7 @@ import { Card, CardTitle } from '@/components/Card'
 import { RecordRow } from '@/components/RecordRow'
 import { Switch } from '@/components/Switch'
 import { useHistory } from '@/hooks/useHistory'
+import { clearHistory } from '@/services/historyStore'
 import { getMe } from '@/services/membershipApi'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useBaziStore } from '@/store/useBaziStore'
@@ -23,7 +24,7 @@ export function ProfilePage() {
   const clearAuth = useAuthStore((s) => s.clear)
   const token = useAuthStore((s) => s.token)
   const [membership, setMembership] = useState<MembershipInfo | null>(null)
-  const { data: records = [] } = useHistory()
+  const { data: records = [], invalidate } = useHistory()
   const latest = records[0] ?? null
   const myResult = result ?? latest?.result ?? null
 
@@ -94,8 +95,11 @@ export function ProfilePage() {
                 borderRadius: 10,
                 padding: '10px 0',
               }}
-              onClick={() => {
+              onClick={async () => {
                 clearAuth()
+                useBaziStore.getState().clear()
+                await clearHistory()
+                invalidate()
                 toast('已退出登录')
               }}
             >
