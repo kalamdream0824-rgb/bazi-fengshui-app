@@ -24,13 +24,15 @@ describe('HistoryPage', () => {
     expect(await screen.findByText(/暂无排盘记录/)).toBeInTheDocument()
   })
 
-  it('有记录时展示列表与导出按钮', async () => {
+  it('有记录时展示列表，导出/导入收进数据管理区', async () => {
     await clearHistory()
     const req = { gender: 'male' as const, solarDateTime: '1995-10-08T14:30:00', trueSolarTime: false }
     await addHistory(req, paipan(req))
     renderPage()
     expect(await screen.findByText('一九九五年闰八月十四')).toBeInTheDocument()
-    expect(screen.getByText('导出全部')).toBeInTheDocument()
+    expect(screen.getByText('数据管理：')).toBeInTheDocument()
+    expect(screen.getByText('导出备份')).toBeInTheDocument()
+    expect(screen.getByText('导入备份')).toBeInTheDocument()
   })
 
   it('清空全部：确认后本地记录清空回到空态', async () => {

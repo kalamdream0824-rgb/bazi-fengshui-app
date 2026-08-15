@@ -2,7 +2,7 @@
 
 | 项目 | 内容 |
 |---|---|
-| 版本 | v0.32（历史一键清空已交付） |
+| 版本 | v0.33（历史页简化：备份收进数据管理区） |
 | 日期 | 2026-08-09 |
 | 索引 | 见 `docs/design/README.md`；后端见 `backend-design.md` |
 
@@ -137,6 +137,7 @@ interface ChartExplanation {
 
 ## 10. 变更日志
 
+- v0.33（2026-08-16）：历史页简化——导出/导入备份从主按钮行收进「数据管理」二级入口（未登录/换设备迁移仍可用），主行只留「去排盘 / 清空全部」；前端 141/141。
 - v0.32（2026-08-16）：历史一键清空交付——后端 DELETE /records 批量清空（按 user_id 隔离，集成测试）；前端 cloudSync.clearCloudRecords + HistoryPage 清空按钮（confirm + 双模式）；交互测试 2 条；前端 141/141、后端 22/22。
 - v0.31（2026-08-16）：E2E 冒烟交付——`e2e/run_e2e.py`（Playwright headless，6/6 通过）；修复刷新兜底 bug（useBaziWithFallback 加 loading，ChartPage/ProPage 加载中不跳转）；hook 回归测试；前端 139/139。
 - v0.30（2026-08-15）：新人解读 P3 交付——buildProfile 一句话档案（总览首条）；词库扩地支意象 12 + 十神六亲 10；前端 136/136、lint 0、build 绿。

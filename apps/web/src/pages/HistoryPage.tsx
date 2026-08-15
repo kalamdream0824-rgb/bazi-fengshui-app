@@ -122,15 +122,38 @@ export function HistoryPage() {
 
       {records.length > 0 && (
         <ButtonRow>
-          <Button variant="primary" onClick={handleExport}>
-            导出全部
-          </Button>
-          <Button onClick={() => fileRef.current?.click()} disabled={importing}>
-            {importing ? '导入中…' : '导入备份'}
-          </Button>
           <Button onClick={() => navigate('/input')}>去排盘</Button>
           <Button onClick={() => void handleClearAll()}>清空全部</Button>
         </ButtonRow>
+      )}
+      {records.length > 0 && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            padding: '2px 16px 12px',
+            fontSize: 12,
+            color: 'var(--ink-3)',
+          }}
+        >
+          <span>数据管理：</span>
+          <button
+            type="button"
+            onClick={handleExport}
+            style={{ border: 0, background: 'none', padding: 0, color: 'var(--red)', fontSize: 12, cursor: 'pointer' }}
+          >
+            导出备份
+          </button>
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            disabled={importing}
+            style={{ border: 0, background: 'none', padding: 0, color: 'var(--red)', fontSize: 12, cursor: 'pointer' }}
+          >
+            {importing ? '导入中…' : '导入备份'}
+          </button>
+        </div>
       )}
       <input
         ref={fileRef}
@@ -139,7 +162,7 @@ export function HistoryPage() {
         style={{ display: 'none' }}
         onChange={handleImportFile}
       />
-      <FooterNote>本地历史仅保存在当前浏览器，建议定期导出备份</FooterNote>
+      <FooterNote>排盘记录保存在云端账号与本地浏览器，可在「数据管理」备份</FooterNote>
     </>
   )
 }
