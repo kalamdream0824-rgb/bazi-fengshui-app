@@ -21,6 +21,7 @@
 - ✅ **v0.10 专业细盘数据已交付**——`yunStart`（起运公历时间 + 顺逆）、`daYun[].naYin/xunKong/shiShen`、`liuNianList`（起运后逐年：year/age/ganZhi/naYin/shiShen/shenSha）；lunar-java `Yun/DaYun/LiuNian` + `LunarUtil.NAYIN/SHI_SHEN` 直接支持；fixtures 6 组用例全断言，后端测试 21/21。
 - ✅ **v0.11 星运/旬空已交付**——`DaYun.starFortune`（大运地支对日主十二长生，复用 ZiZuoConstants）、`LiuNianItem.starFortune/xunKong`（流年旬空 lunar-java `LiuNian.getXunKong`），fixtures 6 组用例全断言，后端测试 21/21。
 - ✅ **v0.12 流月/小运已交付**——`LiuNianItem.liuYue`（流年内节气月）、`xiaoYunList`（起运后小运）、`currentYearLiuYue`（今年逐月）——lunar-java `LiuNian.getLiuYue` / `DaYun.getXiaoYun` 直接支持；fixtures 6 组用例全断言，后端测试 21/21。
+- ✅ **v0.14 批量清空已交付**——`DELETE /records` 清空当前用户全部记录（按 user_id 批量删除，用户隔离）；集成测试覆盖清空本人 + 不影响他人，后端测试 22/22。
 - ⚠️ 神煞 / 真太阳时：**后端第一版不实现**——前端 `HttpBaziApi` 用与 Mock 同一套规则补充（`enrichResult` / `adjustRequestForTrueSolar`），保持结果一致；后续需要可下沉。
 - ⏸️ 合婚 / 运势文案：前端保留，不在本端实现。
 - ✅ 账号 / 云同步：已交付（v0.3）。
@@ -121,6 +122,7 @@ CREATE TABLE bazi_user (
 
 ## 8. 变更日志
 
+- v0.14（2026-08-16）：DELETE /records 批量清空交付——RecordService.clear（按 user_id）+ Controller @DeleteMapping；集成测试 clearAllRemovesOnlyCurrentUserRecords；后端测试 22/22。
 - v0.13（2026-08-16）：MySQL 持久化实测通过——docker compose 拉起 mysql:8.4、schema.sql 自动建表、mysql profile 连接验证；注册/排盘写入 MySQL，重启后端数据保留；后端测试 21/21 不受影响。
 - v0.12（2026-08-15）：流月/小运交付——新增 LiuYueItemDto/XiaoYunItemDto；LiuNianItemDto.liuYue、PaipanResultDto.xiaoYunList/currentYearLiuYue；BaziService 用 lunar-java LiuYue/XiaoYun 填充；fixtures 断言；后端测试 21/21。
 - v0.11（2026-08-15）：DaYunDto/LiuNianItemDto 增加 starFortune/xunKong——大运/流年星运用 ZiZuoConstants.ziZuo（日干太极点）、流年旬空用 LiuNian.getXunKong；fixtures 断言；后端测试 21/21。

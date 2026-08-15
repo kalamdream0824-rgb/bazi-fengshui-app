@@ -56,3 +56,11 @@ export async function deleteCloudRecord(id: number): Promise<void> {
   }
   await fetch(`/api/v1/records/${id}`, { method: 'DELETE', headers: authHeaders() })
 }
+
+/** 清空当前用户云端全部记录 */
+export async function clearCloudRecords(): Promise<void> {
+  if (!isHttpMode()) {
+    return
+  }
+  await fetch('/api/v1/records', { method: 'DELETE', headers: authHeaders() })
+}

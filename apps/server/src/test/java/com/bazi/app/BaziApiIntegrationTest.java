@@ -92,4 +92,32 @@ class BaziApiIntegrationTest {
     mvc.perform(get("/api/v1/records/" + id).header("Authorization", "Bearer " + token1))
         .andExpect(status().isNotFound());
   }
+
+  @Test
+  void clearAllRemovesOnlyCurrentUserRecords() throws Exception {
+    String token = register("clear1");
+    String other = register("clear2");
+
+    mvc.perform(post("/api/v1/records")
+            .header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(payload()))
+        .andExpect(status().isOk());
+    mvc.perform(post("/api/v1/records")
+            .header("Authorization", "Bearer " + other)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(payload()))
+        .andExpect(status().isOk());
+
+    mvc.perform(delete("/api/v1/records").header("Authorization", "Bearer " + token))
+        .andExpect(status().isNoContent());
+
+    mvc.perform(get("/api/v1/records").header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(0));
+    // 其他用户记录不受影响
+    mvc.perform(get("/api/v1/records").header("Authorization", "Bearer " + other))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(1));
+  }
 }

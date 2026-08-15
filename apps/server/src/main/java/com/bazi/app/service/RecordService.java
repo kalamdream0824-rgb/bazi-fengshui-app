@@ -60,6 +60,11 @@ public class RecordService {
     return mapper.delete(new QueryWrapper<BaziRecord>().eq("id", id).eq("user_id", userId)) > 0;
   }
 
+  /** 清空当前用户全部记录 */
+  public void clear(Long userId) {
+    mapper.delete(new QueryWrapper<BaziRecord>().eq("user_id", userId));
+  }
+
   private RecordDto toDto(BaziRecord record) throws Exception {
     return new RecordDto(
         record.getId(),

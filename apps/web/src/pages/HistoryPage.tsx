@@ -7,8 +7,8 @@ import { FooterNote } from '@/components/FooterNote'
 import { RecordRow } from '@/components/RecordRow'
 import { TopBar } from '@/components/TopBar'
 import { useHistory } from '@/hooks/useHistory'
-import { deleteCloudRecord } from '@/services/cloudSync'
-import { backupToRecords, downloadBackup, importHistory, removeHistory } from '@/services/historyStore'
+import { clearCloudRecords, deleteCloudRecord } from '@/services/cloudSync'
+import { backupToRecords, clearHistory, downloadBackup, importHistory, removeHistory } from '@/services/historyStore'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useBaziStore } from '@/store/useBaziStore'
 import { useToastStore } from '@/store/useToastStore'
@@ -35,6 +35,15 @@ export function HistoryPage() {
     } else {
       await removeHistory(id)
     }
+    invalidate()
+  }
+
+  const handleClearAll = async () => {
+    if (!window.confirm('确定清空全部排盘记录？此操作不可恢复')) return
+    if (import.meta.env.VITE_API_MODE === 'http' && token) {
+      await clearCloudRecords()
+    }
+    await clearHistory()
     invalidate()
   }
 
@@ -120,6 +129,7 @@ export function HistoryPage() {
             {importing ? '导入中…' : '导入备份'}
           </Button>
           <Button onClick={() => navigate('/input')}>去排盘</Button>
+          <Button onClick={() => void handleClearAll()}>清空全部</Button>
         </ButtonRow>
       )}
       <input

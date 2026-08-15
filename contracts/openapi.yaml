@@ -136,6 +136,11 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PaipanResult'
+    delete:
+      summary: 清空当前用户全部排盘记录（需 Bearer token）
+      responses:
+        '204':
+          description: 清空成功
   /records/{id}:
     get:
       summary: 单条排盘记录

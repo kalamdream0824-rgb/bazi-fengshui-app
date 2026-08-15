@@ -50,6 +50,12 @@ public class BaziRecordController {
         : ResponseEntity.notFound().build();
   }
 
+  @DeleteMapping
+  public ResponseEntity<Void> clear(HttpServletRequest httpRequest) {
+    recordService.clear(userId(httpRequest));
+    return ResponseEntity.noContent().build();
+  }
+
   private static Long userId(HttpServletRequest httpRequest) {
     return (Long) httpRequest.getAttribute("userId");
   }
