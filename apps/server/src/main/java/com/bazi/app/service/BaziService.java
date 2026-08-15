@@ -4,13 +4,17 @@ import com.nlf.calendar.Lunar;
 import com.nlf.calendar.Solar;
 import com.nlf.calendar.EightChar;
 import com.nlf.calendar.eightchar.DaYun;
+import com.nlf.calendar.eightchar.LiuNian;
 import com.nlf.calendar.eightchar.Yun;
+import com.nlf.calendar.util.LunarUtil;
 import com.bazi.app.dto.DaYunDto;
 import com.bazi.app.dto.HideGanDto;
+import com.bazi.app.dto.LiuNianItemDto;
 import com.bazi.app.dto.LiuNianDto;
 import com.bazi.app.dto.PaipanRequest;
 import com.bazi.app.dto.PaipanResultDto;
 import com.bazi.app.dto.PillarDto;
+import com.bazi.app.dto.YunStartDto;
 import com.bazi.app.domain.constants.WuXingConstants;
 import com.bazi.app.domain.constants.ZiZuoConstants;
 import java.time.LocalDate;
@@ -58,6 +62,7 @@ public class BaziService {
     List<DaYunDto> daYun = new ArrayList<>();
     int nowYear = LocalDate.now().getYear();
     Yun yun = ec.getYun(req.isMale() ? 1 : 0);
+    String dayGan = ec.getDayGan();
     for (DaYun dy : yun.getDaYun()) {
       String gz = dy.getGanZhi();
       if (gz == null || gz.isEmpty()) {
@@ -72,8 +77,38 @@ public class BaziService {
           gz,
           startYear + " - " + (startYear + 10),
           startYear <= nowYear && nowYear < startYear + 10,
+          LunarUtil.NAYIN.getOrDefault(gz, ""),
+          dy.getXunKong(),
+          LunarUtil.SHI_SHEN.getOrDefault(dayGan + gz.substring(0, 1), ""),
           List.of()));
     }
+
+    List<LiuNianItemDto> liuNianList = new ArrayList<>();
+    for (DaYun dy : yun.getDaYun()) {
+      String gz = dy.getGanZhi();
+      if (gz == null || gz.isEmpty()) {
+        continue;
+      }
+      for (LiuNian ln : dy.getLiuNian(10)) {
+        String lgz = ln.getGanZhi();
+        liuNianList.add(new LiuNianItemDto(
+            ln.getYear(),
+            ln.getAge(),
+            lgz,
+            LunarUtil.NAYIN.getOrDefault(lgz, ""),
+            LunarUtil.SHI_SHEN.getOrDefault(dayGan + lgz.substring(0, 1), ""),
+            List.of()));
+      }
+      break;
+    }
+
+    Solar startSolar = yun.getStartSolar();
+    YunStartDto yunStart = new YunStartDto(
+        startSolar.getYear(),
+        startSolar.getMonth(),
+        startSolar.getDay(),
+        startSolar.getHour(),
+        yun.isForward());
 
     Lunar today = Lunar.fromDate(new Date());
     String yearGanZhi = today.getYearInGanZhiExact();
@@ -93,6 +128,8 @@ public class BaziService {
         ec.getShenGongNaYin(),
         wuXing,
         daYun,
+        yunStart,
+        liuNianList,
         currentYearGanZhi,
         new LiuNianDto(yearGanZhi, List.of()),
         null);

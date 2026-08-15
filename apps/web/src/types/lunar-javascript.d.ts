@@ -4,6 +4,10 @@ declare module 'lunar-javascript' {
     static fromDate(date: Date): Solar
     getLunar(): Lunar
     toYmdHms(): string
+    getYear(): number
+    getMonth(): number
+    getDay(): number
+    getHour(): number
   }
 
   export class Lunar {
@@ -73,13 +77,38 @@ declare module 'lunar-javascript' {
     getYun(gender: number): Yun
   }
 
+  export class LunarUtil {
+    static SHI_SHEN: Record<string, string>
+    static NAYIN: Record<string, string>
+    static JIA_ZI: string[]
+  }
+
   export class Yun {
+    getStartYear(): number
+    getStartMonth(): number
+    getStartDay(): number
+    getStartHour(): number
+    isForward(): boolean
+    getStartSolar(): Solar
     getDaYun(): DaYun[]
+    getDaYun(n: number): DaYun[]
   }
 
   export class DaYun {
     getStartAge(): number
     getStartYear(): number
+    getEndAge(): number
+    getEndYear(): number
+    getIndex(): number
     getGanZhi(): string
+    getXunKong(): string
+    getLiuNian(n: number): LiuNian[]
+  }
+
+  export class LiuNian {
+    getYear(): number
+    getAge(): number
+    getGanZhi(): string
+    getXunKong(): string
   }
 }

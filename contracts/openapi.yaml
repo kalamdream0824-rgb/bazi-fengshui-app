@@ -293,6 +293,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DaYun'
+        yunStart:
+          $ref: '#/components/schemas/YunStart'
+        liuNianList:
+          type: array
+          description: 起运后逐年流年（第一步大运内 10 年）
+          items:
+            $ref: '#/components/schemas/LiuNianItem'
         currentYearGanZhi:
           type: string
         currentLiuNian:
@@ -347,10 +354,53 @@ components:
           type: string
         isCurrent:
           type: boolean
+        naYin:
+          type: string
+          description: 大运纳音
+        xunKong:
+          type: string
+          description: 大运旬空
+        shiShen:
+          type: string
+          description: 大运天干对日主的十神（前端补充）
         shenSha:
           type: array
           items:
             type: string
+    YunStart:
+      type: object
+      description: 起运信息（公历）
+      properties:
+        year:
+          type: integer
+        month:
+          type: integer
+        day:
+          type: integer
+        hour:
+          type: integer
+        forward:
+          type: boolean
+          description: 大运顺行（阳男阴女/阴男阳女规则）
+    LiuNianItem:
+      type: object
+      properties:
+        year:
+          type: integer
+        age:
+          type: integer
+        ganZhi:
+          type: string
+        naYin:
+          type: string
+        shiShen:
+          type: string
+          description: 流年天干对日主的十神（前端补充）
+        shenSha:
+          type: array
+          items:
+            type: string
+          description: 流年神煞（前端补充）
     LiuNianInfo:
       type: object
       properties:

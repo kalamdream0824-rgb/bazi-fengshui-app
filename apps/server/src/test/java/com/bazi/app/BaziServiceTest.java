@@ -41,6 +41,38 @@ class BaziServiceTest {
       assertEquals(expected.get("taiYuan").asText(), result.taiYuan(), c.get("id").asText() + " taiYuan");
       assertEquals(expected.get("mingGong").asText(), result.mingGong(), c.get("id").asText() + " mingGong");
       assertEquals(expected.get("shenGong").asText(), result.shenGong(), c.get("id").asText() + " shenGong");
+      assertEquals(
+          expected.get("daYunFirst").get("ganZhi").asText(),
+          result.daYun().get(0).ganZhi(),
+          c.get("id").asText() + " 首步大运");
+      assertEquals(
+          expected.get("daYunFirst").get("naYin").asText(),
+          result.daYun().get(0).naYin(),
+          c.get("id").asText() + " 首步大运纳音");
+      assertEquals(
+          expected.get("daYunFirst").get("xunKong").asText(),
+          result.daYun().get(0).xunKong(),
+          c.get("id").asText() + " 首步大运旬空");
+      assertEquals(
+          expected.get("daYunFirst").get("shiShen").asText(),
+          result.daYun().get(0).shiShen(),
+          c.get("id").asText() + " 首步大运十神");
+      assertEquals(
+          expected.get("yunStart").get("year").asInt(),
+          result.yunStart().year(),
+          c.get("id").asText() + " 起运年份");
+      assertEquals(
+          expected.get("yunStart").get("forward").asBoolean(),
+          result.yunStart().forward(),
+          c.get("id").asText() + " 起运顺逆");
+      assertEquals(
+          expected.get("liuNianFirst").get("ganZhi").asText(),
+          result.liuNianList().get(0).ganZhi(),
+          c.get("id").asText() + " 首年流年");
+      assertEquals(
+          expected.get("liuNianFirst").get("naYin").asText(),
+          result.liuNianList().get(0).naYin(),
+          c.get("id").asText() + " 首年流年纳音");
 
       for (String key : new String[] {"year", "month", "day", "time"}) {
         String ganZhi = result.pillars().get(key).gan() + result.pillars().get(key).zhi();

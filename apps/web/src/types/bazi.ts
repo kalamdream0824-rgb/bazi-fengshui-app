@@ -39,6 +39,27 @@ export interface DaYun {
   ganZhi: string
   yearRange: string
   isCurrent: boolean
+  naYin: string
+  xunKong: string
+  /** 大运天干对日主的十神 */
+  shiShen: string
+  shenSha: string[]
+}
+
+export interface YunStart {
+  year: number
+  month: number
+  day: number
+  hour: number
+  forward: boolean
+}
+
+export interface LiuNianItem {
+  year: number
+  age: number
+  ganZhi: string
+  naYin: string
+  shiShen: string
   shenSha: string[]
 }
 
@@ -95,6 +116,8 @@ export interface PaipanResult {
   shenGongNaYin: string
   wuXing: Record<WuxingKey, number>
   daYun: DaYun[]
+  yunStart: YunStart
+  liuNianList: LiuNianItem[]
   currentYearGanZhi: string
   currentLiuNian?: LiuNianInfo
   trueSolar?: TrueSolarInfo

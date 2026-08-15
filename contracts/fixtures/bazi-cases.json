@@ -13,6 +13,9 @@
         "taiYuan": "丙子",
         "mingGong": "己丑",
         "shenGong": "辛巳",
+        "daYunFirst": { "ganZhi": "甲申", "naYin": "泉中水", "xunKong": "午未", "shiShen": "食神" },
+        "yunStart": { "year": 2005, "month": 10, "day": 28, "forward": false },
+        "liuNianFirst": { "year": 2005, "age": 11, "ganZhi": "乙酉", "naYin": "泉中水" },
         "pillars": {
           "year": { "ganZhi": "乙亥", "shiShen": "伤官", "hideGanShiShen": ["比肩", "食神"], "ziZuo": "死" },
           "month": { "ganZhi": "乙酉", "shiShen": "伤官", "hideGanShiShen": ["正印"], "ziZuo": "绝" },
@@ -31,6 +34,9 @@
         "taiYuan": "壬午",
         "mingGong": "丁酉",
         "shenGong": "丁酉",
+        "daYunFirst": { "ganZhi": "庚寅", "naYin": "松柏木", "xunKong": "午未", "shiShen": "七杀" },
+        "yunStart": { "year": 2000, "month": 6, "day": 18, "forward": false },
+        "liuNianFirst": { "year": 2000, "age": 5, "ganZhi": "庚辰", "naYin": "白蜡金" },
         "pillars": {
           "year": { "ganZhi": "丙子", "shiShen": "食神", "hideGanShiShen": ["正印"], "ziZuo": "胎" },
           "month": { "ganZhi": "辛卯", "shiShen": "正官", "hideGanShiShen": ["劫财"], "ziZuo": "绝" },
@@ -49,6 +55,9 @@
         "taiYuan": "丙辰",
         "mingGong": "庚申",
         "shenGong": "壬戌",
+        "daYunFirst": { "ganZhi": "甲子", "naYin": "海中金", "xunKong": "戌亥", "shiShen": "七杀" },
+        "yunStart": { "year": 2033, "month": 12, "day": 4, "forward": false },
+        "liuNianFirst": { "year": 2033, "age": 10, "ganZhi": "癸丑", "naYin": "桑柘木" },
         "pillars": {
           "year": { "ganZhi": "癸卯", "shiShen": "正财", "hideGanShiShen": ["正官"], "ziZuo": "长生" },
           "month": { "ganZhi": "乙丑", "shiShen": "正官", "hideGanShiShen": ["劫财", "正财", "伤官"], "ziZuo": "衰" },
@@ -67,6 +76,9 @@
         "taiYuan": "丁巳",
         "mingGong": "庚午",
         "shenGong": "丙子",
+        "daYunFirst": { "ganZhi": "丁卯", "naYin": "炉中火", "xunKong": "戌亥", "shiShen": "正印" },
+        "yunStart": { "year": 2033, "month": 12, "day": 24, "forward": true },
+        "liuNianFirst": { "year": 2033, "age": 10, "ganZhi": "癸丑", "naYin": "桑柘木" },
         "pillars": {
           "year": { "ganZhi": "甲辰", "shiShen": "七杀", "hideGanShiShen": ["比肩", "正官", "正财"], "ziZuo": "衰" },
           "month": { "ganZhi": "丙寅", "shiShen": "偏印", "hideGanShiShen": ["七杀", "偏印", "比肩"], "ziZuo": "长生" },
@@ -85,6 +97,9 @@
         "taiYuan": "丙午",
         "mingGong": "辛酉",
         "shenGong": "辛酉",
+        "daYunFirst": { "ganZhi": "丙辰", "naYin": "沙中土", "xunKong": "子丑", "shiShen": "正印" },
+        "yunStart": { "year": 2027, "month": 11, "day": 22, "forward": true },
+        "liuNianFirst": { "year": 2027, "age": 5, "ganZhi": "丁未", "naYin": "天河水" },
         "pillars": {
           "year": { "ganZhi": "癸卯", "shiShen": "偏财", "hideGanShiShen": ["七杀"], "ziZuo": "长生" },
           "month": { "ganZhi": "乙卯", "shiShen": "七杀", "hideGanShiShen": ["七杀"], "ziZuo": "临官" },
@@ -103,6 +118,9 @@
         "taiYuan": "丁卯",
         "mingGong": "己巳",
         "shenGong": "丁丑",
+        "daYunFirst": { "ganZhi": "乙亥", "naYin": "山头火", "xunKong": "申酉", "shiShen": "正印" },
+        "yunStart": { "year": 1998, "month": 6, "day": 21, "forward": false },
+        "liuNianFirst": { "year": 1998, "age": 9, "ganZhi": "戊寅", "naYin": "城头土" },
         "pillars": {
           "year": { "ganZhi": "己巳", "shiShen": "伤官", "hideGanShiShen": ["比肩", "偏财", "食神"], "ziZuo": "帝旺" },
           "month": { "ganZhi": "丙子", "shiShen": "比肩", "hideGanShiShen": ["正官"], "ziZuo": "胎" },

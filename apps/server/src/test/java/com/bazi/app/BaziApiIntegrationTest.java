@@ -60,7 +60,11 @@ class BaziApiIntegrationTest {
         .andExpect(jsonPath("$.lunarText").value("一九九五年闰八月十四"))
         .andExpect(jsonPath("$.taiYuan").value("丙子"))
         .andExpect(jsonPath("$.pillars.year.hideGan[0].shiShen").value("比肩"))
-        .andExpect(jsonPath("$.pillars.day.ziZuo").value("长生"));
+        .andExpect(jsonPath("$.pillars.day.ziZuo").value("长生"))
+        .andExpect(jsonPath("$.yunStart.year").value(2005))
+        .andExpect(jsonPath("$.yunStart.forward").value(false))
+        .andExpect(jsonPath("$.daYun[0].naYin").value("泉中水"))
+        .andExpect(jsonPath("$.liuNianList[0].ganZhi").value("乙酉"));
 
     // 重复提交：去重后列表仍 1 条
     mvc.perform(post("/api/v1/records")

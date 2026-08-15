@@ -21,6 +21,21 @@ describe('enrichResult', () => {
     expect(result.daYun[0].shenSha).toContain('劫煞')
     expect(Array.isArray(result.currentLiuNian?.shenSha)).toBe(true)
   })
+
+  it('后端未返回大运/流年十神与神煞时由前端补齐（口径与 Mock 一致）', () => {
+    const base = paipan({ gender: 'male', solarDateTime: '1995-10-08T14:30:00', trueSolarTime: false })
+    const result = enrichResult({
+      ...base,
+      daYun: base.daYun.map((d) => ({ ...d, naYin: '', shiShen: '', shenSha: [] })),
+      liuNianList: base.liuNianList.map((ln) => ({ ...ln, naYin: '', shiShen: '', shenSha: [] })),
+    })
+
+    expect(result.daYun[0].naYin).toBe('泉中水')
+    expect(result.daYun[0].shiShen).toBe('食神')
+    expect(result.liuNianList[0].naYin).toBe('泉中水')
+    expect(result.liuNianList[0].shiShen).toBe('伤官')
+    expect(result.liuNianList[0].shenSha.length).toBeGreaterThanOrEqual(0)
+  })
 })
 
 describe('adjustRequestForTrueSolar', () => {

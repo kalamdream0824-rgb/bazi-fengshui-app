@@ -1,5 +1,5 @@
-import { Lunar, Solar } from 'lunar-javascript'
-import type { DaYun, LiuNianInfo, PaipanRequest, PaipanResult, Pillar, PillarKey, WuxingKey } from '@/types/bazi'
+import { Lunar, LunarUtil, Solar } from 'lunar-javascript'
+import type { DaYun, LiuNianInfo, LiuNianItem, PaipanRequest, PaipanResult, Pillar, PillarKey, WuxingKey } from '@/types/bazi'
 import { timeToShichen } from './datePicker'
 import { computeExternalShenSha, computeShenSha, type ShenShaRef } from './shenSha'
 import { formatAdjusted, longitudeOf, trueSolarTime } from './trueSolarTime'
@@ -168,20 +168,41 @@ export function paipan(req: PaipanRequest): PaipanResult {
   }
 
   const yun = ec.getYun(YUN_GENDER[req.gender])
+  const dayGan = pillars.day.gan
   const daYun: DaYun[] = yun
     .getDaYun()
     .filter((d) => d.getGanZhi())
     .slice(0, 8)
     .map((d) => {
       const startYear = d.getStartYear()
+      const ganZhi = d.getGanZhi()
       return {
         ageRange: `${d.getStartAge()} - ${d.getStartAge() + 10} 岁`,
-        ganZhi: d.getGanZhi(),
+        ganZhi,
         yearRange: `${startYear} - ${startYear + 10}`,
         isCurrent: startYear <= now.getFullYear() && now.getFullYear() < startYear + 10,
-        shenSha: computeExternalShenSha(shenShaRef, d.getGanZhi()),
+        naYin: LunarUtil.NAYIN[ganZhi] ?? '',
+        xunKong: d.getXunKong(),
+        shiShen: LunarUtil.SHI_SHEN[dayGan + ganZhi[0]] ?? '',
+        shenSha: computeExternalShenSha(shenShaRef, ganZhi),
       }
     })
+
+  const startSolar = yun.getStartSolar()
+  const firstDaYun = yun.getDaYun().find((d) => d.getGanZhi())
+  const liuNianList: LiuNianItem[] = firstDaYun
+    ? firstDaYun.getLiuNian(10).map((ln) => {
+        const ganZhi = ln.getGanZhi()
+        return {
+          year: ln.getYear(),
+          age: ln.getAge(),
+          ganZhi,
+          naYin: LunarUtil.NAYIN[ganZhi] ?? '',
+          shiShen: LunarUtil.SHI_SHEN[dayGan + ganZhi[0]] ?? '',
+          shenSha: computeExternalShenSha(shenShaRef, ganZhi),
+        }
+      })
+    : []
 
   const currentYearGanZhi = today.getYearInGanZhiExact()
   const currentLiuNian: LiuNianInfo = {
@@ -203,6 +224,14 @@ export function paipan(req: PaipanRequest): PaipanResult {
     shenGongNaYin: ec.getShenGongNaYin(),
     wuXing,
     daYun,
+    yunStart: {
+      year: startSolar.getYear(),
+      month: startSolar.getMonth(),
+      day: startSolar.getDay(),
+      hour: startSolar.getHour(),
+      forward: yun.isForward(),
+    },
+    liuNianList,
     currentYearGanZhi: `${currentYearGanZhi}年 ${today.getMonthInGanZhiExact()}月 ${today.getDayInGanZhiExact()}日`,
     currentLiuNian,
     trueSolar,

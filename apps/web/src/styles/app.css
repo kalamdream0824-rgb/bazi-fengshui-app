@@ -167,6 +167,16 @@ button {
 .seg.four {
   grid-template-columns: repeat(4, 1fr);
 }
+.seg.five {
+  grid-template-columns: repeat(5, 1fr);
+}
+.row.current {
+  background: rgba(176, 58, 46, 0.06);
+  box-shadow: inset 3px 0 0 var(--red);
+}
+.row.missing {
+  color: var(--ink-3);
+}
 .opt {
   text-align: center;
   padding: 8px 0;
@@ -479,26 +489,37 @@ button {
 .dy {
   display: grid;
   grid-template-columns: 64px 74px 1fr auto;
+  grid-template-areas:
+    'age gz yr tag'
+    'meta meta meta meta';
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
   border-top: 1px solid var(--line);
   font-size: 12px;
 }
-.dy:first-of-type {
-  border-top: 0;
-}
 .dy .age {
+  grid-area: age;
   color: var(--ink-3);
 }
 .dy .gz {
+  grid-area: gz;
   font-family: var(--font-display);
   font-size: 18px;
   font-weight: 700;
 }
 .dy .yr {
+  grid-area: yr;
   color: var(--ink-3);
   font-size: 11px;
+}
+.dy .meta {
+  grid-area: meta;
+  color: var(--ink-3);
+  font-size: 11px;
+}
+.dy:first-of-type {
+  border-top: 0;
 }
 .dy.current {
   background: rgba(176, 58, 46, 0.05);

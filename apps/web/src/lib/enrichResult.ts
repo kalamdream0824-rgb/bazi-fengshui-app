@@ -1,3 +1,4 @@
+import { LunarUtil } from 'lunar-javascript'
 import { timeToShichen } from './datePicker'
 import { computeExternalShenSha, computeShenSha, type ShenShaRef } from './shenSha'
 import { formatAdjusted, longitudeOf, trueSolarTime } from './trueSolarTime'
@@ -18,10 +19,25 @@ export function enrichResult(result: PaipanResult): PaipanResult {
   }
   result.daYun.forEach((d) => {
     d.shenSha = computeExternalShenSha(ref, d.ganZhi)
+    if (!d.naYin) {
+      d.naYin = LunarUtil.NAYIN[d.ganZhi] ?? ''
+    }
+    if (!d.shiShen) {
+      d.shiShen = LunarUtil.SHI_SHEN[result.pillars.day.gan + d.ganZhi[0]] ?? ''
+    }
   })
   if (result.currentLiuNian) {
     result.currentLiuNian.shenSha = computeExternalShenSha(ref, result.currentLiuNian.ganZhi)
   }
+  result.liuNianList?.forEach((ln) => {
+    ln.shenSha = computeExternalShenSha(ref, ln.ganZhi)
+    if (!ln.naYin) {
+      ln.naYin = LunarUtil.NAYIN[ln.ganZhi] ?? ''
+    }
+    if (!ln.shiShen) {
+      ln.shiShen = LunarUtil.SHI_SHEN[result.pillars.day.gan + ln.ganZhi[0]] ?? ''
+    }
+  })
   return result
 }
 

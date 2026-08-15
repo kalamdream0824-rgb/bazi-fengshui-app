@@ -17,6 +17,8 @@ public record PaipanResultDto(
     String shenGongNaYin,
     Map<String, Integer> wuXing,
     List<DaYunDto> daYun,
+    YunStartDto yunStart,
+    List<LiuNianItemDto> liuNianList,
     String currentYearGanZhi,
     LiuNianDto currentLiuNian,
     TrueSolarDto trueSolar) {

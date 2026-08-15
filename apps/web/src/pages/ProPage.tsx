@@ -6,11 +6,11 @@ import { ExplainCard } from '@/components/ExplainCard'
 import { FooterNote } from '@/components/FooterNote'
 import { SegControl } from '@/components/SegControl'
 import { TopBar } from '@/components/TopBar'
-import { GAN_WUXING, WUXING_LABEL } from '@/lib/wuxing'
+import { GAN_WUXING, WUXING_LABEL, computeWuxingDetail } from '@/lib/wuxing'
 import { useBaziWithFallback } from '@/hooks/useBaziWithFallback'
 import { explain } from '@/lib/explainer'
 
-type Panel = 'yun' | 'liu' | 'ss' | 'shensha'
+type Panel = 'yun' | 'liu' | 'ss' | 'wuxing' | 'shensha'
 
 export function ProPage() {
   const { result } = useBaziWithFallback()
@@ -22,6 +22,9 @@ export function ProPage() {
 
   const currentDaYun = result.daYun.find((d) => d.isCurrent)
   const explanation = explain(result)
+  const wuxingDetail = computeWuxingDetail(result)
+  const startAge = result.daYun[0] ? Number.parseInt(result.daYun[0].ageRange.split(' - ')[0], 10) : 0
+  const nowYear = new Date().getFullYear()
 
   return (
     <>
@@ -43,11 +46,12 @@ export function ProPage() {
       </div>
 
       <SegControl
-        className="four"
+        className="five"
         options={[
           { label: '大运', value: 'yun' },
           { label: '流年', value: 'liu' },
           { label: '十神', value: 'ss' },
+          { label: '五行', value: 'wuxing' },
           { label: '神煞', value: 'shensha' },
         ]}
         value={panel}
@@ -56,6 +60,27 @@ export function ProPage() {
 
       {panel === 'yun' && (
         <>
+          {result.yunStart && (
+            <Card>
+              <CardTitle hint="公历 · 依阴阳年顺逆">起运</CardTitle>
+              <div className="row">
+                <span className="k">起运时间</span>
+                <span className="v">
+                  {result.yunStart.year}年{result.yunStart.month}月{result.yunStart.day}日 {result.yunStart.hour}时
+                </span>
+              </div>
+              <div className="row">
+                <span className="k">大运顺逆</span>
+                <span className="v">{result.yunStart.forward ? '顺行' : '逆行'}</span>
+              </div>
+              {startAge > 0 && (
+                <div className="row">
+                  <span className="k">起运岁数</span>
+                  <span className="v">{startAge} 岁</span>
+                </div>
+              )}
+            </Card>
+          )}
           <ExplainCard explanation={explanation} blockKey="dayun" />
           <Card>
             <CardTitle hint="十年一运">大运</CardTitle>
@@ -68,8 +93,20 @@ export function ProPage() {
         <>
           <ExplainCard explanation={explanation} blockKey="liunian" />
           <Card>
-            <CardTitle hint="十年一运">大运参考</CardTitle>
-            <DaYunList daYun={result.daYun} />
+            <CardTitle hint="起运后逐年 · 对照原局">流年</CardTitle>
+            {result.liuNianList && result.liuNianList.length > 0 ? (
+              result.liuNianList.map((ln) => (
+                <div className={`row ${ln.year === nowYear ? 'current' : ''}`} key={ln.year}>
+                  <span className="k">
+                    {ln.year} · {ln.age} 岁
+                  </span>
+                  <span className="gz">{ln.ganZhi}</span>
+                  <span className="v">{[ln.shiShen, ln.naYin, ln.shenSha.join('·')].filter(Boolean).join(' · ')}</span>
+                </div>
+              ))
+            ) : (
+              <div className="empty">暂无流年数据</div>
+            )}
           </Card>
         </>
       )}
@@ -78,7 +115,7 @@ export function ProPage() {
         <>
           <ExplainCard explanation={explanation} blockKey="shishen" />
           <Card>
-            <CardTitle hint="以日主为原点">十神分布</CardTitle>
+            <CardTitle hint="主星（天干）+ 副星（藏干）">十神分布</CardTitle>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, padding: '4px 16px 16px' }}>
               {(['year', 'month', 'day', 'time'] as const).map((key) => {
                 const p = result.pillars[key]
@@ -101,12 +138,36 @@ export function ProPage() {
                       {p.shiShen}
                     </div>
                     <div className="meta-line" style={{ marginTop: 4 }}>
-                      {WUXING_LABEL[GAN_WUXING[p.gan]]}
+                      {WUXING_LABEL[GAN_WUXING[p.gan]]} · {p.ziZuo}
+                    </div>
+                    <div style={{ marginTop: 6, fontSize: 11, color: 'var(--ink-3)', lineHeight: 1.6 }}>
+                      {p.hideGan.map((h) => (
+                        <div key={h.gan}>
+                          {h.gan} · {h.shiShen}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )
               })}
             </div>
+          </Card>
+        </>
+      )}
+
+      {panel === 'wuxing' && (
+        <>
+          <Card>
+            <CardTitle hint="本气计数 + 含藏干加权（本气1 / 中气0.5 / 余气0.3）">五行明细</CardTitle>
+            {wuxingDetail.map((d) => (
+              <div className={`row ${d.missing ? 'missing' : ''}`} key={d.key}>
+                <span className="k">{d.label}</span>
+                <span className="v">
+                  本气 {d.stemCount} · 含藏干 {d.weightedCount}
+                  {d.missing ? '（缺失）' : ''}
+                </span>
+              </div>
+            ))}
           </Card>
         </>
       )}
