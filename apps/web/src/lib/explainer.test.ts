@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { paipan } from '@/lib/baziMapper'
 import { explain, explainBlock, SHISHEN_TIP, TERM_TIPS } from './explainer'
+import { CHANG_SHENG_TIP, WANG_SHUAI_TIP } from './explainerDictionary'
 
 const result = paipan({ gender: 'male' as const, solarDateTime: '1995-10-08T14:30:00', trueSolarTime: false })
 
@@ -46,6 +47,14 @@ describe('explainer 新人解读引擎', () => {
     }
     expect(SHISHEN_TIP['正财']).toBeTruthy()
     expect(Object.keys(SHISHEN_TIP)).toHaveLength(10)
+  })
+
+  it('组合词库覆盖十二长生与旺衰状态', () => {
+    expect(Object.keys(CHANG_SHENG_TIP)).toHaveLength(12)
+    expect(Object.keys(WANG_SHUAI_TIP)).toEqual(['偏强', '中和', '偏弱'])
+    for (const text of [...Object.values(CHANG_SHENG_TIP), ...Object.values(WANG_SHUAI_TIP)]) {
+      expect(text).toMatch(/传统/)
+    }
   })
 
   it('explainBlock 按 key 取块', () => {
