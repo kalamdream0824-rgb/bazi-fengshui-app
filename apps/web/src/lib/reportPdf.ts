@@ -1,7 +1,9 @@
 import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas'
 import type { PaipanRequest, PaipanResult, PillarKey, WuxingKey } from '@/types/bazi'
-import { WUXING_LABEL } from './wuxing'
+import { GAN_WUXING, WUXING_LABEL } from './wuxing'
+import type { ChartExplanation, ExplainPoint } from './explainer'
+import { computeWangShuai } from './geJu'
 
 const A4_W = 210
 const A4_H = 297
@@ -27,15 +29,51 @@ function pillarRow(label: string, get: (k: PillarKey) => string): string {
   </tr>`
 }
 
-export function buildReportHtml(request: PaipanRequest, result: PaipanResult): string {
+function pointsHtml(points: ExplainPoint[]): string {
+  return points
+    .map(
+      (p) => `<div style="margin-bottom:11px">
+        <div style="font-size:13px;font-weight:bold;color:${C.red}">${p.label}</div>
+        <div style="font-size:13px;line-height:1.9;color:${C.ink2}">${p.text}</div>
+      </div>`,
+    )
+    .join('')
+}
+
+function blockHtml(title: string, points: ExplainPoint[]): string {
+  return `<div style="font-size:15px;font-weight:bold;margin:20px 0 10px;color:${C.ink}">${title}</div>${pointsHtml(points)}`
+}
+
+function pageHeader(title: string): string {
+  return `<div style="font-size:20px;font-weight:bold;border-left:4px solid ${C.red};padding-left:10px;margin-bottom:16px">${title}</div>`
+}
+
+function blockByKey(explanation: ChartExplanation, key: string): ExplainPoint[] {
+  return explanation.blocks.find((b) => b.key === key)?.points ?? []
+}
+
+export function buildReportHtml(
+  request: PaipanRequest,
+  result: PaipanResult,
+  explanation: ChartExplanation,
+): string {
   const genderLabel = request.gender === 'male' ? '乾造' : '坤造'
   const today = new Date().toLocaleDateString('zh-CN')
+  const wangShuai = computeWangShuai(result)
 
   const wuxingRow = (['jin', 'mu', 'shui', 'huo', 'tu'] as WuxingKey[])
     .map(
       (k) => `<td style="padding:8px 4px;text-align:center;font-size:13px">${WUXING_LABEL[k]} ${result.wuXing[k]}</td>`,
     )
     .join('')
+  const daYunRows = result.daYun
+    .map(
+      (d) => `<tr><td style="padding:8px 10px;border:1px solid ${C.line};font-size:13px">${d.ageRange}</td><td style="padding:8px 10px;border:1px solid ${C.line};font-size:15px;font-weight:bold;color:${d.isCurrent ? C.red : C.ink}">${d.ganZhi}${d.isCurrent ? '（今）' : ''}</td><td style="padding:8px 10px;border:1px solid ${C.line};font-size:12px;color:${C.ink2}">${d.yearRange}</td></tr>`,
+    )
+    .join('')
+  const shiShenLine = KEYS.map(
+    (k) => `${LABELS[k]}：${result.pillars[k].gan}${result.pillars[k].zhi}（${result.pillars[k].shiShen}）`,
+  ).join('　')
 
   return `
     <div style="width:${PAGE_W}px;background:${C.paper};color:${C.ink};font-family:'Songti SC','PingFang SC',serif;box-sizing:border-box">
@@ -52,7 +90,7 @@ export function buildReportHtml(request: PaipanRequest, result: PaipanResult): s
       </div>
 
       <div class="page" style="width:100%;min-height:900px;padding:36px 40px;box-sizing:border-box">
-        <div style="font-size:20px;font-weight:bold;border-left:4px solid ${C.red};padding-left:10px;margin-bottom:16px">一、命盘概览</div>
+        ${pageHeader('壹、命盘概览')}
         <table style="width:100%;border-collapse:collapse">
           <tr>
             <td style="padding:8px 4px;border:1px solid ${C.line};background:${C.paper};font-size:12px;color:${C.ink2}">四柱</td>
@@ -78,18 +116,39 @@ export function buildReportHtml(request: PaipanRequest, result: PaipanResult): s
       </div>
 
       <div class="page" style="width:100%;min-height:900px;padding:36px 40px;box-sizing:border-box">
-        <div style="font-size:20px;font-weight:bold;border-left:4px solid ${C.red};padding-left:10px;margin-bottom:16px">二、大运与参考</div>
+        ${pageHeader('贰、五行与用神')}
+        <div style="font-size:13px;line-height:2;color:${C.ink};background:${C.card};border:1px solid ${C.line};padding:12px 14px;border-radius:6px">${explanation.overview[0] ?? ''}</div>
+        <div style="font-size:14px;font-weight:bold;margin:22px 0 8px">日主旺衰（得分制粗判）</div>
+        <div style="font-size:13px;line-height:1.9;color:${C.ink2}">日主${result.pillars.day.gan}${WUXING_LABEL[GAN_WUXING[result.pillars.day.gan]]}旺衰判定为「${wangShuai.level}」（得分 ${wangShuai.score}）。此为传统命理框架下的粗判，供参考。</div>
+        ${blockHtml('日主与五行', blockByKey(explanation, 'daymaster'))}
+        <div style="font-size:14px;font-weight:bold;margin:22px 0 8px">五行占比（本气计数）</div>
+        <table style="width:100%;border-collapse:collapse"><tr>${wuxingRow}</tr></table>
+      </div>
+
+      <div class="page" style="width:100%;min-height:900px;padding:36px 40px;box-sizing:border-box">
+        ${pageHeader('叁、大运流年')}
         <div style="font-size:14px;font-weight:bold;margin-bottom:8px">大运（十年一运）</div>
         <table style="width:100%;border-collapse:collapse">
-          ${result.daYun.map((d) => `<tr><td style="padding:8px 10px;border:1px solid ${C.line};font-size:13px">${d.ageRange}</td><td style="padding:8px 10px;border:1px solid ${C.line};font-size:15px;font-weight:bold;color:${d.isCurrent ? C.red : C.ink}">${d.ganZhi}${d.isCurrent ? '（今）' : ''}</td><td style="padding:8px 10px;border:1px solid ${C.line};font-size:12px;color:${C.ink2}">${d.yearRange}</td></tr>`).join('')}
+          ${daYunRows}
         </table>
+        ${blockHtml('当前大运解读', blockByKey(explanation, 'dayun'))}
+        ${blockHtml('流年参考', blockByKey(explanation, 'liunian'))}
+      </div>
+
+      <div class="page" style="width:100%;min-height:900px;padding:36px 40px;box-sizing:border-box">
+        ${pageHeader('肆、十神详析')}
         <div style="font-size:14px;font-weight:bold;margin:22px 0 8px">十神概览</div>
-        <div style="font-size:13px;line-height:2;color:${C.ink}">
-          ${KEYS.map((k) => `${LABELS[k]}：${result.pillars[k].gan}${result.pillars[k].zhi}（${result.pillars[k].shiShen}）`).join('　')}
-        </div>
+        <div style="font-size:13px;line-height:2;color:${C.ink}">${shiShenLine}</div>
+        ${blockHtml('十神性格', blockByKey(explanation, 'shishen'))}
+        ${blockHtml('神煞参考', blockByKey(explanation, 'shensha'))}
+      </div>
+
+      <div class="page" style="width:100%;min-height:900px;padding:36px 40px;box-sizing:border-box">
+        ${pageHeader('伍、综合建议')}
+        ${explanation.overview.map((s) => `<div style="font-size:13px;line-height:1.9;color:${C.ink2};margin-bottom:8px">${s}</div>`).join('')}
         <div style="font-size:14px;font-weight:bold;margin:22px 0 8px">参考建议</div>
         <div style="font-size:13px;line-height:2;color:${C.ink2}">
-          本命书为排盘数据的整理与呈现，供传统文化研究参考。命理分析存在流派差异，请结合自身实际情况理性看待，不作决策依据。
+          本命书为排盘数据的整理与组合型文化解读，内容基于传统命理框架，仅供娱乐与参考，不构成任何人生、医疗、投资或法律建议。命理分析存在流派差异，请结合自身实际情况理性看待，不作决策依据。
         </div>
         <div style="margin-top:36px;text-align:center;font-size:11px;color:${C.ink2}">— 本文档由「朱墨星图」排盘工具生成 —</div>
       </div>
@@ -101,10 +160,14 @@ export function reportFileName(request: PaipanRequest, result: PaipanResult): st
   return `命书-${request.name || '示例'}-${result.solarText.slice(0, 10)}.pdf`
 }
 
-export async function exportMingshuPdf(request: PaipanRequest, result: PaipanResult): Promise<void> {
+export async function exportMingshuPdf(
+  request: PaipanRequest,
+  result: PaipanResult,
+  explanation: ChartExplanation,
+): Promise<void> {
   const container = document.createElement('div')
   container.style.cssText = `position:fixed;left:-10000px;top:0;width:${PAGE_W}px;background:${C.paper};z-index:-1`
-  container.innerHTML = buildReportHtml(request, result)
+  container.innerHTML = buildReportHtml(request, result, explanation)
   document.body.appendChild(container)
 
   try {

@@ -5,28 +5,30 @@ import { EmptyState } from '@/components/EmptyState'
 import { FooterNote } from '@/components/FooterNote'
 import { TopBar } from '@/components/TopBar'
 import { GAN_WUXING, WUXING_LABEL } from '@/lib/wuxing'
+import { explain } from '@/lib/explainer'
 import { exportMingshuPdf } from '@/lib/reportPdf'
 import { useBaziWithFallback } from '@/hooks/useBaziWithFallback'
 import { useToastStore } from '@/store/useToastStore'
 
 const TOC = [
-  ['壹', '命盘概览', 'P.01'],
+  ['壹', '命盘概览', 'P.02'],
   ['贰', '五行与用神', 'P.03'],
-  ['叁', '大运流年', 'P.05'],
-  ['肆', '十神详析', 'P.08'],
-  ['伍', '综合建议', 'P.11'],
+  ['叁', '大运流年', 'P.04'],
+  ['肆', '十神详析', 'P.05'],
+  ['伍', '综合建议', 'P.06'],
 ] as const
 
 export function ReportPage() {
   const toast = useToastStore((s) => s.show)
   const [exporting, setExporting] = useState(false)
   const { request, result } = useBaziWithFallback()
+  const explanation = result ? explain(result) : null
 
   const handleExport = async () => {
-    if (!request || !result || exporting) return
+    if (!request || !result || !explanation || exporting) return
     setExporting(true)
     try {
-      await exportMingshuPdf(request, result)
+      await exportMingshuPdf(request, result, explanation)
       toast('命书 PDF 已生成')
     } catch {
       toast('生成失败，请重试')
