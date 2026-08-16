@@ -134,7 +134,7 @@ flowchart TD
 | 文件 | 路径 | 说明 |
 |---|---|---|
 | 交互原型 v2（最新） | `/Users/lijialin/.codex/visualizations/2026/08/07/019fdc97-ccf9-7903-a15d-2577e2b5a01b/bazi-app-v2.html` | 会话内渲染源；修改后需重新输出 `::codex-inline-vis{file="bazi-app-v2.html"}` |
-| 原型副本（入库） | `/Users/lijialin/Documents/Codex/bazi-fengshui-app/docs/mockups/bazi-app-v2.html` | 项目仓库内稳定副本，随 git 版本管理 |
+| 原型副本（入库） | `/Users/lijialin/Documents/ChatGPT/fengshui/docs/mockups/bazi-app-v2.html` | 项目仓库内稳定副本，随 git 版本管理 |
 | 设计哲学 | `/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/design-philosophy.md` | 完整版哲学 |
 | 产品设计文档 PRD | `/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/bazi-fengshui-app-PRD.md` | 需求/竞品/商业模式 |
 | 本文档 | `/Users/lijialin/Documents/Codex/2026-08-07/wo/outputs/bazi-app-mockups.md` | 产品图总览与修改入口 |

@@ -13,7 +13,7 @@
 
 | 项 | 内容 |
 |---|---|
-| 本地路径 | `/Users/lijialin/Documents/Codex/bazi-fengshui-app` |
+| 本地路径 | `/Users/lijialin/Documents/ChatGPT/fengshui` |
 | GitHub | `kalamdream0824-rgb/bazi-fengshui-app`（公开，main 分支） |
 | 前端 | `apps/web`：Vite + React 19 + TS strict + zustand + TanStack Query + Vitest + lunar-javascript |
 | 后端 | `apps/server`：Spring Boot 3.5.16 + Java 17 + MyBatis-Plus + lunar-java + H2（开发）/ MySQL（Docker 已配） |
