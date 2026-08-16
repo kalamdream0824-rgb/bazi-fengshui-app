@@ -118,7 +118,6 @@ export function ReportPage() {
             <Button variant="primary" onClick={handleExport} disabled={exporting}>
               {exporting ? '生成中…' : '导出 PDF'}
             </Button>
-            <Button onClick={() => toast('分享功能规划中')}>分享</Button>
             <Button onClick={() => window.history.back()}>返回</Button>
           </ButtonRow>
           <FooterNote>命书内容仅供传统文化研究参考</FooterNote>
