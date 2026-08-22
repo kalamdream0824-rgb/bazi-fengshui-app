@@ -36,15 +36,7 @@ export function ProPage() {
     <>
       <TopBar title="专业细盘" />
 
-      <div
-        style={{
-          margin: '4px 14px 10px',
-          fontSize: 12,
-          color: 'var(--ink-3)',
-          display: 'flex',
-          justifyContent: 'space-between',
-        }}
-      >
+      <div className="pro-current-strip">
         <span>
           当前大运 <b style={{ color: 'var(--ink)' }}>{currentDaYun?.ganZhi ?? '—'}</b>
         </span>
@@ -52,7 +44,7 @@ export function ProPage() {
       </div>
 
       <SegControl
-        className="six"
+        className="pro-tabs six"
         options={[
           { label: '大运', value: 'yun' },
           { label: '流年', value: 'liu' },
@@ -66,9 +58,13 @@ export function ProPage() {
       />
 
       {panel === 'yun' && (
-        <>
+        <section className="pro-yun">
+          <div className="pro-yun__heading">
+            <span>时间轨迹</span>
+            <small>十年一运 · 以当前大运为锚点</small>
+          </div>
           {result.yunStart && (
-            <Card>
+            <Card className="pro-yun__start">
               <CardTitle hint="公历 · 依阴阳年顺逆">起运</CardTitle>
               <div className="row">
                 <span className="k">起运时间</span>
@@ -89,11 +85,11 @@ export function ProPage() {
             </Card>
           )}
           <ExplainCard explanation={explanation} blockKey="dayun" />
-          <Card>
+          <Card className="pro-yun__list">
             <CardTitle hint="十年一运">大运</CardTitle>
             <DaYunList daYun={result.daYun} />
           </Card>
-        </>
+        </section>
       )}
 
       {panel === 'liu' && (

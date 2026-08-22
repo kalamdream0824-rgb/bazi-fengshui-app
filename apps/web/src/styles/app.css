@@ -602,6 +602,596 @@ button {
   transform: rotate(-2deg);
 }
 
+/* 专业细盘：大运不再是列表，而是可定位的时间轨 */
+.pro-current-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 2px var(--space-page) 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(185, 154, 97, 0.42);
+  border-radius: 6px;
+  color: rgba(246, 241, 231, 0.68);
+  font-size: 11px;
+  background: linear-gradient(90deg, var(--night), var(--night-2));
+}
+.pro-current-strip b {
+  margin-left: 4px;
+  color: #f6e4bc !important;
+  font-family: var(--font-glyph);
+  font-size: 15px;
+}
+.pro-tabs.seg {
+  padding-bottom: 10px;
+}
+.pro-tabs .opt {
+  border-radius: 4px;
+}
+.pro-yun__heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 4px 18px 10px;
+  color: var(--night);
+  font-family: var(--font-glyph);
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+.pro-yun__heading::before {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 1px;
+  margin-right: 7px;
+  vertical-align: middle;
+  background: var(--red);
+}
+.pro-yun__heading small {
+  margin-left: auto;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--ink-3);
+}
+.pro-yun .card {
+  border-radius: 6px;
+}
+.pro-yun__start {
+  position: relative;
+  overflow: hidden;
+}
+.pro-yun__start::after {
+  content: '启运';
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  color: rgba(185, 154, 97, 0.26);
+  font-family: var(--font-glyph);
+  font-size: 27px;
+  letter-spacing: 4px;
+}
+.pro-yun__list .sec-title {
+  padding-bottom: 12px;
+  background: linear-gradient(90deg, rgba(24, 32, 41, 0.04), transparent 72%);
+}
+.pro-yun__list .dayun-axis::before {
+  left: 47px;
+  background: repeating-linear-gradient(180deg, var(--slate) 0 3px, transparent 3px 7px);
+  opacity: 0.62;
+}
+.pro-yun__list .dy {
+  min-height: 70px;
+  grid-template-columns: 66px 64px 1fr auto;
+  border-top-color: rgba(185, 154, 97, 0.28);
+}
+.pro-yun__list .dy::before {
+  left: 47px;
+  border-color: var(--slate);
+}
+.pro-yun__list .dy.current {
+  background: linear-gradient(90deg, rgba(185, 65, 56, 0.12), rgba(185, 65, 56, 0.015) 75%);
+  box-shadow: inset 2px 0 0 var(--red);
+}
+.pro-yun__list .dy.current::before {
+  border-color: var(--red);
+  background: var(--red);
+}
+.pro-yun__list .dy .gz {
+  font-size: 21px;
+}
+.pro-yun__list .dy .meta {
+  padding-left: 18px;
+  letter-spacing: 0.2px;
+}
+
+/* 命书：封面是可保存的个人档案，目录和正文回到安静的纸面 */
+.report-cover {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 380px;
+  margin: 4px var(--space-page) 14px;
+  padding: 24px 20px 18px;
+  border: 1px solid rgba(185, 154, 97, 0.52);
+  border-radius: 8px;
+  color: var(--paper-bright);
+  background:
+    radial-gradient(circle at 50% 22%, rgba(185, 154, 97, 0.12) 0 1px, transparent 2px),
+    linear-gradient(160deg, #202e38, var(--night) 70%);
+  box-shadow: 0 14px 26px rgba(24, 32, 41, 0.2);
+}
+.report-cover__orbit {
+  position: absolute;
+  z-index: -1;
+  width: 520px;
+  height: 280px;
+  left: 50%;
+  bottom: -198px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(185, 154, 97, 0.28);
+  border-radius: 50% 50% 0 0;
+  box-shadow:
+    0 0 0 26px transparent,
+    0 0 0 27px rgba(185, 154, 97, 0.12),
+    0 0 0 60px transparent,
+    0 0 0 61px rgba(185, 154, 97, 0.08);
+}
+.report-cover__kicker {
+  color: #d9c69e;
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-align: center;
+}
+.report-cover__seal {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+.report-cover__title {
+  margin: 14px 0 22px;
+  color: #f6e4bc;
+  font-family: var(--font-glyph);
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 13px;
+  text-align: center;
+  text-indent: 13px;
+}
+.report-cover__pillars {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin: 0 4px 24px;
+  border-top: 1px solid rgba(185, 154, 97, 0.3);
+  border-bottom: 1px solid rgba(185, 154, 97, 0.3);
+}
+.report-cover__pillar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  padding: 12px 3px 14px;
+  border-left: 1px solid rgba(185, 154, 97, 0.26);
+}
+.report-cover__pillar:last-child {
+  border-right: 1px solid rgba(185, 154, 97, 0.26);
+}
+.report-cover__pillar small {
+  color: rgba(246, 241, 231, 0.52);
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+.report-cover__pillar span {
+  margin-top: 9px;
+  font-family: var(--font-glyph);
+  font-size: clamp(28px, 8.5vw, 38px);
+  font-weight: 700;
+  letter-spacing: 2px;
+  line-height: 1.08;
+  writing-mode: vertical-rl;
+}
+.report-cover__pillar.is-day {
+  background: linear-gradient(180deg, rgba(185, 65, 56, 0.82), rgba(185, 65, 56, 0.2));
+}
+.report-cover__pillar.is-day small,
+.report-cover__pillar.is-day span {
+  color: #fff0dd;
+}
+.report-cover__subject {
+  color: #f2dfb8;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-align: center;
+}
+.report-cover__meta {
+  margin-top: 7px;
+  color: rgba(246, 241, 231, 0.54);
+  font-size: 10px;
+  text-align: center;
+}
+.report-sample__copy {
+  margin: 0 16px 14px;
+  padding: 11px 12px;
+  border: 1px solid rgba(185, 154, 97, 0.3);
+  border-radius: 3px;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 26px, rgba(185, 65, 56, 0.06) 26px 27px),
+    #fdf9ef;
+  color: var(--ink-2);
+  font-size: 12px;
+  line-height: 1.95;
+}
+.report-price {
+  margin: 0 var(--space-page) 10px;
+  color: var(--ink-3);
+  font-size: 12px;
+  text-align: center;
+}
+.report-price b {
+  color: var(--red);
+  font-family: var(--font-glyph);
+  font-size: 17px;
+}
+
+/* 命书是独立的阅读场景：夜空承托月白命书，正文保持一张短页 */
+.report-page {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 100dvh;
+  margin-bottom: -72px;
+  padding-bottom: 28px;
+  background:
+    radial-gradient(90% 25% at 50% 38%, rgba(72, 102, 116, 0.28), transparent 68%),
+    linear-gradient(180deg, #101b24, #152832 52%, #0f1a22);
+}
+.report-page::before {
+  position: absolute;
+  z-index: 0;
+  inset: 92px -230px 12px;
+  content: '';
+  pointer-events: none;
+  opacity: 0.68;
+  background:
+    radial-gradient(ellipse at 96% 34%, transparent 0 32%, rgba(200, 167, 104, 0.17) 32.12% 32.23%, transparent 32.35%),
+    radial-gradient(ellipse at 5% 63%, transparent 0 39%, rgba(200, 167, 104, 0.11) 39.12% 39.22%, transparent 39.34%),
+    radial-gradient(circle at 17% 41%, rgba(242, 220, 161, 0.62) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 82% 53%, rgba(242, 220, 161, 0.42) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 74% 73%, rgba(242, 220, 161, 0.34) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 31% 83%, rgba(242, 220, 161, 0.28) 0 1px, transparent 1.8px);
+}
+.report-page > * {
+  position: relative;
+  z-index: 1;
+}
+.top.top-night {
+  padding-bottom: 14px;
+  color: #f6e4bc;
+  background: transparent;
+}
+.top-night .title {
+  color: #f6e4bc;
+}
+.top-night .icon-btn {
+  border-color: rgba(185, 154, 97, 0.46);
+  color: #f6e4bc;
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: none;
+}
+.top-night .title .seal {
+  box-shadow: inset 0 0 0 1px rgba(255, 246, 232, 0.22);
+}
+.report-page .report-cover {
+  min-height: 326px;
+  margin: 0;
+  padding: 16px 24px 17px;
+  border: 0;
+  border-top: 1px solid rgba(185, 154, 97, 0.28);
+  border-radius: 0;
+  box-shadow: none;
+  background:
+    radial-gradient(circle at 50% 31%, rgba(185, 154, 97, 0.13) 0 1px, transparent 2px),
+    linear-gradient(160deg, #202e38, var(--night) 72%);
+}
+.report-page .report-cover__orbit {
+  bottom: -210px;
+  width: 560px;
+  height: 304px;
+  border-color: rgba(185, 154, 97, 0.26);
+}
+.report-page .report-cover__kicker {
+  padding-top: 2px;
+}
+.report-page .report-cover__title {
+  margin: 10px 0 16px;
+  font-size: 24px;
+}
+.report-page .report-cover__pillars {
+  max-width: 390px;
+  margin: 0 auto 16px;
+}
+.report-page .report-cover__pillar {
+  padding-top: 9px;
+  padding-bottom: 11px;
+}
+.report-page .report-cover__pillar span {
+  margin-top: 6px;
+  font-size: clamp(25px, 7.6vw, 34px);
+}
+.report-page .report-cover__subject {
+  position: relative;
+  z-index: 1;
+}
+.report-page .report-cover__meta {
+  position: relative;
+  z-index: 1;
+}
+.report-page__document {
+  position: relative;
+  margin-top: 0;
+  padding: 16px 0 20px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.report-page__document-mark {
+  position: absolute;
+  top: 13px;
+  right: 20px;
+  color: rgba(185, 65, 56, 0.16);
+  font-family: var(--font-glyph);
+  font-size: 42px;
+  line-height: 1;
+  transform: rotate(-8deg);
+}
+.report-page__document .card {
+  position: relative;
+  border-radius: 5px;
+  box-shadow: 0 3px 10px rgba(47, 37, 28, 0.04);
+}
+.report-page__document .card:first-of-type {
+  border-top-color: var(--red);
+}
+.report-page__document .row {
+  min-height: 42px;
+}
+.report-page__document .row .v {
+  color: var(--gold);
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  font-size: 11px;
+}
+.report-page__document .row3 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 14px;
+  margin-bottom: 12px;
+}
+.report-page__document .row3 .btn {
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+.report-page__document .footer-note {
+  padding-bottom: 0;
+  color: rgba(246, 241, 231, 0.55);
+}
+.report-page__empty {
+  min-height: calc(100dvh - 64px);
+  padding-top: 36px;
+  color: var(--paper-bright);
+}
+.report-page__empty .empty {
+  color: var(--paper-bright);
+}
+
+/* 命理档案：月白纸页只放核心摘要，避免与封面重复展示四柱 */
+.report-dossier {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  margin: 0 14px 18px;
+  border: 1px solid rgba(185, 154, 97, 0.7);
+  border-radius: 12px;
+  background: #faf5e9;
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+.report-dossier__index {
+  display: grid;
+  grid-template-rows: repeat(5, 1fr);
+  min-height: 354px;
+  border-right: 1px solid rgba(255, 232, 186, 0.42);
+  color: rgba(239, 213, 160, 0.72);
+  background:
+    linear-gradient(90deg, rgba(255, 246, 232, 0.08), transparent 14%),
+    linear-gradient(180deg, #a34232, #843125);
+}
+.report-dossier__index span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgba(255, 232, 186, 0.22);
+  font-family: var(--font-glyph);
+  font-size: 18px;
+  writing-mode: vertical-rl;
+  letter-spacing: 3px;
+}
+.report-dossier__index span:last-child {
+  border-bottom: 0;
+}
+.report-dossier__index span.is-current {
+  color: #fff3d6;
+  background: rgba(57, 31, 22, 0.18);
+  box-shadow: inset 3px 0 0 #f3d59c;
+}
+.report-dossier__sheet {
+  min-width: 0;
+  padding: 17px 16px 15px;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 31px, rgba(185, 154, 97, 0.04) 31px 32px),
+    radial-gradient(circle at 92% 8%, rgba(185, 65, 56, 0.09) 0 1px, transparent 2px),
+    #fffcf5;
+}
+.report-dossier__heading {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(185, 154, 97, 0.62);
+}
+.report-dossier__heading span {
+  color: var(--red);
+  font-family: var(--font-glyph);
+  font-size: 26px;
+  line-height: 1;
+}
+.report-dossier__heading h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-glyph);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+.report-dossier__identity {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px dashed rgba(185, 154, 97, 0.52);
+}
+.report-dossier__glyph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border: 1px solid rgba(185, 154, 97, 0.46);
+  border-radius: 50%;
+  color: var(--ink);
+  font-family: var(--font-glyph);
+  font-size: 52px;
+  line-height: 1;
+  background: radial-gradient(circle, rgba(185, 154, 97, 0.13), transparent 70%);
+}
+.report-dossier__eyebrow {
+  color: var(--red);
+  font-size: 10px;
+  letter-spacing: 2px;
+}
+.report-dossier__identity h3 {
+  margin: 5px 0 6px;
+  color: var(--ink);
+  font-family: var(--font-glyph);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+.report-dossier__identity p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 11px;
+  line-height: 1.7;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.report-dossier__summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 14px 0;
+  border: 1px solid rgba(185, 154, 97, 0.58);
+  border-radius: 3px;
+}
+.report-dossier__summary div {
+  min-width: 0;
+  padding: 11px 5px 10px;
+  text-align: center;
+}
+.report-dossier__summary div + div {
+  border-left: 1px solid rgba(185, 154, 97, 0.42);
+}
+.report-dossier__summary dt {
+  color: var(--ink-3);
+  font-size: 10px;
+}
+.report-dossier__summary dd {
+  margin: 5px 0 0;
+  color: var(--red);
+  font-family: var(--font-glyph);
+  font-size: 18px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.report-dossier__chapters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px dashed rgba(185, 154, 97, 0.56);
+  border-left: 1px dashed rgba(185, 154, 97, 0.42);
+}
+.report-dossier__chapter {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  gap: 5px;
+  align-items: center;
+  min-height: 39px;
+  padding: 7px 7px;
+  border-right: 1px dashed rgba(185, 154, 97, 0.42);
+  border-bottom: 1px dashed rgba(185, 154, 97, 0.42);
+  color: var(--ink);
+  font-size: 11px;
+}
+.report-dossier__chapter-number {
+  color: var(--red);
+  font-family: var(--font-glyph);
+  font-weight: 700;
+}
+.report-dossier__chapter small {
+  color: var(--gold);
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  font-size: 9px;
+}
+.report-page__document .report-price {
+  margin-top: 0;
+  color: rgba(246, 241, 231, 0.72);
+}
+.report-page__document .row3 .btn:not(.primary) {
+  border-color: rgba(207, 174, 109, 0.78);
+  color: #f6e4bc;
+  background: rgba(255, 250, 239, 0.06);
+}
+@media (max-width: 370px) {
+  .report-dossier {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+  .report-dossier__sheet {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+  .report-dossier__index {
+    min-height: 348px;
+  }
+  .report-dossier__identity {
+    grid-template-columns: 66px minmax(0, 1fr);
+    gap: 8px;
+  }
+  .report-dossier__glyph {
+    width: 66px;
+    height: 66px;
+    font-size: 43px;
+  }
+  .report-dossier__identity h3 {
+    font-size: 21px;
+  }
+  .report-dossier__chapter {
+    grid-template-columns: 17px minmax(0, 1fr);
+  }
+  .report-dossier__chapter small {
+    display: none;
+  }
+}
+
 /* 释义底部笺纸 */
 .sheet {
   position: fixed;
@@ -712,6 +1302,119 @@ button {
 .chip.no {
   background: rgba(0, 0, 0, 0.1);
   border-color: rgba(255, 246, 232, 0.22);
+}
+
+/* 四柱星轨：首页以「今日」为主角，而非普通信息卡 */
+.home-almanac {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin: 4px var(--space-page) 14px;
+  padding: 18px;
+  border: 1px solid rgba(185, 154, 97, 0.54);
+  border-radius: 10px;
+  color: var(--paper-bright);
+  background:
+    radial-gradient(circle at 18% 24%, rgba(185, 154, 97, 0.14) 0 1px, transparent 2px),
+    radial-gradient(circle at 74% 19%, rgba(185, 154, 97, 0.2) 0 1.5px, transparent 2.5px),
+    linear-gradient(145deg, #202e38, var(--night) 68%);
+  box-shadow: 0 12px 28px rgba(24, 32, 41, 0.23);
+}
+.home-almanac__orbit {
+  position: absolute;
+  z-index: -1;
+  width: 390px;
+  height: 390px;
+  top: -258px;
+  right: -108px;
+  border: 1px solid rgba(185, 154, 97, 0.3);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 34px transparent,
+    0 0 0 35px rgba(185, 154, 97, 0.16),
+    0 0 0 72px transparent,
+    0 0 0 73px rgba(185, 154, 97, 0.1);
+}
+.home-almanac__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.home-almanac__eyebrow {
+  color: #d9c69e;
+  font-size: 10px;
+  letter-spacing: 3px;
+}
+.home-almanac__date {
+  margin-top: 5px;
+  font-size: 12px;
+  letter-spacing: 0.6px;
+  color: rgba(246, 241, 231, 0.8);
+}
+.home-almanac__seal,
+.report-cover__seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid currentColor;
+  border-radius: 3px 7px 3px 7px;
+  color: #ffe7d4;
+  background: var(--red);
+  box-shadow: inset 0 0 0 2px rgba(255, 246, 232, 0.2);
+  font-family: var(--font-glyph);
+  font-size: 16px;
+  transform: rotate(-4deg);
+}
+.home-almanac__pillar {
+  margin: 16px 0 12px;
+  font-family: var(--font-glyph);
+  font-size: clamp(42px, 12vw, 56px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 12px;
+  text-indent: 12px;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+}
+.home-almanac__seg.seg {
+  width: 150px;
+  padding: 0 0 14px;
+}
+.home-almanac .opt {
+  background: transparent;
+  border-color: rgba(246, 241, 231, 0.35);
+  color: rgba(246, 241, 231, 0.75);
+}
+.home-almanac .opt.active {
+  background: var(--paper-bright);
+  border-color: var(--paper-bright);
+  color: var(--night);
+  box-shadow: none;
+}
+.home-almanac__chips {
+  padding-top: 2px;
+  border-top: 1px solid rgba(185, 154, 97, 0.3);
+}
+.home-almanac__chip {
+  display: inline-block;
+  margin: 9px 6px 0 0;
+  padding: 4px 8px;
+  border: 1px solid rgba(99, 150, 126, 0.72);
+  border-radius: 3px;
+  background: rgba(84, 120, 107, 0.22);
+  color: #d6e5dc;
+  font-size: 11px;
+}
+.home-almanac__chip.is-avoid {
+  border-color: rgba(185, 154, 97, 0.46);
+  background: rgba(185, 154, 97, 0.08);
+  color: rgba(246, 241, 231, 0.76);
+}
+.home-almanac__meta {
+  margin-top: 12px;
+  color: rgba(246, 241, 231, 0.56);
+  font-size: 11px;
 }
 
 /* 表单 */
@@ -1022,22 +1725,22 @@ select.input-box {
   gap: 11px;
   padding: 10px 12px;
   text-align: left;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
-  box-shadow: 0 2px 8px rgba(47, 37, 28, 0.045);
+  background: linear-gradient(135deg, var(--card), #fbf5e8);
+  border: 1px solid rgba(185, 154, 97, 0.38);
+  border-radius: 6px;
+  box-shadow: 0 3px 10px rgba(47, 37, 28, 0.04);
 }
 .quick-grid .q-glyph {
   width: 38px;
   height: 38px;
   border-radius: var(--radius-btn);
   flex-shrink: 0;
-  background: linear-gradient(180deg, #f6efdd, #efe6cd);
+  background: var(--night);
   border: 1px solid rgba(184, 144, 74, 0.45);
   font-family: var(--font-glyph);
   font-size: 18px;
   font-weight: 700;
-  color: var(--red);
+  color: #edd7aa;
   display: flex;
   align-items: center;
   justify-content: center;

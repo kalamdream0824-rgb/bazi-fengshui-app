@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 
-export function Card({ children }: { children: ReactNode }) {
-  return <div className="card">{children}</div>
+export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return <div className={['card', className].filter(Boolean).join(' ')}>{children}</div>
 }
 
 export function CardTitle({ children, hint }: { children: ReactNode; hint?: string }) {

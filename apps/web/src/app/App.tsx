@@ -17,7 +17,7 @@ const ProfilePage = lazy(() => import('@/pages/ProfilePage').then((m) => ({ defa
 const MembershipPage = lazy(() => import('@/pages/MembershipPage').then((m) => ({ default: m.MembershipPage })))
 const SettingsPage = lazy(() => import('@/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })))
 
-const TAB_PATHS = ['/', '/input', '/profile', '/membership', '/history', '/report']
+const TAB_PATHS = ['/', '/input', '/profile', '/membership', '/history']
 
 function Shell() {
   const { pathname } = useLocation()

@@ -29,6 +29,7 @@ export function HomePage() {
   const [day, setDay] = useState<'today' | 'tomorrow'>('today')
   const info = day === 'today' ? TODAY : TOMORROW
   const alm = day === 'today' ? ALM_TODAY : ALM_TOMORROW
+  const [yearGanZhi = '', monthGanZhi = '', dayGanZhi = info.ganZhi] = info.ganZhi.split(' ')
 
   return (
     <>
@@ -55,14 +56,19 @@ export function HomePage() {
         </button>
       </div>
 
-      <div className="hero">
-        <div className="date">
-          {day === 'today' ? '今日' : '明日'} · {info.dateText}
+      <section className="home-almanac" aria-label={`${day === 'today' ? '今日' : '明日'}黄历`}>
+        <div className="home-almanac__orbit" aria-hidden="true" />
+        <div className="home-almanac__head">
+          <div>
+            <div className="home-almanac__eyebrow">{day === 'today' ? '今日历签' : '明日历签'}</div>
+            <div className="home-almanac__date">{info.dateText}</div>
+          </div>
+          <span className="home-almanac__seal">历</span>
         </div>
-        <div className="gz">{info.ganZhi}</div>
+        <div className="home-almanac__pillar">{dayGanZhi.replace('日', '')}</div>
         <SegControl
           two
-          className="hero-seg"
+          className="home-almanac__seg"
           options={[
             { label: '今日', value: 'today' },
             { label: '明日', value: 'tomorrow' },
@@ -70,22 +76,22 @@ export function HomePage() {
           value={day}
           onChange={(v) => setDay(v as 'today' | 'tomorrow')}
         />
-        <div>
+        <div className="home-almanac__chips">
           {alm.yi.slice(0, 4).map((t) => (
-            <span key={t} className="chip">
+            <span key={t} className="home-almanac__chip">
               宜 {t}
             </span>
           ))}
           {alm.ji.slice(0, 3).map((t) => (
-            <span key={t} className="chip no">
+            <span key={t} className="home-almanac__chip is-avoid">
               忌 {t}
             </span>
           ))}
         </div>
-        <div className="meta-line" style={{ marginTop: 8, color: 'rgba(255,246,232,.85)' }}>
-          冲煞：{alm.chongDesc} · 煞{alm.sha}
+        <div className="home-almanac__meta">
+          {yearGanZhi} · {monthGanZhi} · 冲煞：{alm.chongDesc} · 煞{alm.sha}
         </div>
-      </div>
+      </section>
 
       <Card>
         <CardTitle hint="选一件事开始">起盘</CardTitle>
