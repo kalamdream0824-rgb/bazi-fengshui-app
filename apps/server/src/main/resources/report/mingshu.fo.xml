@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format" font-family="Mingshu Serif" color="#26231F">
+  <fo:layout-master-set>
+    <fo:simple-page-master master-name="report" page-height="297mm" page-width="210mm" margin-top="14mm" margin-bottom="14mm" margin-left="17mm" margin-right="17mm">
+      <fo:region-body margin-top="8mm" margin-bottom="11mm"/>
+      <fo:region-before extent="6mm"/>
+      <fo:region-after extent="8mm"/>
+    </fo:simple-page-master>
+  </fo:layout-master-set>
+  <fo:page-sequence master-reference="report" initial-page-number="1">
+    <fo:static-content flow-name="xsl-region-before">
+      <fo:block border-bottom="0.35pt solid #C8AA72" color="#7B6B56" font-size="7.5pt" letter-spacing="0.8pt" padding-bottom="2mm">命书研读 · {{EDITION_LABEL}} · {{TOPIC_LABEL}}</fo:block>
+    </fo:static-content>
+    <fo:static-content flow-name="xsl-region-after">
+      <fo:block border-top="0.35pt solid #C8AA72" color="#8A7B67" font-size="7.5pt" padding-top="2mm" text-align="center">{{REPORT_ID}}　·　第 <fo:page-number/> 页</fo:block>
+    </fo:static-content>
+    <fo:flow flow-name="xsl-region-body">
+      {{BODY}}
+    </fo:flow>
+  </fo:page-sequence>
+</fo:root>

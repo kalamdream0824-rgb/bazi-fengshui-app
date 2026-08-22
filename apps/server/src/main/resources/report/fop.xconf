@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fop version="1.0">
+  <strict-configuration>true</strict-configuration>
+  <strict-validation>true</strict-validation>
+  <renderers>
+    <renderer mime="application/pdf">
+      <fonts>
+        <font kerning="yes" embed-url="{{FONT_URI}}" {{SUB_FONT_ATTRIBUTE}}>
+          <font-triplet name="Mingshu Serif" style="normal" weight="normal"/>
+          <font-triplet name="Mingshu Serif" style="normal" weight="bold"/>
+        </font>
+      </fonts>
+    </renderer>
+  </renderers>
+</fop>

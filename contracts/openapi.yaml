@@ -157,6 +157,62 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaipanResult'
+  /reports:
+    post:
+      summary: 创建一份文字型命书（需 Bearer token）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReportRequest'
+      responses:
+        '200':
+          description: 报告生成记录
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportInfo'
+    get:
+      summary: 我的命书列表（需 Bearer token）
+      responses:
+        '200':
+          description: 报告列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReportInfo'
+  /reports/{id}:
+    get:
+      summary: 命书详情（需 Bearer token）
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: 报告详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportInfo'
+  /reports/{id}/download:
+    get:
+      summary: 下载已生成的文字型命书（需 Bearer token）
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: 可搜索文字的 PDF 文件
+          content:
+            application/pdf:
+              schema: { type: string, format: binary }
 components:
   schemas:
     AuthRequest:
@@ -235,6 +291,33 @@ components:
           type: string
         providerTradeNo:
           type: string
+    ReportTopic:
+      type: string
+      enum: [overall, career, wealth, relationship]
+    ReportEdition:
+      type: string
+      enum: [plain, professional]
+    CreateReportRequest:
+      type: object
+      required: [recordId, topic, edition]
+      properties:
+        recordId:
+          type: integer
+        topic:
+          $ref: '#/components/schemas/ReportTopic'
+        edition:
+          $ref: '#/components/schemas/ReportEdition'
+    ReportInfo:
+      type: object
+      properties:
+        id: { type: integer }
+        recordId: { type: integer }
+        topic: { $ref: '#/components/schemas/ReportTopic' }
+        edition: { $ref: '#/components/schemas/ReportEdition' }
+        status: { type: string, enum: [pending, generating, ready, failed] }
+        contentVersion: { type: string }
+        createdAt: { type: string, format: date-time }
+        generatedAt: { type: string, format: date-time, nullable: true }
     PaipanRequest:
       type: object
       required: [gender, solarDateTime, trueSolarTime]
