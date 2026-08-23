@@ -7,44 +7,56 @@ import com.bazi.app.dto.PaipanResultDto;
 import com.bazi.app.dto.ReportDto;
 import com.bazi.app.dto.ReportPreviewRequest;
 import com.bazi.app.mapper.BaziReportMapper;
+import com.bazi.app.report.AnnualContextFactory;
 import com.bazi.app.report.CareerContext;
 import com.bazi.app.report.CareerNarrativePlan;
 import com.bazi.app.report.CareerNarrativePlanner;
+import com.bazi.app.report.ReportContent;
 import com.bazi.app.report.ReportEdition;
+import com.bazi.app.report.ReportHorizon;
 import com.bazi.app.report.ReportTopic;
 import com.bazi.app.report.ThreeYearAssessment;
 import com.bazi.app.report.ThreeYearAssessor;
-import com.bazi.app.report.WealthContext;
-import com.bazi.app.report.WealthNarrativePlanner;
 import com.bazi.app.report.rules.AnnualRuleCatalog;
+import com.bazi.app.report.wealth.WealthFactExtractor;
+import com.bazi.app.report.wealth.WealthNarrativePlan;
+import com.bazi.app.report.wealth.WealthNarrativePlanner;
+import com.bazi.app.report.wealth.WealthPathEvaluator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ReportService {
 
   public static final String CAREER_CONTENT_VERSION = "career-narrative-v3";
-  public static final String WEALTH_CONTENT_VERSION = "wealth-narrative-v1";
+  public static final String WEALTH_CONTENT_VERSION = "wealth-narrative-v2";
 
   private final BaziService baziService;
   private final BaziReportMapper mapper;
   private final ObjectMapper objectMapper;
+  private final Clock clock;
   private final ThreeYearAssessor assessor;
   private final CareerNarrativePlanner careerPlanner = new CareerNarrativePlanner();
   private final WealthNarrativePlanner wealthPlanner = new WealthNarrativePlanner();
+  private final WealthFactExtractor wealthFactExtractor = new WealthFactExtractor();
+  private final WealthPathEvaluator wealthPathEvaluator = new WealthPathEvaluator();
 
   public ReportService(BaziService baziService, BaziReportMapper mapper, ObjectMapper objectMapper) {
     this.baziService = baziService;
     this.mapper = mapper;
     this.objectMapper = objectMapper;
-    this.assessor = new ThreeYearAssessor(Clock.systemDefaultZone(), new AnnualRuleCatalog());
+    this.clock = Clock.systemDefaultZone();
+    this.assessor = new ThreeYearAssessor(clock, new AnnualRuleCatalog());
   }
 
+  @Transactional
   public ReportDto create(Long userId, ReportPreviewRequest request) throws Exception {
     ReportTopic topic = ReportTopic.fromCode(request.topic());
     ReportEdition edition = ReportEdition.fromCode(request.edition());
@@ -54,11 +66,12 @@ public class ReportService {
     if (topic == ReportTopic.CAREER && request.careerContext() == null) {
       throw new BusinessException("CAREER_CONTEXT_REQUIRED", "生成事业命书前，请完成事业状态问卷");
     }
-    if (topic == ReportTopic.WEALTH && request.wealthContext() == null) {
-      throw new BusinessException("WEALTH_CONTEXT_REQUIRED", "生成财富命书前，请完成财富状态问卷");
+    if (topic == ReportTopic.WEALTH && edition == ReportEdition.PROFESSIONAL) {
+      throw new BusinessException(
+          "WEALTH_PROFESSIONAL_NOT_AVAILABLE", "财富专业版仍在设计中，当前只开放通俗版");
     }
     PaipanResultDto chart = baziService.paipan(request.request());
-    CareerNarrativePlan content;
+    ReportContent content;
     String contentVersion;
     Object contextRequest;
     if (topic == ReportTopic.CAREER) {
@@ -68,11 +81,14 @@ public class ReportService {
       contentVersion = CAREER_CONTENT_VERSION;
       contextRequest = request.careerContext();
     } else {
-      WealthContext context = request.wealthContext().toDomain();
-      ThreeYearAssessment assessment = assessor.assess(request.request(), chart, topic);
-      content = wealthPlanner.plan(assessment, context);
+      content = wealthPlanner.plan(wealthPathEvaluator.evaluate(wealthFactExtractor.extract(
+          chart,
+          new AnnualContextFactory(clock)
+              .create(request.request(), chart, ReportHorizon.WEALTH_PRODUCT))));
       contentVersion = WEALTH_CONTENT_VERSION;
-      contextRequest = request.wealthContext();
+      contextRequest = Map.of(
+          "source", "system",
+          "horizonYears", ReportHorizon.WEALTH_PRODUCT.years());
     }
     LocalDateTime now = LocalDateTime.now();
 
@@ -109,6 +125,9 @@ public class ReportService {
   }
 
   private ReportDto toDto(BaziReport report) throws Exception {
+    ReportContent content = WEALTH_CONTENT_VERSION.equals(report.getContentVersion())
+        ? objectMapper.readValue(report.getContentJson(), WealthNarrativePlan.class)
+        : objectMapper.readValue(report.getContentJson(), CareerNarrativePlan.class);
     return new ReportDto(
         report.getId(),
         report.getSubject(),
@@ -116,7 +135,7 @@ public class ReportService {
         report.getEdition(),
         report.getStatus(),
         report.getContentVersion(),
-        objectMapper.readValue(report.getContentJson(), CareerNarrativePlan.class),
+        content,
         report.getCreatedAt(),
         report.getGeneratedAt());
   }

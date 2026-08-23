@@ -9,5 +9,6 @@ public record ReportPreviewRequest(
     @NotBlank String topic,
     @NotBlank String edition,
     @Valid CareerContextRequest careerContext,
+    @Deprecated
     @Valid WealthContextRequest wealthContext) {
 }

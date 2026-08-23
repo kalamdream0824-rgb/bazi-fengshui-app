@@ -1,6 +1,6 @@
 package com.bazi.app.dto;
 
-import com.bazi.app.report.CareerNarrativePlan;
+import com.bazi.app.report.ReportContent;
 import java.time.LocalDateTime;
 
 public record ReportDto(
@@ -10,7 +10,7 @@ public record ReportDto(
     String edition,
     String status,
     String contentVersion,
-    CareerNarrativePlan content,
+    ReportContent content,
     LocalDateTime createdAt,
     LocalDateTime generatedAt) {
 }
