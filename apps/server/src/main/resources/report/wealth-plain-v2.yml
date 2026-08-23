@@ -1,0 +1,54 @@
+# 财富通俗版 v2：只描述钱从哪里来、怎样到账、花在哪里和能否留下。
+thesis: "未来三年先找到能带来钱的事情，再把可靠的收入稳定下来。"
+
+path.stable_income: "固定工资、长期客户或定期收入更值得保留。"
+path.skill_income: "别人愿意为你能解决的问题付钱。"
+path.project_income: "奖金、订单和临时项目可以带来额外收入。"
+path.cooperation_income: "合作可以增收，但收入分配和付款时间要先说清。"
+path.retention: "收入增加后，也要防止支出跟着增加。"
+
+risk.stable_income: "固定收入不稳时，先保住必要的生活开支。"
+risk.skill_income: "有人询问却不付款时，不要继续免费投入。"
+risk.project_income: "项目看着不少，也要扣掉成本再看实际收入。"
+risk.cooperation_income: "合作前不说清分配方式，收钱后容易有争议。"
+risk.retention: "收入增加不代表结余增加，要管住新增支出。"
+
+income.stable_income: "这一年的钱主要来自固定工资或长期客户。"
+income.skill_income: "这一年的钱主要来自别人愿意付费的能力。"
+income.project_income: "这一年的钱主要来自奖金、订单或临时项目。"
+income.cooperation_income: "这一年的钱主要来自共同完成并收费的事情。"
+income.retention: "这一年更重要的是减少不必要的支出。"
+
+signal.stable_income: "固定收入按时到账，金额也没有明显减少。"
+signal.skill_income: "咨询逐渐变成付款，收入能够按时到账。"
+signal.project_income: "订单或奖金到账，不再只是口头约定。"
+signal.cooperation_income: "合作款按约定到账，分配也没有争议。"
+signal.retention: "每月支出没有跟着收入一起增加。"
+
+action.stable_income: "记录每笔固定收入的金额和到账时间。"
+action.skill_income: "先说清收费标准，再投入时间解决问题。"
+action.project_income: "每笔收入扣除成本后，再看实际剩下的钱。"
+action.cooperation_income: "合作前写清收入分配和付款时间。"
+action.retention: "发工资或收款当天，先留下一笔结余。"
+
+year.first.focus: "第一年：确认什么事情真的能带来收入。"
+year.first.retention: "先记录收入、成本和支出，再判断能留下多少。"
+year.first.signal: "连续三个月有实际收款，才算可靠的收入来源。"
+year.first.action: "把每月收入、成本、支出和结余记在一起。"
+year.first.transition: "把能稳定收钱的事情留下，下一年再增加次数。"
+
+year.second.focus: "第二年：把已经能收钱的事情做得更稳定。"
+year.second.retention: "今年收入增加时，支出不要按同样速度增加。"
+year.second.signal: "同一类收入重复出现，付款时间也更稳定。"
+year.second.action: "减少很费时间、扣除成本后收入很少的事情。"
+year.second.transition: "今年先稳定重复收入，再为第三年留下余地。"
+
+year.later.focus: "第三年：减少低收益安排，增加实际结余。"
+year.later.retention: "固定支出要与稳定收入匹配，不靠偶然收款维持。"
+year.later.signal: "收入来源更集中，每月结余也比前两年稳定。"
+year.later.action: "保留付款及时、成本清楚、能重复收费的事情。"
+year.later.transition: "前两年验证有效的收入方式，可以继续保留。"
+
+route.1: "先确认什么事情真的带来收入，并记录到账时间。"
+route.2: "再保留能够重复收费、成本清楚的收入来源。"
+route.3: "最后减少低收益安排，让每月结余稳定下来。"

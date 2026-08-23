@@ -7,7 +7,7 @@ public record CareerNarrativePlan(
     String thesis,
     String contextSummary,
     List<YearNarrative> years,
-    List<String> route) {
+    List<String> route) implements ReportContent {
 
   public CareerNarrativePlan {
     Objects.requireNonNull(thesis, "thesis");
