@@ -10,7 +10,6 @@ import {
   type CareerContextInput,
   type ReportEditionCode,
   type ReportTopicCode,
-  type WealthContextInput,
 } from '@/services/reportApi'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useToastStore } from '@/store/useToastStore'
@@ -82,56 +81,6 @@ function completedCareerContext(
   return { status: value.status, goal: value.goal, pace: value.pace }
 }
 
-type WealthContextKey = keyof WealthContextInput
-
-const WEALTH_QUESTIONS: Array<{
-  key: WealthContextKey
-  seal: string
-  label: string
-  options: Array<{ value: string; label: string }>
-}> = [
-  {
-    key: 'incomeSource',
-    seal: '壹',
-    label: '主要收入来源',
-    options: [
-      { value: 'salary', label: '固定工资为主' },
-      { value: 'self_employed', label: '自营或项目收入为主' },
-      { value: 'mixed', label: '工资和副业都有' },
-      { value: 'unstable', label: '暂时没有稳定收入' },
-    ],
-  },
-  {
-    key: 'goal',
-    seal: '贰',
-    label: '当前最想解决',
-    options: [
-      { value: 'increase_income', label: '希望增加收入' },
-      { value: 'stabilize_cashflow', label: '希望稳定收支' },
-      { value: 'reduce_pressure', label: '希望减轻支出压力' },
-      { value: 'new_income_source', label: '尝试新的收入来源' },
-    ],
-  },
-  {
-    key: 'pace',
-    seal: '叁',
-    label: '近期收支情况',
-    options: [
-      { value: 'stable', label: '目前收支稳定' },
-      { value: 'income_fluctuating', label: '近期收入有波动' },
-      { value: 'spending_pressure', label: '近期支出压力较大' },
-      { value: 'preparing_adjustment', label: '正在准备调整收支' },
-    ],
-  },
-]
-
-function completedWealthContext(
-  value: Partial<WealthContextInput>,
-): WealthContextInput | null {
-  if (!value.incomeSource || !value.goal || !value.pace) return null
-  return { incomeSource: value.incomeSource, goal: value.goal, pace: value.pace }
-}
-
 export function ReportPage() {
   const navigate = useNavigate()
   const token = useAuthStore((state) => state.token)
@@ -140,7 +89,6 @@ export function ReportPage() {
   const [topic, setTopic] = useState<ReportTopicCode>('career')
   const [edition, setEdition] = useState<ReportEditionCode>('plain')
   const [careerContext, setCareerContext] = useState<Partial<CareerContextInput>>({})
-  const [wealthContext, setWealthContext] = useState<Partial<WealthContextInput>>({})
   const [generating, setGenerating] = useState(false)
   const [status, setStatus] = useState('')
 
@@ -148,21 +96,27 @@ export function ReportPage() {
   const selectedEdition = EDITIONS.find((item) => item.code === edition) ?? EDITIONS[0]
   const isHttpMode = import.meta.env.VITE_API_MODE === 'http'
   const completeCareerContext = completedCareerContext(careerContext)
-  const completeWealthContext = completedWealthContext(wealthContext)
+  const reportYears = topic === 'career' ? '未来两年' : '未来三年'
   const canGenerate = Boolean(
     token && isHttpMode && request && (
       (topic === 'career' && completeCareerContext)
-      || (topic === 'wealth' && completeWealthContext)
+      || topic === 'wealth'
     ),
   )
+
+  const handleTopicChange = (nextTopic: ReportTopicCode) => {
+    setTopic(nextTopic)
+    if (nextTopic === 'wealth') setEdition('plain')
+  }
 
   const handleGenerate = async () => {
     if (!request || !canGenerate || generating) return
     setGenerating(true)
     setStatus('')
     try {
-      const context = topic === 'career' ? completeCareerContext : completeWealthContext
-      const report = await createReport(request, topic, edition, context ?? undefined)
+      const report = topic === 'career'
+        ? await createReport(request, topic, edition, completeCareerContext ?? undefined)
+        : await createReport(request, topic, edition)
       const message = `${selectedEdition.label}命书已生成并保存`
       setStatus(message)
       toast(message)
@@ -208,7 +162,7 @@ export function ReportPage() {
               {request?.name || '示例'} · {request?.gender === 'male' ? '乾造' : '坤造'}
             </div>
             <div className="report-cover__meta">
-              {selectedTopic.label} · {selectedEdition.label} · {topic === 'career' || topic === 'wealth' ? '未来两年' : '未来三年'}
+              {selectedTopic.label} · {selectedEdition.label} · {reportYears}
             </div>
           </section>
 
@@ -228,7 +182,7 @@ export function ReportPage() {
                     aria-checked={topic === item.code}
                     className={`report-topic-slip ${topic === item.code ? 'is-selected' : ''}`}
                     key={item.code}
-                    onClick={() => setTopic(item.code)}
+                    onClick={() => handleTopicChange(item.code)}
                     role="radio"
                     type="button"
                   >
@@ -290,76 +244,36 @@ export function ReportPage() {
                 </section>
               )}
 
-              {topic === 'wealth' && (
-                <section className="career-questionnaire" aria-labelledby="wealth-questionnaire-title">
-                  <header className="career-questionnaire__header">
-                    <span aria-hidden="true">问</span>
-                    <div>
-                      <h3 id="wealth-questionnaire-title">补充财富现状</h3>
-                      <p>不会改变命盘计算，只帮助内容落到真实的收入和支出场景</p>
-                    </div>
-                  </header>
-                  <div className="career-questionnaire__body">
-                    {WEALTH_QUESTIONS.map((question) => {
-                      const labelId = `wealth-question-${question.key}`
-                      return (
-                        <div className="career-question" key={question.key}>
-                          <div className="career-question__label" id={labelId}>
-                            <span aria-hidden="true">{question.seal}</span>
-                            <strong>{question.label}</strong>
-                          </div>
-                          <div aria-labelledby={labelId} className="career-question__options" role="radiogroup">
-                            {question.options.map((option) => {
-                              const selected = wealthContext[question.key] === option.value
-                              return (
-                                <button
-                                  aria-checked={selected}
-                                  className={`career-question__option ${selected ? 'is-selected' : ''}`}
-                                  key={option.value}
-                                  onClick={() => setWealthContext((current) => ({
-                                    ...current,
-                                    [question.key]: option.value,
-                                  }))}
-                                  role="radio"
-                                  type="button"
-                                >
-                                  {option.label}
-                                </button>
-                              )
-                            })}
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </section>
-              )}
-
               <div className="report-order__divider"><span>选择解读版本</span></div>
 
               <div className="report-edition-plates" role="radiogroup" aria-label="命书版本">
-                {EDITIONS.map((item) => (
-                  <button
-                    aria-checked={edition === item.code}
-                    className={`report-edition-plate ${edition === item.code ? 'is-selected' : ''}`}
-                    key={item.code}
-                    onClick={() => setEdition(item.code)}
-                    role="radio"
-                    type="button"
-                  >
-                    <span className="report-edition-plate__topline">
-                      <strong>{item.label}</strong>
-                      <b>¥{item.price}</b>
-                    </span>
-                    <small>{item.note}</small>
-                  </button>
-                ))}
+                {EDITIONS.map((item) => {
+                  const unavailable = topic === 'wealth' && item.code === 'professional'
+                  return (
+                    <button
+                      aria-checked={!unavailable && edition === item.code}
+                      aria-disabled={unavailable}
+                      className={`report-edition-plate ${edition === item.code ? 'is-selected' : ''} ${unavailable ? 'is-disabled' : ''}`}
+                      disabled={unavailable}
+                      key={item.code}
+                      onClick={() => setEdition(item.code)}
+                      role="radio"
+                      type="button"
+                    >
+                      <span className="report-edition-plate__topline">
+                        <strong>{item.label}</strong>
+                        {unavailable ? <em>设计中 · 暂未开放</em> : <b>¥{item.price}</b>}
+                      </span>
+                      <small>{unavailable ? '专业内容标准尚未完成验收' : item.note}</small>
+                    </button>
+                  )
+                })}
               </div>
 
               <aside className="report-order__summary" aria-label="已选命书">
                 <span>已选</span>
                 <strong>{selectedTopic.label} · {selectedEdition.label}</strong>
-                <small>联调预览 · 当前不扣费 · 生成后自动保存并打开正文</small>
+                <small>{reportYears} · 联调预览 · 当前不扣费 · 生成后自动保存并打开正文</small>
               </aside>
 
               {!token && <p className="report-order__notice">后端联调生成需要先登录</p>}
@@ -368,9 +282,6 @@ export function ReportPage() {
               )}
               {token && isHttpMode && topic === 'career' && !completeCareerContext && (
                 <p className="report-order__notice">完成三项事业状态后即可生成</p>
-              )}
-              {token && isHttpMode && topic === 'wealth' && !completeWealthContext && (
-                <p className="report-order__notice">完成三项财富状态后即可生成</p>
               )}
               {token && isHttpMode && topic !== 'career' && topic !== 'wealth' && (
                 <p className="report-order__notice">综合与感情主题仍在打磨，当前暂不生成</p>

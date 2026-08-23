@@ -60,27 +60,46 @@ describe('ReportPage', () => {
     expect(screen.getByText(/综合与感情主题仍在打磨/)).toBeInTheDocument()
   })
 
-  it('财富主题完成三项状态问卷后允许生成并提交财富答案', async () => {
+  it('财富主题直接展示三年通俗版，并明确禁用专业版', () => {
     renderPage()
     fireEvent.click(screen.getByRole('radio', { name: /财富运势/ }))
 
-    expect(screen.getByRole('heading', { name: '补充财富现状' })).toBeInTheDocument()
-    expect(screen.getByText('不会改变命盘计算，只帮助内容落到真实的收入和支出场景')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '生成通俗版命书 · ¥6.9' })).toBeDisabled()
+    expect(screen.queryByRole('heading', { name: '补充财富现状' })).not.toBeInTheDocument()
+    expect(screen.getByLabelText('命书封面')).toHaveTextContent('财富运势 · 通俗版 · 未来三年')
+    expect(screen.getByLabelText('已选命书')).toHaveTextContent('未来三年')
+    expect(screen.getByRole('radio', { name: /通俗版.*6\.9/ })).toHaveAttribute('aria-checked', 'true')
+    const professional = screen.getByRole('radio', { name: /专业版.*设计中.*暂未开放/ })
+    expect(professional).toBeDisabled()
+    expect(professional).toHaveAttribute('aria-disabled', 'true')
+    expect(professional).not.toHaveTextContent('12.9')
+    expect(screen.getByRole('button', { name: '生成通俗版命书 · ¥6.9' })).toBeEnabled()
+  })
 
-    fireEvent.click(screen.getByRole('radio', { name: '工资和副业都有' }))
-    fireEvent.click(screen.getByRole('radio', { name: '希望增加收入' }))
-    fireEvent.click(screen.getByRole('radio', { name: '近期收入有波动' }))
+  it('从事业专业版切到财富主题时自动回到通俗版', () => {
+    renderPage()
+    fireEvent.click(screen.getByRole('radio', { name: /专业版.*12\.9/ }))
+    expect(screen.getByRole('radio', { name: /专业版.*12\.9/ })).toHaveAttribute('aria-checked', 'true')
+
+    fireEvent.click(screen.getByRole('radio', { name: /财富运势/ }))
+
+    expect(screen.getByRole('radio', { name: /通俗版.*6\.9/ })).toHaveAttribute('aria-checked', 'true')
+    expect(screen.getByRole('radio', { name: /专业版.*设计中.*暂未开放/ })).not.toHaveAttribute(
+      'aria-checked',
+      'true',
+    )
+  })
+
+  it('财富通俗版无需问卷即可生成，且不提交上下文', async () => {
+    renderPage()
+    fireEvent.click(screen.getByRole('radio', { name: /财富运势/ }))
 
     const generate = screen.getByRole('button', { name: '生成通俗版命书 · ¥6.9' })
-    expect(generate).toBeEnabled()
     fireEvent.click(generate)
 
     await waitFor(() => expect(createReport).toHaveBeenCalledWith(
       request,
       'wealth',
       'plain',
-      { incomeSource: 'mixed', goal: 'increase_income', pace: 'income_fluctuating' },
     ))
   })
 

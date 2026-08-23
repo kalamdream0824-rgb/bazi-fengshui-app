@@ -1238,6 +1238,20 @@ button {
   background: linear-gradient(135deg, rgba(207, 174, 109, 0.17), rgba(255, 253, 247, 0.78));
   box-shadow: inset 3px 0 0 var(--red);
 }
+.report-edition-plate.is-disabled {
+  border-style: dashed;
+  border-color: rgba(125, 110, 88, 0.28);
+  color: rgba(79, 63, 47, 0.52);
+  background: rgba(236, 230, 216, 0.44);
+  cursor: not-allowed;
+}
+.report-edition-plate.is-disabled::after {
+  display: block;
+  width: 28px;
+  margin-top: 9px;
+  border-top: 1px solid rgba(185, 65, 56, 0.42);
+  content: '';
+}
 .report-edition-plate__topline {
   display: flex;
   align-items: baseline;
@@ -1252,6 +1266,15 @@ button {
   color: var(--red);
   font-family: Georgia, serif;
   font-size: 15px;
+}
+.report-edition-plate em {
+  color: var(--red);
+  font-size: 9px;
+  font-style: normal;
+  letter-spacing: 0.04em;
+}
+.report-edition-plate.is-disabled small {
+  color: rgba(79, 63, 47, 0.5);
 }
 .report-edition-plate small {
   display: block;

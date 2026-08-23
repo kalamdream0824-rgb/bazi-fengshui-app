@@ -38,7 +38,7 @@ describe('reportApi', () => {
     }))
   })
 
-  it('生成财富命书时只提交财富状态问卷', async () => {
+  it('生成财富命书时忽略旧问卷参数，只提交命盘、主题和通俗版本', async () => {
     useAuthStore.getState().setAuth('report-token', 'tester')
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(JSON.stringify({ id: 28, topic: 'wealth' }), {
@@ -47,16 +47,16 @@ describe('reportApi', () => {
       }),
     )
     vi.stubGlobal('fetch', fetchMock)
-    const wealthContext = {
-      incomeSource: 'mixed' as const,
-      goal: 'increase_income' as const,
-      pace: 'income_fluctuating' as const,
+    const accidentalContext = {
+      status: 'employed' as const,
+      goal: 'promotion' as const,
+      pace: 'smooth' as const,
     }
 
-    await createReport(request, 'wealth', 'plain', wealthContext)
+    await createReport(request, 'wealth', 'plain', accidentalContext)
 
     expect(fetchMock).toHaveBeenCalledWith('/api/v1/reports', expect.objectContaining({
-      body: JSON.stringify({ request, topic: 'wealth', edition: 'plain', wealthContext }),
+      body: JSON.stringify({ request, topic: 'wealth', edition: 'plain' }),
     }))
   })
 

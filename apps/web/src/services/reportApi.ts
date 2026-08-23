@@ -22,8 +22,6 @@ export interface WealthContextInput {
   pace: WealthPaceCode
 }
 
-export type ReportContextInput = CareerContextInput | WealthContextInput
-
 export interface ReportEvidence {
   key: string
   label: string
@@ -69,12 +67,10 @@ export async function createReport(
   request: PaipanRequest,
   topic: ReportTopicCode,
   edition: ReportEditionCode,
-  context?: ReportContextInput,
+  careerContext?: CareerContextInput,
 ): Promise<SavedReport> {
-  const payload = context
-    ? topic === 'wealth'
-      ? { request, topic, edition, wealthContext: context }
-      : { request, topic, edition, careerContext: context }
+  const payload = topic === 'career' && careerContext
+    ? { request, topic, edition, careerContext }
     : { request, topic, edition }
   return reportJson('/api/v1/reports', {
     method: 'POST',
