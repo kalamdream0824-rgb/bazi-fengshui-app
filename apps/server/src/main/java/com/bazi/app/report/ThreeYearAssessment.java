@@ -31,4 +31,13 @@ public record ThreeYearAssessment(
   public String periodLabel() {
     return years.size() == 2 ? "两年" : "三年";
   }
+
+  static ThreeYearAssessment from(AnnualPeriodAssessment assessment) {
+    return new ThreeYearAssessment(
+        assessment.topic(),
+        assessment.generatedOn(),
+        assessment.years(),
+        assessment.trajectory(),
+        assessment.priorities());
+  }
 }
