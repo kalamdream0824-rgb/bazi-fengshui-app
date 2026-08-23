@@ -51,16 +51,77 @@ export interface CareerNarrativePlan {
   route: string[]
 }
 
-export interface SavedReport {
+export interface WealthPathSummary {
+  code: string
+  label: string
+  status: string
+  judgment: string
+  supportingEvidenceKeys: string[]
+  limitingEvidenceKeys: string[]
+}
+
+export interface WealthRiskSummary {
+  pathCode: string
+  label: string
+  judgment: string
+  evidenceKeys: string[]
+}
+
+export interface WealthYearNarrative {
+  year: number
+  ganZhi: string
+  focus: string
+  incomeSource: string
+  retention: string
+  mainLimit: string
+  realitySignals: string[]
+  actions: string[]
+  transition: string
+  evidenceKeys: string[]
+}
+
+export interface WealthNarrativePlan {
+  horizonYears: number
+  thesis: string
+  summary: string
+  paths: WealthPathSummary[]
+  primaryPathCode: string
+  secondaryPathCode: string
+  mainRisk: WealthRiskSummary
+  years: WealthYearNarrative[]
+  route: string[]
+}
+
+interface SavedReportBase {
   id: number
   subject: string
   topic: ReportTopicCode
   edition: ReportEditionCode
   status: string
-  contentVersion: string
-  content: CareerNarrativePlan
   createdAt: string
   generatedAt: string
+}
+
+export interface LegacySavedReport extends SavedReportBase {
+  contentVersion:
+    | 'career-narrative-v1'
+    | 'career-narrative-v2'
+    | 'career-narrative-v3'
+    | 'wealth-narrative-v1'
+  content: CareerNarrativePlan
+}
+
+export interface WealthV2SavedReport extends SavedReportBase {
+  topic: 'wealth'
+  edition: 'plain'
+  contentVersion: 'wealth-narrative-v2'
+  content: WealthNarrativePlan
+}
+
+export type SavedReport = LegacySavedReport | WealthV2SavedReport
+
+export function isWealthV2Report(report: SavedReport): report is WealthV2SavedReport {
+  return report.contentVersion === 'wealth-narrative-v2'
 }
 
 export async function createReport(
