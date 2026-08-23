@@ -29,13 +29,21 @@ public final class AnnualContextFactory {
   }
 
   public List<AnnualContext> create(PaipanRequest request, PaipanResultDto chart) {
+    return create(request, chart, ReportHorizon.of(3));
+  }
+
+  public List<AnnualContext> create(
+      PaipanRequest request,
+      PaipanResultDto chart,
+      ReportHorizon horizon) {
     Objects.requireNonNull(request, "request");
     Objects.requireNonNull(chart, "chart");
+    Objects.requireNonNull(horizon, "horizon");
     ReportAnalysis analysis = ReportAnalysis.from(request, chart);
     int firstYear = LocalDate.now(clock).getYear();
     String dayStem = chart.pillars().get("day").gan();
     List<AnnualContext> contexts = new ArrayList<>();
-    for (int year = firstYear; year < firstYear + 3; year++) {
+    for (int year = firstYear; year < firstYear + horizon.years(); year++) {
       String ganZhi = Solar.fromYmdHms(year, 7, 1, 12, 0, 0)
           .getLunar()
           .getYearInGanZhiExact();

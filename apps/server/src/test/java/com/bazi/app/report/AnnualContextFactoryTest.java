@@ -43,6 +43,23 @@ class AnnualContextFactoryTest {
   }
 
   @Test
+  void buildsFiveAnnualContextsWhenTheTechnicalHorizonRequestsFiveYears() {
+    PaipanRequest request = fixtureRequest();
+    PaipanResultDto chart = new BaziService().paipan(request);
+
+    List<AnnualContext> contexts = new AnnualContextFactory(CLOCK)
+        .create(request, chart, ReportHorizon.of(5));
+
+    assertEquals(List.of(2026, 2027, 2028, 2029, 2030),
+        contexts.stream().map(AnnualContext::year).toList());
+    assertTrue(contexts.stream().allMatch(context -> !context.ganZhi().isBlank()));
+    assertTrue(contexts.stream().allMatch(context -> !context.yearStemTenGod().isBlank()));
+    assertTrue(contexts.stream().allMatch(context -> context.natalAnalysis() != null));
+    assertTrue(contexts.stream().allMatch(context -> context.factKeys().stream()
+        .anyMatch(key -> key.startsWith("next.annual.stem.group."))));
+  }
+
+  @Test
   void emitsStructuredNatalAndDayunRelationFacts() {
     PaipanRequest request = fixtureRequest();
     List<AnnualContext> contexts = new AnnualContextFactory(CLOCK)
