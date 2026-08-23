@@ -83,15 +83,14 @@ class ReportPresenterTest {
   }
 
   @Test
-  void presentsFiveTopicFirstChaptersAndASeparateBasisAppendix() {
+  void presentsFourCareerChaptersAndASeparateBasisAppendix() {
     ReportDocument document = plainPresenter.present(assessment, profile);
 
     assertEquals(List.of(
-        "未来三年事业运势总览",
+        "未来两年事业运势总览",
         "2026年事业运势详解",
         "2027年事业运势详解",
-        "2028年事业运势详解",
-        "三年事业行动路线"),
+        "两年事业行动路线"),
         document.chapters().stream().map(ReportDocument.ReportChapter::title).toList());
     assertEquals("命盘与计算依据", document.appendix().title());
     assertFalse(document.appendix().sections().isEmpty());
@@ -107,8 +106,24 @@ class ReportPresenterTest {
     assertTrue(text.contains("反向证据"));
   }
 
+  @Test
+  void careerEditionsDoNotRenderMissingFindingsAsPaidContent() {
+    for (ReportDocument document : List.of(
+        plainPresenter.present(assessment, profile),
+        professionalPresenter.present(assessment, profile))) {
+      String text = flatten(document);
+      for (String placeholder : List.of(
+          "证据不足",
+          "暂无达到证据门槛",
+          "未达到双证据门槛",
+          "本轮未检出足以降低结论的反向事实")) {
+        assertFalse(text.contains(placeholder), document.editionCode() + ": " + placeholder);
+      }
+    }
+  }
+
   private Stream<ReportPoint> annualPoints(ReportDocument document) {
-    return document.chapters().stream().skip(1).limit(3)
+    return document.chapters().stream().skip(1).limit(document.chapters().size() - 2L)
         .flatMap(chapter -> chapter.sections().stream())
         .flatMap(section -> section.points().stream());
   }

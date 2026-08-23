@@ -8,6 +8,9 @@
 | `backend-design.md` | 后端技术设计（技术栈/模块/API/表结构/一致性策略） | 后端开发会话 |
 | `database-design.md` | 数据库设计（表/字段/索引/迁移/约定） | 后端开发会话 |
 | `commercial-design.md` | 商业化设计（免费/付费边界/定价/合规文案/落地路径） | 产品/前后端会话 |
+| `mingshu-output-current-state-and-pain-points.md` | 命书当前内容引擎、输出流程、覆盖率数据、付费内容痛点与质量边界 | 命书产品/内容引擎会话 |
+| `mingshu-backend-algorithm-review-brief.md` | 命书后端算法瓶颈、技术难点、产品约束与外部智能体评审问题清单 | 外部算法评审/内容引擎会话 |
+| `report-reader-language-standard.md` | 命书通俗版“日常稳重”语言标准、禁用词、结构与跨主题验收要求 | 命书内容/综合、财富、感情主题开发会话 |
 | `dev-checklist.md` | 开发自检清单（防复发：状态/交互/双模式/运行态/视觉/测试纪律） | **所有开发会话（提交前逐条自查）** |
 | `handover-summary.md` | 项目交接总结（仓库/完成度/约定/环境坑/待办/下一步） | **新对话恢复上下文第一入口** |
 | `../mockups/bazi-app-mockups.md` | 产品图、交互原型、设计系统规范 | 产品/UI 迭代会话 |

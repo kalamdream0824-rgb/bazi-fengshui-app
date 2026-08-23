@@ -6,6 +6,7 @@ import com.bazi.app.report.ReportDocument.ReportPoint;
 import com.bazi.app.report.ReportDocument.ReportProfile;
 import com.bazi.app.report.ReportDocument.ReportSection;
 import com.bazi.app.report.rules.AnnualRuleCatalog;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -30,14 +31,23 @@ abstract class BaseReportPresenter implements ReportPresenter {
     String resolvedSubject = subject == null || subject.isBlank() ? "命主" : subject;
     ReportTopic topic = assessment.topic();
     List<YearAssessment> years = assessment.years();
-    List<ReportChapter> chapters = List.of(
-        chapter("壹", "未来三年" + topic.label() + "总览", overviewLead(assessment), topic,
-            List.of(overviewPoint(assessment))),
-        annualChapter("贰", years.get(0), topic),
-        annualChapter("叁", years.get(1), topic),
-        annualChapter("肆", years.get(2), topic),
-        chapter("伍", "三年" + topic.label().replace("运势", "") + "行动路线",
-            routeLead(assessment), topic, List.of(routePoint(assessment))));
+    List<String> numbers = List.of("壹", "贰", "叁", "肆", "伍");
+    List<ReportChapter> chapters = new ArrayList<>();
+    chapters.add(chapter(
+        numbers.get(0),
+        "未来" + assessment.periodLabel() + topic.label() + "总览",
+        overviewLead(assessment),
+        topic,
+        List.of(overviewPoint(assessment))));
+    for (int index = 0; index < years.size(); index++) {
+      chapters.add(annualChapter(numbers.get(index + 1), years.get(index), topic));
+    }
+    chapters.add(chapter(
+        numbers.get(years.size() + 1),
+        assessment.periodLabel() + topic.label().replace("运势", "") + "行动路线",
+        routeLead(assessment),
+        topic,
+        List.of(routePoint(assessment))));
 
     return new ReportDocument(
         ReportCopy.get("content.version"),
@@ -48,7 +58,7 @@ abstract class BaseReportPresenter implements ReportPresenter {
         edition.code(),
         edition.label(),
         profile,
-        chapters,
+        List.copyOf(chapters),
         appendix(profile),
         ReportCopy.get("disclaimer"));
   }
@@ -128,8 +138,8 @@ abstract class BaseReportPresenter implements ReportPresenter {
 
   private ReportPoint routePoint(ThreeYearAssessment assessment) {
     return new ReportPoint(
-        "route." + assessment.topic().code(),
-        "三年行动优先级",
+      "route." + assessment.topic().code(),
+        assessment.periodLabel() + "行动优先级",
         assessment.priorities(),
         assessment.years().stream().flatMap(year -> year.ruleKeys().stream()).distinct().toList(),
         routeInterpretation(assessment),
@@ -157,11 +167,11 @@ abstract class BaseReportPresenter implements ReportPresenter {
 
   private String overviewLead(ThreeYearAssessment assessment) {
     return assessment.topic().label() + "以" + assessment.trajectory()
-        + "为三年主线，以下结论按年度证据分别展开。";
+        + "为" + assessment.periodLabel() + "主线，以下结论按年度证据分别展开。";
   }
 
   private String routeLead(ThreeYearAssessment assessment) {
-    return "行动路线只收录三年规则共同筛选后的优先事项："
+    return "行动路线只收录" + assessment.periodLabel() + "规则共同筛选后的优先事项："
         + joined(assessment.priorities(), "继续记录现实信号");
   }
 }

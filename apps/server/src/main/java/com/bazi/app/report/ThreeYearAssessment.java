@@ -17,11 +17,18 @@ public record ThreeYearAssessment(
     Objects.requireNonNull(trajectory, "trajectory");
     years = years == null ? List.of() : List.copyOf(years);
     priorities = priorities == null ? List.of() : List.copyOf(priorities);
-    if (years.size() != 3
-        || years.get(0).year() != generatedOn.getYear()
-        || years.get(1).year() != years.get(0).year() + 1
-        || years.get(2).year() != years.get(1).year() + 1) {
-      throw new IllegalArgumentException("current and next two consecutive years are required");
+    int expectedYears = topic == ReportTopic.CAREER || topic == ReportTopic.WEALTH ? 2 : 3;
+    if (years.size() != expectedYears || years.get(0).year() != generatedOn.getYear()) {
+      throw new IllegalArgumentException("the configured consecutive report years are required");
     }
+    for (int index = 1; index < years.size(); index++) {
+      if (years.get(index).year() != years.get(index - 1).year() + 1) {
+        throw new IllegalArgumentException("the configured consecutive report years are required");
+      }
+    }
+  }
+
+  public String periodLabel() {
+    return years.size() == 2 ? "两年" : "三年";
   }
 }

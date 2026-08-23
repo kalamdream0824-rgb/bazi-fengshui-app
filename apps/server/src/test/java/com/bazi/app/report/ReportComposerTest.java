@@ -30,13 +30,13 @@ class ReportComposerTest {
   }
 
   @Test
-  void professionalCareerReportUsesFiveTopicFirstChapters() {
+  void professionalCareerReportUsesFourTopicFirstChapters() {
     ReportDocument report = composer.compose(request, result, ReportTopic.CAREER, ReportEdition.PROFESSIONAL);
 
-    assertEquals(5, report.chapters().size());
-    assertEquals("未来三年事业运势总览", report.chapters().get(0).title());
+    assertEquals(4, report.chapters().size());
+    assertEquals("未来两年事业运势总览", report.chapters().get(0).title());
     assertEquals("2026年事业运势详解", report.chapters().get(1).title());
-    assertEquals("三年事业行动路线", report.chapters().get(4).title());
+    assertEquals("两年事业行动路线", report.chapters().get(3).title());
     assertTrue(points(report).anyMatch(point -> point.methodNote() != null && !point.methodNote().isBlank()));
     assertTrue(report.profile().pillarsText().contains("乙亥 · 乙酉 · 壬申 · 丁未"));
   }
@@ -54,13 +54,14 @@ class ReportComposerTest {
 
   @ParameterizedTest
   @EnumSource(ReportTopic.class)
-  void everyTopicSharesThreeAnnualConclusionsAcrossEditions(ReportTopic topic) {
+  void everyTopicSharesItsConfiguredAnnualConclusionsAcrossEditions(ReportTopic topic) {
     ReportDocument plain = composer.compose(request, result, topic, ReportEdition.PLAIN);
     ReportDocument professional = composer.compose(request, result, topic, ReportEdition.PROFESSIONAL);
 
     List<ReportPoint> plainTopicPoints = annualPoints(plain);
     List<ReportPoint> professionalTopicPoints = annualPoints(professional);
-    assertEquals(3, plainTopicPoints.size());
+    assertEquals(topic == ReportTopic.CAREER || topic == ReportTopic.WEALTH ? 2 : 3,
+        plainTopicPoints.size());
     assertEquals(plainTopicPoints.stream().map(ReportPoint::ruleKey).toList(),
         professionalTopicPoints.stream().map(ReportPoint::ruleKey).toList());
     assertEquals(plainTopicPoints.stream().map(ReportPoint::conclusion).toList(),
@@ -77,7 +78,7 @@ class ReportComposerTest {
   }
 
   private List<ReportPoint> annualPoints(ReportDocument report) {
-    return report.chapters().stream().skip(1).limit(3)
+    return report.chapters().stream().skip(1).limit(report.chapters().size() - 2L)
         .flatMap(chapter -> chapter.sections().stream())
         .flatMap(section -> section.points().stream())
         .toList();

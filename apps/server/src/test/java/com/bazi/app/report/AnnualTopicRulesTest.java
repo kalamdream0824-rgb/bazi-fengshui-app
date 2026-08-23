@@ -42,10 +42,14 @@ class AnnualTopicRulesTest {
   }
 
   @Test
-  void shipsFiveToSevenReviewedRulesForEveryLaunchTopic() {
+  void addsAnAlwaysDefinedBaselineToCareerAndWealth() {
     for (ReportTopic topic : ReportTopic.values()) {
       int size = catalog.rulesFor(topic).size();
-      assertTrue(size >= 5 && size <= 7, topic + " rules=" + size);
+      if (topic == ReportTopic.CAREER || topic == ReportTopic.WEALTH) {
+        assertEquals(8, size, topic + " rules=" + size);
+      } else {
+        assertTrue(size >= 5 && size <= 7, topic + " rules=" + size);
+      }
     }
   }
 
@@ -77,11 +81,59 @@ class AnnualTopicRulesTest {
   }
 
   @Test
-  void noTopicRepeatsTheSameHeadlineOrEvidenceAcrossThreeYears() {
+  void careerAssessmentStopsAfterCurrentAndNextYear() {
+    ThreeYearAssessment report = assess(fixture1995(), ReportTopic.CAREER);
+
+    assertEquals(List.of(2026, 2027), report.years().stream().map(YearAssessment::year).toList());
+  }
+
+  @Test
+  void wealthAssessmentStopsAfterCurrentAndNextYearWithoutInsufficientResults() {
+    ThreeYearAssessment report = assess(fixture1995(), ReportTopic.WEALTH);
+
+    assertEquals(List.of(2026, 2027), report.years().stream().map(YearAssessment::year).toList());
+    assertTrue(report.years().stream().allMatch(
+        year -> year.basis() == AssessmentBasis.REVIEWED_RULES && year.evidence().size() >= 2));
+  }
+
+  @Test
+  void careerTrajectoryExplainsHowNextYearRelatesToTheCurrentYear() {
+    String trajectory = assess(fixture1995(), ReportTopic.CAREER).trajectory();
+
+    assertTrue(List.of("延续", "增强", "回落", "转折").stream().anyMatch(trajectory::contains), trajectory);
+  }
+
+  @Test
+  void careerContextChangesInterpretationButNeverAstrologyEvidence() {
+    PaipanRequest request = fixture1995();
+    PaipanResultDto chart = baziService.paipan(request);
+    CareerContext employed = CareerContext.fromCodes("employed", "promotion", "smooth");
+    CareerContext jobSeeking = CareerContext.fromCodes("job_seeking", "job_change", "stalled");
+
+    ThreeYearAssessment employedReport = assessor.assess(request, chart, ReportTopic.CAREER, employed);
+    ThreeYearAssessment seekingReport = assessor.assess(request, chart, ReportTopic.CAREER, jobSeeking);
+
+    for (int index = 0; index < employedReport.years().size(); index++) {
+      YearAssessment employedYear = employedReport.years().get(index);
+      YearAssessment seekingYear = seekingReport.years().get(index);
+      assertEquals(employedYear.stage(), seekingYear.stage());
+      assertEquals(employedYear.ruleKeys(), seekingYear.ruleKeys());
+      assertEquals(employedYear.evidence(), seekingYear.evidence());
+      assertEquals(3, employedYear.contextEvidence().size());
+      assertEquals(3, seekingYear.contextEvidence().size());
+      assertNotEquals(employedYear.conclusion(), seekingYear.conclusion());
+      assertNotEquals(employedYear.actions(), seekingYear.actions());
+      assertTrue(seekingYear.conclusion().contains("不能解读为现岗位晋升"));
+    }
+  }
+
+  @Test
+  void noTopicRepeatsTheSameHeadlineOrEvidenceAcrossItsConfiguredYears() {
     for (ReportTopic topic : ReportTopic.values()) {
       ThreeYearAssessment report = assess(fixture1995(), topic);
-      assertEquals(3, report.years().stream().map(YearAssessment::headline).distinct().count(), topic.name());
-      assertEquals(3, report.years().stream()
+      assertEquals(report.years().size(),
+          report.years().stream().map(YearAssessment::headline).distinct().count(), topic.name());
+      assertEquals(report.years().size(), report.years().stream()
           .map(year -> year.evidence().stream().map(ReportEvidence::key).sorted().toList())
           .distinct()
           .count(), topic.name());
@@ -94,7 +146,7 @@ class AnnualTopicRulesTest {
     ThreeYearAssessment female = assess(fixture1996(), ReportTopic.CAREER);
 
     long differences = 0;
-    for (int index = 0; index < 3; index++) {
+    for (int index = 0; index < male.years().size(); index++) {
       YearAssessment left = male.years().get(index);
       YearAssessment right = female.years().get(index);
       if (!left.headline().equals(right.headline()) || left.stage() != right.stage()) {
@@ -122,7 +174,7 @@ class AnnualTopicRulesTest {
   }
 
   @Test
-  void exportsTwelveReviewedResultsForContentReview() throws Exception {
+  void exportsConfiguredReviewedResultsForContentReview() throws Exception {
     Map<String, Object> debug = new LinkedHashMap<>();
     debug.put("fixture", "male-1995-10-08-1430");
     debug.put("asOf", "2026-08-23");
@@ -140,7 +192,7 @@ class AnnualTopicRulesTest {
         .writeValue(output.toFile(), debug);
 
     assertTrue(Files.size(output) > 1000);
-    assertEquals(12, topics.values().stream().mapToInt(report -> report.years().size()).sum());
+    assertEquals(10, topics.values().stream().mapToInt(report -> report.years().size()).sum());
   }
 
   private Map<ReportTopic, ThreeYearAssessment> assessAllTopics(PaipanRequest request) {

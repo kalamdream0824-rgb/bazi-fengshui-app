@@ -165,7 +165,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateReportRequest'
+              $ref: '#/components/schemas/ReportPreviewRequest'
       responses:
         '200':
           description: 报告生成记录
@@ -184,6 +184,31 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ReportInfo'
+  /reports/preview:
+    post:
+      deprecated: true
+      summary: 旧版 PDF 联调预览（兼容保留，不再作为事业命书主流程）
+      description: 新流程使用 POST /reports 保存内容快照，并在页面阅读。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportPreviewRequest'
+      responses:
+        '200':
+          description: 可搜索文字的 PDF 文件
+          headers:
+            Content-Disposition:
+              schema: { type: string }
+              description: UTF-8 编码的下载文件名
+          content:
+            application/pdf:
+              schema: { type: string, format: binary }
+        '400':
+          description: 主题、版本、排盘参数或事业状态问卷不受支持
+        '401':
+          description: 未登录或 token 无效
   /reports/{id}:
     get:
       summary: 命书详情（需 Bearer token）
@@ -199,20 +224,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportInfo'
-  /reports/{id}/download:
-    get:
-      summary: 下载已生成的文字型命书（需 Bearer token）
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: { type: integer }
-      responses:
-        '200':
-          description: 可搜索文字的 PDF 文件
-          content:
-            application/pdf:
-              schema: { type: string, format: binary }
 components:
   schemas:
     AuthRequest:
@@ -297,27 +308,106 @@ components:
     ReportEdition:
       type: string
       enum: [plain, professional]
-    CreateReportRequest:
+    ReportPreviewRequest:
       type: object
-      required: [recordId, topic, edition]
+      required: [request, topic, edition]
+      description: career 必须提交 careerContext；wealth 必须提交 wealthContext。现实问卷不计入命理证据。
       properties:
-        recordId:
-          type: integer
+        request:
+          $ref: '#/components/schemas/PaipanRequest'
         topic:
           $ref: '#/components/schemas/ReportTopic'
         edition:
           $ref: '#/components/schemas/ReportEdition'
+        careerContext:
+          $ref: '#/components/schemas/CareerContext'
+        wealthContext:
+          $ref: '#/components/schemas/WealthContext'
+    CareerContext:
+      type: object
+      required: [status, goal, pace]
+      description: 事业现实状态只用于解释分支与行动建议，不计入命理证据。
+      properties:
+        status:
+          type: string
+          enum: [employed, self_employed, job_seeking, studying]
+        goal:
+          type: string
+          enum: [promotion, job_change, stability, transition]
+        pace:
+          type: string
+          enum: [smooth, stalled, high_pressure, preparing_change]
+    WealthContext:
+      type: object
+      required: [incomeSource, goal, pace]
+      description: 财富现实状态只用于生活场景用词、建议顺序和风险提醒，不计入命理证据。
+      properties:
+        incomeSource:
+          type: string
+          enum: [salary, self_employed, mixed, unstable]
+        goal:
+          type: string
+          enum: [increase_income, stabilize_cashflow, reduce_pressure, new_income_source]
+        pace:
+          type: string
+          enum: [stable, income_fluctuating, spending_pressure, preparing_adjustment]
     ReportInfo:
       type: object
       properties:
         id: { type: integer }
-        recordId: { type: integer }
+        subject: { type: string }
         topic: { $ref: '#/components/schemas/ReportTopic' }
         edition: { $ref: '#/components/schemas/ReportEdition' }
-        status: { type: string, enum: [pending, generating, ready, failed] }
+        status: { type: string, enum: [ready] }
         contentVersion: { type: string }
+        content:
+          $ref: '#/components/schemas/CareerNarrativePlan'
         createdAt: { type: string, format: date-time }
-        generatedAt: { type: string, format: date-time, nullable: true }
+        generatedAt: { type: string, format: date-time }
+    CareerNarrativePlan:
+      type: object
+      required: [thesis, contextSummary, years, route]
+      properties:
+        thesis: { type: string }
+        contextSummary: { type: string }
+        years:
+          type: array
+          items: { $ref: '#/components/schemas/CareerYearNarrative' }
+        route:
+          type: array
+          items: { type: string }
+    CareerYearNarrative:
+      type: object
+      properties:
+        year: { type: integer }
+        ganZhi: { type: string }
+        stage: { type: string }
+        headline: { type: string }
+        verdict: { type: string }
+        reasons:
+          type: array
+          items: { type: string }
+        obstacle: { type: string }
+        actions:
+          type: array
+          items: { type: string }
+        changeCondition: { type: string }
+        evidenceKeys:
+          type: array
+          items: { type: string }
+        evidence:
+          type: array
+          items: { $ref: '#/components/schemas/ReportEvidence' }
+        counterEvidence:
+          type: array
+          items: { $ref: '#/components/schemas/ReportEvidence' }
+        confidence: { type: string }
+    ReportEvidence:
+      type: object
+      properties:
+        key: { type: string }
+        label: { type: string }
+        value: { type: string }
     PaipanRequest:
       type: object
       required: [gender, solarDateTime, trueSolarTime]

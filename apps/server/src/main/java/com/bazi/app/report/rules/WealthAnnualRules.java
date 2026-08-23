@@ -9,6 +9,7 @@ import com.bazi.app.report.AnnualRule;
 import com.bazi.app.report.AnnualStage;
 import com.bazi.app.report.ConfidenceLevel;
 import com.bazi.app.report.ReportTopic;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class WealthAnnualRules {
@@ -16,7 +17,7 @@ public final class WealthAnnualRules {
 
   static List<AnnualRule> create(AnnualRuleCopy copy) {
     AnnualRuleFactory rules = new AnnualRuleFactory(copy);
-    return List.of(
+    List<AnnualRule> rulesList = new ArrayList<>(List.of(
         rules.rule("wealth.realization", ReportTopic.WEALTH, "income", AnnualFindingType.OPPORTUNITY,
             AnnualStage.ADVANCE, 90, ConfidenceLevel.HIGH,
             groups(one("annual.stem.group.wealth"), one("natal.balance.adequate"))),
@@ -37,6 +38,8 @@ public final class WealthAnnualRules {
             groups(one("annual.stem.group.authority"), one("natal.ten_god.group.wealth"))),
         rules.rule("wealth.coordination", ReportTopic.WEALTH, "coordination", AnnualFindingType.OPPORTUNITY,
             AnnualStage.ADVANCE, 95, ConfidenceLevel.HIGH,
-            groups(one("annual.branch.harmony.dayun"), one("annual.stem.group.wealth"))));
+            groups(one("annual.branch.harmony.dayun"), one("annual.stem.group.wealth")))));
+    rulesList.add(new WealthBaselineRule(copy));
+    return List.copyOf(rulesList);
   }
 }

@@ -151,7 +151,7 @@ export function ProfilePage() {
           <span className="k">历史记录</span>
           <span className="arrow">›</span>
         </Link>
-        <Link className="row" to="/report">
+        <Link className="row" to="/reports">
           <span className="k">我的命书</span>
           <span className="arrow">›</span>
         </Link>

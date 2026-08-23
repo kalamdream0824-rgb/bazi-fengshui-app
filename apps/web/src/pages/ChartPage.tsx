@@ -131,8 +131,8 @@ export function ChartPage() {
       </Card>
 
       <ButtonRow>
-        <Button variant="primary" onClick={() => navigate('/report')}>
-          导出命书
+        <Button variant="primary" onClick={() => navigate('/reports')}>
+          查看命书
         </Button>
         <Button onClick={() => navigate('/comp')}>合婚</Button>
         <Button onClick={() => navigate('/daily')}>每日运势</Button>

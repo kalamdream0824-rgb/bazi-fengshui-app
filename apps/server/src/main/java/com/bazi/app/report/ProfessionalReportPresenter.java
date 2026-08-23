@@ -20,7 +20,7 @@ public final class ProfessionalReportPresenter extends BaseReportPresenter {
             + "，规则=" + joined(year.ruleKeys(), "证据不足"))
         .collect(Collectors.joining("；"));
     return topicCopy(assessment.topic(), "professional")
-        + " 三年轨迹为“" + assessment.trajectory() + "”。年度规则路径：" + annualPath
+        + " " + assessment.periodLabel() + "轨迹为“" + assessment.trajectory() + "”。年度规则路径：" + annualPath
         + "。同一命局在不同年份使用独立岁运证据，不以固定段落替换年份判断。";
   }
 
@@ -28,26 +28,42 @@ public final class ProfessionalReportPresenter extends BaseReportPresenter {
   protected String annualInterpretation(YearAssessment year, ReportTopic topic) {
     String evidence = year.evidence().stream().map(ReportEvidence::display).collect(Collectors.joining("；"));
     String counter = year.counterEvidence().stream().map(ReportEvidence::display).collect(Collectors.joining("；"));
-    return "核心结论：" + year.conclusion()
-        + "。机会项：" + findings(year.opportunities())
-        + "。压力项：" + findings(year.pressures())
-        + "。规则键：" + joined(year.ruleKeys(), "无")
-        + "。完整证据：" + (evidence.isBlank() ? "未达到双证据门槛" : evidence)
-        + "。反向证据：" + (counter.isBlank() ? "本轮未检出足以降低结论的反向事实" : counter)
-        + "。置信等级：" + confidence(year.confidence())
-        + "。行动建议：" + joined(year.actions(), "继续观察")
-        + "。现实观察信号：" + joined(year.realitySignals(), "记录同类变化是否持续")
-        + "。方法边界：年度结果只表达主题、压力与行动顺序，不锁定具体事件，不下延到月份，"
-        + "且不能替代职业、财务或关系中的现实决策。";
+    String context = year.contextEvidence().stream().map(ReportEvidence::display).collect(Collectors.joining("；"));
+    StringBuilder text = new StringBuilder("核心结论：").append(year.conclusion());
+    if (!year.opportunities().isEmpty()) {
+      text.append("。机会项：").append(findings(year.opportunities()));
+    }
+    if (!year.pressures().isEmpty()) {
+      text.append("。压力项：").append(findings(year.pressures()));
+    }
+    text.append("。规则键：").append(joined(year.ruleKeys(), "无"));
+    if (!evidence.isBlank()) {
+      text.append("。完整证据：").append(evidence);
+    }
+    if (!counter.isBlank()) {
+      text.append("。反向证据：").append(counter);
+    }
+    if (!context.isBlank()) {
+      text.append("。现实上下文（不计入命理证据）：").append(context);
+    }
+    text.append("。置信等级：").append(confidence(year.confidence()))
+        .append("。行动建议：").append(joined(year.actions(), "记录后再行动"))
+        .append("。现实观察信号：")
+        .append(joined(year.realitySignals(), "记录同类变化是否持续"))
+        .append("。方法边界：年度结果只表达主题、压力与行动顺序，不锁定具体事件，不下延到月份，")
+        .append("且不能替代职业、财务或关系中的现实决策。");
+    return text.toString();
   }
 
   @Override
   protected String annualMethodNote(YearAssessment year) {
-    return "方法边界｜规则键=" + joined(year.ruleKeys(), "无")
+    String note = "方法边界｜规则键=" + joined(year.ruleKeys(), "无")
         + "；证据基准=" + year.basis()
-        + "；置信等级=" + confidence(year.confidence())
-        + "；反向证据=" + (year.counterEvidence().isEmpty() ? "未检出" : year.counterEvidence().size() + "项")
-        + "。阶段标签由通过证据门槛的机会、压力和转换类规则共同决定。";
+        + "；置信等级=" + confidence(year.confidence());
+    if (!year.counterEvidence().isEmpty()) {
+      note += "；反向证据=" + year.counterEvidence().size() + "项";
+    }
+    return note + "。阶段标签由通过证据门槛的机会、压力和转换类规则共同决定。";
   }
 
   @Override
@@ -55,7 +71,7 @@ public final class ProfessionalReportPresenter extends BaseReportPresenter {
     String annualActions = assessment.years().stream()
         .map(year -> year.year() + "年：" + joined(year.actions(), "继续观察"))
         .collect(Collectors.joining("；"));
-    return "三年行动路线以跨年度去重后的优先项为主："
+    return assessment.periodLabel() + "行动路线以跨年度去重后的优先项为主："
         + joined(assessment.priorities(), "继续记录现实信号")
         + "。逐年执行索引：" + annualActions
         + "。复核时应同时记录命中信号与未命中信号，避免只收集支持原结论的材料。";

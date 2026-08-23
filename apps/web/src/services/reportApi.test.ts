@@ -1,0 +1,141 @@
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import type { PaipanRequest } from '@/types/bazi'
+import { useAuthStore } from '@/store/useAuthStore'
+import { createReport, fetchReportPreview, getReport, listReports } from './reportApi'
+
+const request: PaipanRequest = {
+  name: '林先生',
+  gender: 'male',
+  solarDateTime: '1995-10-08T14:30:00',
+  birthPlace: '上海',
+  trueSolarTime: false,
+}
+
+describe('reportApi', () => {
+  it('生成事业命书后返回可保存的页面报告', async () => {
+    useAuthStore.getState().setAuth('report-token', 'tester')
+    const report = {
+      id: 18,
+      subject: '林先生',
+      topic: 'career',
+      edition: 'plain',
+      status: 'ready',
+      contentVersion: 'career-narrative-v1',
+      content: { thesis: '今年先做实成果。', contextSummary: '在职', years: [], route: [] },
+      createdAt: '2026-08-23T16:00:00',
+      generatedAt: '2026-08-23T16:00:00',
+    }
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify(report), { status: 200, headers: { 'Content-Type': 'application/json' } }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+    const careerContext = { status: 'employed' as const, goal: 'promotion' as const, pace: 'smooth' as const }
+
+    await expect(createReport(request, 'career', 'plain', careerContext)).resolves.toEqual(report)
+    expect(fetchMock).toHaveBeenCalledWith('/api/v1/reports', expect.objectContaining({
+      method: 'POST',
+      body: JSON.stringify({ request, topic: 'career', edition: 'plain', careerContext }),
+    }))
+  })
+
+  it('生成财富命书时只提交财富状态问卷', async () => {
+    useAuthStore.getState().setAuth('report-token', 'tester')
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ id: 28, topic: 'wealth' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+    const wealthContext = {
+      incomeSource: 'mixed' as const,
+      goal: 'increase_income' as const,
+      pace: 'income_fluctuating' as const,
+    }
+
+    await createReport(request, 'wealth', 'plain', wealthContext)
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/v1/reports', expect.objectContaining({
+      body: JSON.stringify({ request, topic: 'wealth', edition: 'plain', wealthContext }),
+    }))
+  })
+
+  it('读取当前账号的命书列表与单份详情', async () => {
+    useAuthStore.getState().setAuth('report-token', 'tester')
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response('[]', { status: 200, headers: { 'Content-Type': 'application/json' } }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ id: 9 }), { status: 200, headers: { 'Content-Type': 'application/json' } }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(listReports()).resolves.toEqual([])
+    await expect(getReport(9)).resolves.toEqual({ id: 9 })
+    expect(fetchMock).toHaveBeenNthCalledWith(1, '/api/v1/reports', expect.any(Object))
+    expect(fetchMock).toHaveBeenNthCalledWith(2, '/api/v1/reports/9', expect.any(Object))
+  })
+
+  it('携带主题版本和命盘请求下载后端文字型 PDF', async () => {
+    useAuthStore.getState().setAuth('report-token', 'tester')
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(new Blob(['pdf-bytes'], { type: 'application/pdf' }), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': "attachment; filename*=UTF-8''%E5%91%BD%E4%B9%A6-%E8%B4%A2%E5%AF%8C%E8%BF%90%E5%8A%BF-%E4%B8%93%E4%B8%9A%E7%89%88.pdf",
+        },
+      }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    const result = await fetchReportPreview(request, 'wealth', 'professional')
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/v1/reports/preview',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ request, topic: 'wealth', edition: 'professional' }),
+        headers: expect.objectContaining({ Authorization: 'Bearer report-token' }),
+      }),
+    )
+    expect(result.fileName).toBe('命书-财富运势-专业版.pdf')
+    expect(result.blob.type).toBe('application/pdf')
+  })
+
+  it('后端错误时展示可读业务信息', async () => {
+    useAuthStore.getState().setAuth('report-token', 'tester')
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ code: 'REPORT_TOPIC_UNSUPPORTED', message: '不支持的命书主题' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    ))
+
+    await expect(fetchReportPreview(request, 'wealth', 'plain')).rejects.toThrow('不支持的命书主题')
+  })
+
+  it('事业主题单独携带完整现实状态问卷', async () => {
+    useAuthStore.getState().setAuth('report-token', 'tester')
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(new Blob(['pdf-bytes'], { type: 'application/pdf' }), { status: 200 }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+    const careerContext = {
+      status: 'job_seeking' as const,
+      goal: 'job_change' as const,
+      pace: 'stalled' as const,
+    }
+
+    await fetchReportPreview(request, 'career', 'plain', careerContext)
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/v1/reports/preview',
+      expect.objectContaining({
+        body: JSON.stringify({ request, topic: 'career', edition: 'plain', careerContext }),
+      }),
+    )
+  })
+
+  afterEach(() => {
+    useAuthStore.getState().clear()
+    vi.unstubAllGlobals()
+  })
+})

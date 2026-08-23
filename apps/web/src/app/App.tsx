@@ -13,6 +13,8 @@ const CompPage = lazy(() => import('@/pages/CompPage').then((m) => ({ default: m
 const DayPickerPage = lazy(() => import('@/pages/DayPickerPage').then((m) => ({ default: m.DayPickerPage })))
 const DailyPage = lazy(() => import('@/pages/DailyPage').then((m) => ({ default: m.DailyPage })))
 const ReportPage = lazy(() => import('@/pages/ReportPage').then((m) => ({ default: m.ReportPage })))
+const ReportLibraryPage = lazy(() => import('@/pages/ReportLibraryPage').then((m) => ({ default: m.ReportLibraryPage })))
+const ReportReaderPage = lazy(() => import('@/pages/ReportReaderPage').then((m) => ({ default: m.ReportReaderPage })))
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then((m) => ({ default: m.ProfilePage })))
 const MembershipPage = lazy(() => import('@/pages/MembershipPage').then((m) => ({ default: m.MembershipPage })))
 const SettingsPage = lazy(() => import('@/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })))
@@ -36,6 +38,8 @@ function Shell() {
           <Route path="/day-picker" element={<DayPickerPage />} />
           <Route path="/daily" element={<DailyPage />} />
           <Route path="/report" element={<ReportPage />} />
+          <Route path="/reports" element={<ReportLibraryPage />} />
+          <Route path="/reports/:id" element={<ReportReaderPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/membership" element={<MembershipPage />} />
           <Route path="/settings" element={<SettingsPage />} />

@@ -1,44 +1,178 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button, ButtonRow } from '@/components/Button'
 import { EmptyState } from '@/components/EmptyState'
 import { FooterNote } from '@/components/FooterNote'
 import { TopBar } from '@/components/TopBar'
-import { GAN_WUXING, WUXING_LABEL } from '@/lib/wuxing'
-import { explain } from '@/lib/explainer'
-import { computeWangShuai } from '@/lib/geJu'
-import { exportMingshuPdf } from '@/lib/reportPdf'
 import { useBaziWithFallback } from '@/hooks/useBaziWithFallback'
+import {
+  createReport,
+  type CareerContextInput,
+  type ReportEditionCode,
+  type ReportTopicCode,
+  type WealthContextInput,
+} from '@/services/reportApi'
+import { useAuthStore } from '@/store/useAuthStore'
 import { useToastStore } from '@/store/useToastStore'
 
-const TOC = [
-  ['壹', '命盘概览', 'P.02'],
-  ['贰', '五行与用神', 'P.03'],
-  ['叁', '大运流年', 'P.04'],
-  ['肆', '十神详析', 'P.05'],
-  ['伍', '综合建议', 'P.06'],
-] as const
+const TOPICS: Array<{ code: ReportTopicCode; seal: string; label: string; note: string }> = [
+  { code: 'overall', seal: '总', label: '综合运势', note: '三年主线与年度节奏' },
+  { code: 'career', seal: '业', label: '事业运势', note: '职责、协作与发展窗口' },
+  { code: 'wealth', seal: '财', label: '财富运势', note: '收入、支出与合同约定' },
+  { code: 'relationship', seal: '缘', label: '感情运势', note: '互动、沟通与关系边界' },
+]
 
-type TocNumber = (typeof TOC)[number][0]
+const EDITIONS: Array<{
+  code: ReportEditionCode
+  label: string
+  price: string
+  note: string
+}> = [
+  { code: 'plain', label: '通俗版', price: '6.9', note: '直白结论 · 现实信号 · 行动建议' },
+  { code: 'professional', label: '专业版', price: '12.9', note: '规则键 · 完整证据 · 置信等级' },
+]
+
+type CareerContextKey = keyof CareerContextInput
+
+const CAREER_QUESTIONS: Array<{
+  key: CareerContextKey
+  seal: string
+  label: string
+  options: Array<{ value: string; label: string }>
+}> = [
+  {
+    key: 'status',
+    seal: '壹',
+    label: '当前状态',
+    options: [
+      { value: 'employed', label: '在职' },
+      { value: 'self_employed', label: '自营或创业' },
+      { value: 'job_seeking', label: '求职中' },
+      { value: 'studying', label: '学习或准备入行' },
+    ],
+  },
+  {
+    key: 'goal',
+    seal: '贰',
+    label: '当前目标',
+    options: [
+      { value: 'promotion', label: '晋升增责' },
+      { value: 'job_change', label: '跳槽换岗' },
+      { value: 'stability', label: '稳住现状' },
+      { value: 'transition', label: '转型换方向' },
+    ],
+  },
+  {
+    key: 'pace',
+    seal: '叁',
+    label: '近期体感',
+    options: [
+      { value: 'smooth', label: '推进顺利' },
+      { value: 'stalled', label: '进展停滞' },
+      { value: 'high_pressure', label: '负荷很高' },
+      { value: 'preparing_change', label: '正在准备变化' },
+    ],
+  },
+]
+
+function completedCareerContext(
+  value: Partial<CareerContextInput>,
+): CareerContextInput | null {
+  if (!value.status || !value.goal || !value.pace) return null
+  return { status: value.status, goal: value.goal, pace: value.pace }
+}
+
+type WealthContextKey = keyof WealthContextInput
+
+const WEALTH_QUESTIONS: Array<{
+  key: WealthContextKey
+  seal: string
+  label: string
+  options: Array<{ value: string; label: string }>
+}> = [
+  {
+    key: 'incomeSource',
+    seal: '壹',
+    label: '主要收入来源',
+    options: [
+      { value: 'salary', label: '固定工资为主' },
+      { value: 'self_employed', label: '自营或项目收入为主' },
+      { value: 'mixed', label: '工资和副业都有' },
+      { value: 'unstable', label: '暂时没有稳定收入' },
+    ],
+  },
+  {
+    key: 'goal',
+    seal: '贰',
+    label: '当前最想解决',
+    options: [
+      { value: 'increase_income', label: '希望增加收入' },
+      { value: 'stabilize_cashflow', label: '希望稳定收支' },
+      { value: 'reduce_pressure', label: '希望减轻支出压力' },
+      { value: 'new_income_source', label: '尝试新的收入来源' },
+    ],
+  },
+  {
+    key: 'pace',
+    seal: '叁',
+    label: '近期收支情况',
+    options: [
+      { value: 'stable', label: '目前收支稳定' },
+      { value: 'income_fluctuating', label: '近期收入有波动' },
+      { value: 'spending_pressure', label: '近期支出压力较大' },
+      { value: 'preparing_adjustment', label: '正在准备调整收支' },
+    ],
+  },
+]
+
+function completedWealthContext(
+  value: Partial<WealthContextInput>,
+): WealthContextInput | null {
+  if (!value.incomeSource || !value.goal || !value.pace) return null
+  return { incomeSource: value.incomeSource, goal: value.goal, pace: value.pace }
+}
 
 export function ReportPage() {
-  const toast = useToastStore((s) => s.show)
-  const [exporting, setExporting] = useState(false)
-  const [activeChapter, setActiveChapter] = useState<TocNumber>('壹')
+  const navigate = useNavigate()
+  const token = useAuthStore((state) => state.token)
+  const toast = useToastStore((state) => state.show)
   const { request, result } = useBaziWithFallback()
-  const explanation = result ? explain(result) : null
-  const wangShuai = result ? computeWangShuai(result) : null
-  const currentDaYun = result?.daYun.find((item) => item.isCurrent)
+  const [topic, setTopic] = useState<ReportTopicCode>('career')
+  const [edition, setEdition] = useState<ReportEditionCode>('plain')
+  const [careerContext, setCareerContext] = useState<Partial<CareerContextInput>>({})
+  const [wealthContext, setWealthContext] = useState<Partial<WealthContextInput>>({})
+  const [generating, setGenerating] = useState(false)
+  const [status, setStatus] = useState('')
 
-  const handleExport = async () => {
-    if (!request || !result || !explanation || exporting) return
-    setExporting(true)
+  const selectedTopic = TOPICS.find((item) => item.code === topic) ?? TOPICS[0]
+  const selectedEdition = EDITIONS.find((item) => item.code === edition) ?? EDITIONS[0]
+  const isHttpMode = import.meta.env.VITE_API_MODE === 'http'
+  const completeCareerContext = completedCareerContext(careerContext)
+  const completeWealthContext = completedWealthContext(wealthContext)
+  const canGenerate = Boolean(
+    token && isHttpMode && request && (
+      (topic === 'career' && completeCareerContext)
+      || (topic === 'wealth' && completeWealthContext)
+    ),
+  )
+
+  const handleGenerate = async () => {
+    if (!request || !canGenerate || generating) return
+    setGenerating(true)
+    setStatus('')
     try {
-      await exportMingshuPdf(request, result, explanation)
-      toast('命书 PDF 已生成')
-    } catch {
-      toast('生成失败，请重试')
+      const context = topic === 'career' ? completeCareerContext : completeWealthContext
+      const report = await createReport(request, topic, edition, context ?? undefined)
+      const message = `${selectedEdition.label}命书已生成并保存`
+      setStatus(message)
+      toast(message)
+      navigate(`/reports/${report.id}`)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '命书生成失败，请重试'
+      setStatus(message)
+      toast(message)
     } finally {
-      setExporting(false)
+      setGenerating(false)
     }
   }
 
@@ -53,24 +187,6 @@ export function ReportPage() {
         </div>
       ) : (
         <>
-          {(() => {
-            const dayElement = WUXING_LABEL[GAN_WUXING[result.pillars.day.gan]]
-            const dayMaster = `${result.pillars.day.gan}${dayElement}`
-            const activeToc = TOC.find(([num]) => num === activeChapter) ?? TOC[0]
-            const activeChapterIndex = TOC.findIndex(([num]) => num === activeChapter) + 1
-            const chapterPoints =
-              activeChapter === '贰'
-                ? explanation?.blocks.find((block) => block.key === 'daymaster')?.points.slice(0, 2) ?? []
-                : activeChapter === '叁'
-                  ? explanation?.blocks.filter((block) => block.key === 'dayun' || block.key === 'liunian').flatMap((block) => block.points).slice(0, 2) ?? []
-                  : activeChapter === '肆'
-                    ? explanation?.blocks.filter((block) => block.key === 'shishen' || block.key === 'shensha').flatMap((block) => block.points).slice(0, 2) ?? []
-                    : activeChapter === '伍'
-                      ? (explanation?.overview.slice(0, 2).map((text, index) => ({ label: index === 0 ? '命盘提示' : '阅读口径', text })) ?? [])
-                      : []
-
-            return (
-              <>
           <section className="report-cover" aria-label="命书封面">
             <div className="report-cover__orbit" aria-hidden="true" />
             <div className="report-cover__kicker">八字命书</div>
@@ -83,10 +199,7 @@ export function ReportPage() {
                 return (
                   <div className={`report-cover__pillar ${key === 'day' ? 'is-day' : ''}`} key={key}>
                     <small>{label}</small>
-                    <span>
-                      {pillar.gan}
-                      {pillar.zhi}
-                    </span>
+                    <span>{pillar.gan}{pillar.zhi}</span>
                   </div>
                 )
               })}
@@ -94,132 +207,190 @@ export function ReportPage() {
             <div className="report-cover__subject">
               {request?.name || '示例'} · {request?.gender === 'male' ? '乾造' : '坤造'}
             </div>
-            <div className="report-cover__meta">{result.lunarText} · 五章命书 · 传统文化研究参考</div>
+            <div className="report-cover__meta">
+              {selectedTopic.label} · {selectedEdition.label} · {topic === 'career' || topic === 'wealth' ? '未来两年' : '未来三年'}
+            </div>
           </section>
 
-          <div className="report-page__document">
-            <section className="report-dossier" aria-label="命盘档案">
-              <nav className="report-dossier__index" aria-label="章节索引">
-                {TOC.map(([num, title]) => (
+          <main className="report-page__document">
+            <section className="report-order" aria-label="命书生成选择">
+              <header className="report-order__header">
+                <span className="report-order__eyebrow">命题</span>
+                <div>
+                  <h2>这份命书，重点回答什么？</h2>
+                  <p>选择一个主题，报告会让它贯穿逐年判断与行动路线。</p>
+                </div>
+              </header>
+
+              <div className="report-topic-slips" role="radiogroup" aria-label="命书主题">
+                {TOPICS.map((item) => (
                   <button
-                    aria-current={num === activeChapter ? 'page' : undefined}
-                    aria-label={`第${num}章：${title}`}
-                    className={num === activeChapter ? 'is-current' : ''}
-                    key={num}
-                    onClick={() => setActiveChapter(num)}
+                    aria-checked={topic === item.code}
+                    className={`report-topic-slip ${topic === item.code ? 'is-selected' : ''}`}
+                    key={item.code}
+                    onClick={() => setTopic(item.code)}
+                    role="radio"
                     type="button"
                   >
-                    {num}
+                    <span className="report-topic-slip__seal" aria-hidden="true">{item.seal}</span>
+                    <span>
+                      <strong>{item.label}</strong>
+                      <small>{item.note}</small>
+                    </span>
                   </button>
                 ))}
-              </nav>
-              <div className="report-dossier__sheet">
-                <header className="report-dossier__heading">
-                  <span>{activeChapterIndex < 10 ? `0${activeChapterIndex}` : activeChapterIndex}</span>
-                  <h2>{activeToc[1]}</h2>
-                </header>
-
-                {activeChapter === '壹' ? (
-                  <>
-                    <section className="report-dossier__identity">
-                      <div className="report-dossier__glyph" aria-hidden="true">
-                        {result.pillars.day.gan}
-                      </div>
-                      <div>
-                        <div className="report-dossier__eyebrow">日主档案</div>
-                        <h3>{dayMaster}日主</h3>
-                        <p>{explanation?.overview[0] ?? '结合命盘结构，以下内容仅供传统文化研究参考。'}</p>
-                      </div>
-                    </section>
-
-                    <dl className="report-dossier__summary" aria-label="命盘提要">
-                      <div>
-                        <dt>日主</dt>
-                        <dd>{dayMaster}</dd>
-                      </div>
-                      <div>
-                        <dt>旺衰</dt>
-                        <dd>{wangShuai?.level ?? '—'}</dd>
-                      </div>
-                      <div>
-                        <dt>当前大运</dt>
-                        <dd>{currentDaYun?.ganZhi ?? '—'}</dd>
-                      </div>
-                    </dl>
-                  </>
-                ) : (
-                  <section aria-live="polite" className="report-dossier__chapter-detail">
-                    {activeChapter === '贰' && (
-                      <>
-                        <div className="report-dossier__chapter-lede">五行分布</div>
-                        <dl className="report-dossier__wuxing" aria-label="五行分布">
-                          {(['jin', 'mu', 'shui', 'huo', 'tu'] as const).map((key) => (
-                            <div key={key}>
-                              <dt>{WUXING_LABEL[key]}</dt>
-                              <dd>{result.wuXing[key]}</dd>
-                            </div>
-                          ))}
-                        </dl>
-                        <p className="report-dossier__scope">本页只展示五行结构；用神需结合流派、寒暖燥湿等综合判断，暂不作确定性推断。</p>
-                      </>
-                    )}
-
-                    {activeChapter === '叁' && (
-                      <dl className="report-dossier__summary report-dossier__summary--two" aria-label="大运流年提要">
-                        <div>
-                          <dt>当前大运</dt>
-                          <dd>{currentDaYun?.ganZhi ?? '—'}</dd>
-                        </div>
-                        <div>
-                          <dt>今年流年</dt>
-                          <dd>{result.currentLiuNian?.ganZhi ?? result.currentYearGanZhi}</dd>
-                        </div>
-                      </dl>
-                    )}
-
-                    {activeChapter === '肆' && (
-                      <dl className="report-dossier__summary report-dossier__summary--two" aria-label="十神提要">
-                        <div>
-                          <dt>日主十神</dt>
-                          <dd>{result.pillars.day.shiShen}</dd>
-                        </div>
-                        <div>
-                          <dt>命局神煞</dt>
-                          <dd>{Array.from(new Set(Object.values(result.pillars).flatMap((pillar) => pillar.shenSha))).length || '—'}</dd>
-                        </div>
-                      </dl>
-                    )}
-
-                    {activeChapter === '伍' && <div className="report-dossier__chapter-lede">传统文化研究参考</div>}
-
-                    <div className="report-dossier__notes">
-                      {chapterPoints.map((point) => (
-                        <article key={`${point.label}-${point.text}`}>
-                          <h3>{point.label}</h3>
-                          <p>{point.text}</p>
-                        </article>
-                      ))}
-                    </div>
-                  </section>
-                )}
-
               </div>
-            </section>
 
-            <div className="report-price">
-              深度版命书 <b style={{ color: 'var(--red)', fontSize: 16 }}>¥9.9</b>（示例定价，待定）
-            </div>
-            <ButtonRow>
-              <Button variant="primary" onClick={handleExport} disabled={exporting}>
-                {exporting ? '生成中…' : '生成命书'}
-              </Button>
-              <Button onClick={() => window.history.back()}>返回</Button>
-            </ButtonRow>
-            <FooterNote>命书内容仅供传统文化研究参考</FooterNote>
-          </div>
-              </>
-            )
-          })()}
+              {topic === 'career' && (
+                <section className="career-questionnaire" aria-labelledby="career-questionnaire-title">
+                  <header className="career-questionnaire__header">
+                    <span aria-hidden="true">问</span>
+                    <div>
+                      <h3 id="career-questionnaire-title">补充事业现状</h3>
+                      <p>不会改变命盘计算，只帮助判断落到岗位、求职或经营场景</p>
+                    </div>
+                  </header>
+                  <div className="career-questionnaire__body">
+                    {CAREER_QUESTIONS.map((question) => {
+                      const labelId = `career-question-${question.key}`
+                      return (
+                        <div className="career-question" key={question.key}>
+                          <div className="career-question__label" id={labelId}>
+                            <span aria-hidden="true">{question.seal}</span>
+                            <strong>{question.label}</strong>
+                          </div>
+                          <div
+                            aria-labelledby={labelId}
+                            className="career-question__options"
+                            role="radiogroup"
+                          >
+                            {question.options.map((option) => {
+                              const selected = careerContext[question.key] === option.value
+                              return (
+                                <button
+                                  aria-checked={selected}
+                                  className={`career-question__option ${selected ? 'is-selected' : ''}`}
+                                  key={option.value}
+                                  onClick={() => setCareerContext((current) => ({
+                                    ...current,
+                                    [question.key]: option.value,
+                                  }))}
+                                  role="radio"
+                                  type="button"
+                                >
+                                  {option.label}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </section>
+              )}
+
+              {topic === 'wealth' && (
+                <section className="career-questionnaire" aria-labelledby="wealth-questionnaire-title">
+                  <header className="career-questionnaire__header">
+                    <span aria-hidden="true">问</span>
+                    <div>
+                      <h3 id="wealth-questionnaire-title">补充财富现状</h3>
+                      <p>不会改变命盘计算，只帮助内容落到真实的收入和支出场景</p>
+                    </div>
+                  </header>
+                  <div className="career-questionnaire__body">
+                    {WEALTH_QUESTIONS.map((question) => {
+                      const labelId = `wealth-question-${question.key}`
+                      return (
+                        <div className="career-question" key={question.key}>
+                          <div className="career-question__label" id={labelId}>
+                            <span aria-hidden="true">{question.seal}</span>
+                            <strong>{question.label}</strong>
+                          </div>
+                          <div aria-labelledby={labelId} className="career-question__options" role="radiogroup">
+                            {question.options.map((option) => {
+                              const selected = wealthContext[question.key] === option.value
+                              return (
+                                <button
+                                  aria-checked={selected}
+                                  className={`career-question__option ${selected ? 'is-selected' : ''}`}
+                                  key={option.value}
+                                  onClick={() => setWealthContext((current) => ({
+                                    ...current,
+                                    [question.key]: option.value,
+                                  }))}
+                                  role="radio"
+                                  type="button"
+                                >
+                                  {option.label}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </section>
+              )}
+
+              <div className="report-order__divider"><span>选择解读版本</span></div>
+
+              <div className="report-edition-plates" role="radiogroup" aria-label="命书版本">
+                {EDITIONS.map((item) => (
+                  <button
+                    aria-checked={edition === item.code}
+                    className={`report-edition-plate ${edition === item.code ? 'is-selected' : ''}`}
+                    key={item.code}
+                    onClick={() => setEdition(item.code)}
+                    role="radio"
+                    type="button"
+                  >
+                    <span className="report-edition-plate__topline">
+                      <strong>{item.label}</strong>
+                      <b>¥{item.price}</b>
+                    </span>
+                    <small>{item.note}</small>
+                  </button>
+                ))}
+              </div>
+
+              <aside className="report-order__summary" aria-label="已选命书">
+                <span>已选</span>
+                <strong>{selectedTopic.label} · {selectedEdition.label}</strong>
+                <small>联调预览 · 当前不扣费 · 生成后自动保存并打开正文</small>
+              </aside>
+
+              {!token && <p className="report-order__notice">后端联调生成需要先登录</p>}
+              {token && !isHttpMode && (
+                <p className="report-order__notice">请使用 VITE_API_MODE=http 启动前端以连接报告服务</p>
+              )}
+              {token && isHttpMode && topic === 'career' && !completeCareerContext && (
+                <p className="report-order__notice">完成三项事业状态后即可生成</p>
+              )}
+              {token && isHttpMode && topic === 'wealth' && !completeWealthContext && (
+                <p className="report-order__notice">完成三项财富状态后即可生成</p>
+              )}
+              {token && isHttpMode && topic !== 'career' && topic !== 'wealth' && (
+                <p className="report-order__notice">综合与感情主题仍在打磨，当前暂不生成</p>
+              )}
+
+              <ButtonRow>
+                <Button variant="primary" onClick={handleGenerate} disabled={!canGenerate || generating}>
+                  {!token
+                    ? '登录后生成命书'
+                    : generating
+                      ? `正在生成${selectedEdition.label}…`
+                      : `生成${selectedEdition.label}命书 · ¥${selectedEdition.price}`}
+                </Button>
+                <Button onClick={() => window.history.back()}>返回</Button>
+              </ButtonRow>
+
+              <p aria-live="polite" className="report-order__status">{status}</p>
+            </section>
+            <FooterNote>命书内容仅供传统文化研究参考，不作为现实决策的唯一依据</FooterNote>
+          </main>
         </>
       )}
     </div>

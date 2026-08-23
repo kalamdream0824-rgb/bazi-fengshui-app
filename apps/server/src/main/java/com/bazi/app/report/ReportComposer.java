@@ -32,6 +32,15 @@ public final class ReportComposer {
       PaipanResultDto result,
       ReportTopic topic,
       ReportEdition edition) {
+    return compose(request, result, topic, edition, null);
+  }
+
+  public ReportDocument compose(
+      PaipanRequest request,
+      PaipanResultDto result,
+      ReportTopic topic,
+      ReportEdition edition,
+      CareerContext careerContext) {
     Objects.requireNonNull(request);
     Objects.requireNonNull(result);
     Objects.requireNonNull(topic);
@@ -46,7 +55,7 @@ public final class ReportComposer {
         analysis.fact("currentDayun").value(),
         analysis.fact("currentYear").value());
     String subject = request.name() == null || request.name().isBlank() ? "命主" : request.name();
-    ThreeYearAssessment assessment = assessor.assess(request, result, topic);
+    ThreeYearAssessment assessment = assessor.assess(request, result, topic, careerContext);
     ReportPresenter presenter = edition == ReportEdition.PLAIN
         ? plainPresenter
         : professionalPresenter;

@@ -29,6 +29,14 @@ final class AnnualRuleFactory {
         key, topic, category, type, stage, priority, confidence, groups, List.of(), condition, copy);
   }
 
+  AnnualRule ruleWithCounters(String key, ReportTopic topic, String category, AnnualFindingType type,
+      AnnualStage stage, int priority, ConfidenceLevel confidence, List<List<String>> groups,
+      List<String> counterSelectors) {
+    return new FactAnnualRule(
+        key, topic, category, type, stage, priority, confidence,
+        groups, counterSelectors, ALWAYS, copy);
+  }
+
   @SafeVarargs
   static List<List<String>> groups(List<String>... groups) {
     return List.of(groups);

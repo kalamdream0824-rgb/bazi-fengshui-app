@@ -15,6 +15,7 @@ public record YearAssessment(
     List<String> realitySignals,
     List<ReportEvidence> evidence,
     List<ReportEvidence> counterEvidence,
+    List<ReportEvidence> contextEvidence,
     ConfidenceLevel confidence,
     List<String> ruleKeys,
     AssessmentBasis basis) {
@@ -32,6 +33,7 @@ public record YearAssessment(
     realitySignals = copy(realitySignals);
     evidence = copy(evidence);
     counterEvidence = copy(counterEvidence);
+    contextEvidence = copy(contextEvidence);
     ruleKeys = copy(ruleKeys);
     long independentEvidence = evidence.stream()
         .map(ReportEvidence::key)
@@ -46,6 +48,25 @@ public record YearAssessment(
             || !opportunities.isEmpty() || !pressures.isEmpty())) {
       throw new IllegalArgumentException("insufficient-evidence result must be low confidence without rule findings");
     }
+  }
+
+  public YearAssessment(
+      int year,
+      String ganZhi,
+      AnnualStage stage,
+      String headline,
+      String conclusion,
+      List<AnnualFinding> opportunities,
+      List<AnnualFinding> pressures,
+      List<String> actions,
+      List<String> realitySignals,
+      List<ReportEvidence> evidence,
+      List<ReportEvidence> counterEvidence,
+      ConfidenceLevel confidence,
+      List<String> ruleKeys,
+      AssessmentBasis basis) {
+    this(year, ganZhi, stage, headline, conclusion, opportunities, pressures, actions,
+        realitySignals, evidence, counterEvidence, List.of(), confidence, ruleKeys, basis);
   }
 
   private static <T> List<T> copy(List<T> values) {

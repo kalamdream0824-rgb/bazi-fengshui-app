@@ -11,6 +11,32 @@ import org.junit.jupiter.api.Test;
 class ThreeYearAssessmentTest {
 
   @Test
+  void careerAcceptsCurrentAndNextYearAsTheCompletePeriod() {
+    ThreeYearAssessment assessment = new ThreeYearAssessment(
+        ReportTopic.CAREER,
+        LocalDate.of(2026, 8, 23),
+        List.of(year(2026), year(2027)),
+        "先稳后进",
+        List.of("核对职责"));
+
+    assertEquals(List.of(2026, 2027),
+        assessment.years().stream().map(YearAssessment::year).toList());
+    assertEquals("两年", assessment.periodLabel());
+  }
+
+  @Test
+  void wealthAlsoUsesCurrentAndNextYearForThePageReport() {
+    ThreeYearAssessment assessment = new ThreeYearAssessment(
+        ReportTopic.WEALTH,
+        LocalDate.of(2026, 8, 23),
+        List.of(year(2026), year(2027)),
+        "先稳住收支，再争取增加收入",
+        List.of("记录收入与支出"));
+
+    assertEquals("两年", assessment.periodLabel());
+  }
+
+  @Test
   void requiresThreeConsecutiveYears() {
     assertThrows(IllegalArgumentException.class, () -> new ThreeYearAssessment(
         ReportTopic.CAREER,
@@ -95,7 +121,7 @@ class ThreeYearAssessmentTest {
     ThreeYearAssessment assessment = new ThreeYearAssessment(
         ReportTopic.CAREER,
         LocalDate.of(2026, 8, 23),
-        List.of(year(2026), year(2027), year(2028)),
+        List.of(year(2026), year(2027)),
         "先稳后进",
         priorities);
 
