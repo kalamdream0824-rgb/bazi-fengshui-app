@@ -17,6 +17,7 @@
 | `../mockups/design-philosophy.md` | 视觉哲学「朱墨星图」 | UI 相关会话 |
 | `../../contracts/openapi.yaml` | 前后端共享 API 契约（**唯一真源**） | 前后端联调 |
 | `../../contracts/fixtures/bazi-cases.json` | 排盘边界用例（一致性回归基准） | 前后端算法联调 |
+| `../../apps/server/src/test/resources/report/wealth-v2-golden-cases.json` | 财富 v2 年限、五路径与证据边界黄金案例；人工复核前不锁定偶然精确分数 | 财富算法/契约回归 |
 
 ## 使用约定
 
@@ -30,4 +31,5 @@
 - `apps/web` 与 `apps/server` **互不 import 源码**；共享信息只通过 `contracts/`（openapi + fixtures）。
 - 接口字段以 `contracts/openapi.yaml` 为准；各端内部类型自行定义，但字段名与契约一致（camelCase）。
 - 排盘正确性以 `contracts/fixtures/bazi-cases.json` 为共同基准，前后端各跑一份一致性测试。
+- 财富 v2 改动必须运行 `WealthGoldenCaseTest`；黄金案例锁定结构、路线与已审查证据，不使用整段文案快照代替内容验收。
 - 前端第一版保留神煞/合婚/运势规则（`lib/`）；后端第一版不重复实现，只做排盘核心 + 记录存储。

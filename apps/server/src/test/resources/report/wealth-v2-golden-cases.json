@@ -1,0 +1,16 @@
+[
+  {
+    "fixtureId": "lin-1995-10-08-1430",
+    "asOf": "2026-08-23",
+    "horizonYears": 3,
+    "requiredYears": [2026, 2027, 2028],
+    "requiredPaths": [
+      "stable_income",
+      "skill_income",
+      "project_income",
+      "cooperation_income",
+      "retention"
+    ],
+    "forbiddenEvidenceKeys": []
+  }
+]
