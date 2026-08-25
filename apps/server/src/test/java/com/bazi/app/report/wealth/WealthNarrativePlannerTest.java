@@ -81,6 +81,13 @@ class WealthNarrativePlannerTest {
     }
   }
 
+  @Test
+  void skillIncomeNamesWhoseAbilitySolvesWhoseProblem() {
+    assertEquals(
+        "这一年的钱主要来自用自己的能力，解决别人愿意付钱的问题。",
+        plan.years().get(2).incomeSource());
+  }
+
   private List<String> readerLines() {
     return Stream.of(
             Stream.of(plan.thesis(), plan.summary()),

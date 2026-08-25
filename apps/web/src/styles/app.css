@@ -2819,6 +2819,15 @@ select.input-box {
   margin-top: 14px;
 }
 
+@media (max-width: 430px) {
+  .wealth-reader__directions > div {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .money-direction.is-primary {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 390px) {
   .report-year__grid {
     grid-template-columns: 1fr;
@@ -2834,12 +2843,6 @@ select.input-box {
   .wealth-reader .report-reader__route,
   .wealth-reader .report-reader__footer {
     margin-left: 40px;
-  }
-  .wealth-reader__directions > div {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .money-direction.is-primary {
-    grid-column: 1 / -1;
   }
   .wealth-reader__paths > header {
     align-items: flex-start;
