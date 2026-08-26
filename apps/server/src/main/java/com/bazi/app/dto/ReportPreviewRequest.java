@@ -10,5 +10,6 @@ public record ReportPreviewRequest(
     @NotBlank String edition,
     @Valid CareerContextRequest careerContext,
     @Deprecated
-    @Valid WealthContextRequest wealthContext) {
+    @Valid WealthContextRequest wealthContext,
+    @Valid RelationshipContextRequest relationshipContext) {
 }
