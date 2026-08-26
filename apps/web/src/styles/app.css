@@ -1202,6 +1202,93 @@ button {
   outline: 2px solid var(--red);
   outline-offset: 2px;
 }
+.relationship-context {
+  margin-top: 14px;
+  border: 1px solid rgba(177, 143, 88, 0.46);
+  border-radius: 3px;
+  background: rgba(255, 253, 247, 0.84);
+  box-shadow: inset 3px 0 0 rgba(185, 65, 56, 0.72);
+}
+.relationship-context__header {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  padding: 11px 12px 9px;
+  border-bottom: 1px solid rgba(177, 143, 88, 0.3);
+}
+.relationship-context__header > span {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border: 1px solid var(--red);
+  color: var(--red);
+  font-family: var(--font-glyph);
+  font-size: 13px;
+  transform: rotate(-3deg);
+}
+.relationship-context__header h3 {
+  margin: 0;
+  font-family: var(--font-glyph);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+.relationship-context__header p {
+  margin: 3px 0 0;
+  color: var(--ink-2);
+  font-size: 9.5px;
+}
+.relationship-context__choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  padding: 11px 12px 12px;
+}
+.relationship-context__choice {
+  display: grid;
+  grid-template-columns: 25px minmax(0, 1fr);
+  gap: 7px;
+  align-items: center;
+  min-height: 54px;
+  padding: 8px;
+  border: 1px solid rgba(177, 143, 88, 0.34);
+  border-radius: 2px;
+  color: var(--ink-2);
+  text-align: left;
+  background: rgba(255, 250, 240, 0.68);
+  cursor: pointer;
+}
+.relationship-context__choice > span {
+  display: grid;
+  width: 24px;
+  height: 29px;
+  place-items: center;
+  border: 1px solid rgba(185, 65, 56, 0.48);
+  color: var(--red);
+  font-family: var(--font-glyph);
+  font-size: 10px;
+}
+.relationship-context__choice strong {
+  font-family: var(--font-glyph);
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.relationship-context__choice.is-selected {
+  border-color: var(--red);
+  color: var(--red);
+  background: rgba(185, 65, 56, 0.07);
+  box-shadow: inset 0 -2px 0 rgba(185, 65, 56, 0.18);
+}
+.relationship-context__choice.is-selected > span {
+  color: #fff8e9;
+  background: var(--red);
+}
+.relationship-context__choice:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
 .report-order__divider {
   display: flex;
   align-items: center;
@@ -1578,6 +1665,9 @@ button {
   .career-question {
     grid-template-columns: 1fr;
     gap: 6px;
+  }
+  .relationship-context__choices {
+    grid-template-columns: 1fr;
   }
   .report-dossier {
     grid-template-columns: 40px minmax(0, 1fr);

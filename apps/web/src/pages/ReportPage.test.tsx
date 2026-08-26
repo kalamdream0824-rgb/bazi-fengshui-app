@@ -57,7 +57,7 @@ describe('ReportPage', () => {
     fireEvent.click(screen.getByRole('radio', { name: /专业版.*12\.9/ }))
 
     expect(screen.getByRole('button', { name: '生成专业版命书 · ¥12.9' })).toBeDisabled()
-    expect(screen.getByText(/综合与感情主题仍在打磨/)).toBeInTheDocument()
+    expect(screen.getByText(/综合主题仍在打磨/)).toBeInTheDocument()
   })
 
   it('财富主题直接展示三年通俗版，并明确禁用专业版', () => {
@@ -103,6 +103,45 @@ describe('ReportPage', () => {
     ))
   })
 
+  it('感情主题只显示三种关系状态，选中后才能生成通俗版', async () => {
+    renderPage()
+    fireEvent.click(screen.getByRole('radio', { name: /感情运势/ }))
+
+    expect(screen.queryByRole('heading', { name: '补充事业现状' })).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '选择当前关系状态' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: '单身或尚未确定关系' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: '已确认交往关系' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: '已婚或长期共同生活' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '生成通俗版命书 · ¥6.9' })).toBeDisabled()
+    expect(screen.getByRole('radio', { name: /专业版.*设计中.*暂未开放/ })).toBeDisabled()
+
+    fireEvent.click(screen.getByRole('radio', { name: '已确认交往关系' }))
+    fireEvent.click(screen.getByRole('button', { name: '生成通俗版命书 · ¥6.9' }))
+
+    await waitFor(() => expect(createReport).toHaveBeenCalledWith(
+      request,
+      'relationship',
+      'plain',
+      { relationshipContext: { status: 'dating' } },
+    ))
+  })
+
+  it('离开感情主题后清除上一次选择', () => {
+    renderPage()
+    fireEvent.click(screen.getByRole('radio', { name: /感情运势/ }))
+    fireEvent.click(screen.getByRole('radio', { name: '单身或尚未确定关系' }))
+    expect(screen.getByRole('button', { name: '生成通俗版命书 · ¥6.9' })).toBeEnabled()
+
+    fireEvent.click(screen.getByRole('radio', { name: /财富运势/ }))
+    fireEvent.click(screen.getByRole('radio', { name: /感情运势/ }))
+
+    expect(screen.getByRole('radio', { name: '单身或尚未确定关系' })).toHaveAttribute(
+      'aria-checked',
+      'false',
+    )
+    expect(screen.getByRole('button', { name: '生成通俗版命书 · ¥6.9' })).toBeDisabled()
+  })
+
   it('未登录时明确提示需要登录而不调用生成接口', () => {
     useAuthStore.getState().clear()
     renderPage()
@@ -131,7 +170,7 @@ describe('ReportPage', () => {
       request,
       'career',
       'plain',
-      { status: 'job_seeking', goal: 'job_change', pace: 'stalled' },
+      { careerContext: { status: 'job_seeking', goal: 'job_change', pace: 'stalled' } },
     ))
   })
 

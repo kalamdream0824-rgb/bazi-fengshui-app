@@ -31,7 +31,7 @@ describe('reportApi', () => {
     vi.stubGlobal('fetch', fetchMock)
     const careerContext = { status: 'employed' as const, goal: 'promotion' as const, pace: 'smooth' as const }
 
-    await expect(createReport(request, 'career', 'plain', careerContext)).resolves.toEqual(report)
+    await expect(createReport(request, 'career', 'plain', { careerContext })).resolves.toEqual(report)
     expect(fetchMock).toHaveBeenCalledWith('/api/v1/reports', expect.objectContaining({
       method: 'POST',
       body: JSON.stringify({ request, topic: 'career', edition: 'plain', careerContext }),
@@ -53,10 +53,34 @@ describe('reportApi', () => {
       pace: 'smooth' as const,
     }
 
-    await createReport(request, 'wealth', 'plain', accidentalContext)
+    await createReport(request, 'wealth', 'plain', { careerContext: accidentalContext })
 
     expect(fetchMock).toHaveBeenCalledWith('/api/v1/reports', expect.objectContaining({
       body: JSON.stringify({ request, topic: 'wealth', edition: 'plain' }),
+    }))
+  })
+
+  it('生成感情命书时只提交当前关系状态', async () => {
+    useAuthStore.getState().setAuth('report-token', 'tester')
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ id: 38, topic: 'relationship' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    await createReport(request, 'relationship', 'plain', {
+      relationshipContext: { status: 'dating' },
+    })
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/v1/reports', expect.objectContaining({
+      body: JSON.stringify({
+        request,
+        topic: 'relationship',
+        edition: 'plain',
+        relationshipContext: { status: 'dating' },
+      }),
     }))
   })
 

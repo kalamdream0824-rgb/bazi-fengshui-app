@@ -9,6 +9,7 @@ export type CareerPaceCode = 'smooth' | 'stalled' | 'high_pressure' | 'preparing
 export type WealthIncomeSourceCode = 'salary' | 'self_employed' | 'mixed' | 'unstable'
 export type WealthGoalCode = 'increase_income' | 'stabilize_cashflow' | 'reduce_pressure' | 'new_income_source'
 export type WealthPaceCode = 'stable' | 'income_fluctuating' | 'spending_pressure' | 'preparing_adjustment'
+export type RelationshipStatus = 'single' | 'dating' | 'married'
 
 export interface CareerContextInput {
   status: CareerStatusCode
@@ -20,6 +21,15 @@ export interface WealthContextInput {
   incomeSource: WealthIncomeSourceCode
   goal: WealthGoalCode
   pace: WealthPaceCode
+}
+
+export interface RelationshipContextInput {
+  status: RelationshipStatus
+}
+
+export interface CreateReportOptions {
+  careerContext?: CareerContextInput
+  relationshipContext?: RelationshipContextInput
 }
 
 export interface ReportEvidence {
@@ -128,11 +138,13 @@ export async function createReport(
   request: PaipanRequest,
   topic: ReportTopicCode,
   edition: ReportEditionCode,
-  careerContext?: CareerContextInput,
+  options: CreateReportOptions = {},
 ): Promise<SavedReport> {
-  const payload = topic === 'career' && careerContext
-    ? { request, topic, edition, careerContext }
-    : { request, topic, edition }
+  const payload = topic === 'career' && options.careerContext
+    ? { request, topic, edition, careerContext: options.careerContext }
+    : topic === 'relationship' && options.relationshipContext
+      ? { request, topic, edition, relationshipContext: options.relationshipContext }
+      : { request, topic, edition }
   return reportJson('/api/v1/reports', {
     method: 'POST',
     body: JSON.stringify(payload),

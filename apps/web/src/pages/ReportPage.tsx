@@ -8,6 +8,7 @@ import { useBaziWithFallback } from '@/hooks/useBaziWithFallback'
 import {
   createReport,
   type CareerContextInput,
+  type RelationshipStatus,
   type ReportEditionCode,
   type ReportTopicCode,
 } from '@/services/reportApi'
@@ -74,6 +75,12 @@ const CAREER_QUESTIONS: Array<{
   },
 ]
 
+const RELATIONSHIP_STATUSES: Array<{ code: RelationshipStatus; seal: string; label: string }> = [
+  { code: 'single', seal: '初', label: '单身或尚未确定关系' },
+  { code: 'dating', seal: '伴', label: '已确认交往关系' },
+  { code: 'married', seal: '合', label: '已婚或长期共同生活' },
+]
+
 function completedCareerContext(
   value: Partial<CareerContextInput>,
 ): CareerContextInput | null {
@@ -89,6 +96,7 @@ export function ReportPage() {
   const [topic, setTopic] = useState<ReportTopicCode>('career')
   const [edition, setEdition] = useState<ReportEditionCode>('plain')
   const [careerContext, setCareerContext] = useState<Partial<CareerContextInput>>({})
+  const [relationshipStatus, setRelationshipStatus] = useState<RelationshipStatus | null>(null)
   const [generating, setGenerating] = useState(false)
   const [status, setStatus] = useState('')
 
@@ -101,12 +109,14 @@ export function ReportPage() {
     token && isHttpMode && request && (
       (topic === 'career' && completeCareerContext)
       || topic === 'wealth'
+      || (topic === 'relationship' && relationshipStatus)
     ),
   )
 
   const handleTopicChange = (nextTopic: ReportTopicCode) => {
     setTopic(nextTopic)
-    if (nextTopic === 'wealth') setEdition('plain')
+    setRelationshipStatus(null)
+    if (nextTopic === 'wealth' || nextTopic === 'relationship') setEdition('plain')
   }
 
   const handleGenerate = async () => {
@@ -115,8 +125,14 @@ export function ReportPage() {
     setStatus('')
     try {
       const report = topic === 'career'
-        ? await createReport(request, topic, edition, completeCareerContext ?? undefined)
-        : await createReport(request, topic, edition)
+        ? await createReport(request, topic, edition, {
+            careerContext: completeCareerContext ?? undefined,
+          })
+        : topic === 'relationship' && relationshipStatus
+          ? await createReport(request, topic, edition, {
+              relationshipContext: { status: relationshipStatus },
+            })
+          : await createReport(request, topic, edition)
       const message = `${selectedEdition.label}命书已生成并保存`
       setStatus(message)
       toast(message)
@@ -244,11 +260,39 @@ export function ReportPage() {
                 </section>
               )}
 
+              {topic === 'relationship' && (
+                <section className="relationship-context" aria-labelledby="relationship-context-title">
+                  <header className="relationship-context__header">
+                    <span aria-hidden="true">缘</span>
+                    <div>
+                      <h3 id="relationship-context-title">选择当前关系状态</h3>
+                      <p>只改变表达角度，不改变命盘计算结果</p>
+                    </div>
+                  </header>
+                  <div className="relationship-context__choices" role="radiogroup" aria-labelledby="relationship-context-title">
+                    {RELATIONSHIP_STATUSES.map((item) => (
+                      <button
+                        aria-checked={relationshipStatus === item.code}
+                        className={`relationship-context__choice ${relationshipStatus === item.code ? 'is-selected' : ''}`}
+                        key={item.code}
+                        onClick={() => setRelationshipStatus(item.code)}
+                        role="radio"
+                        type="button"
+                      >
+                        <span aria-hidden="true">{item.seal}</span>
+                        <strong>{item.label}</strong>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              )}
+
               <div className="report-order__divider"><span>选择解读版本</span></div>
 
               <div className="report-edition-plates" role="radiogroup" aria-label="命书版本">
                 {EDITIONS.map((item) => {
-                  const unavailable = topic === 'wealth' && item.code === 'professional'
+                  const unavailable = (topic === 'wealth' || topic === 'relationship')
+                    && item.code === 'professional'
                   return (
                     <button
                       aria-checked={!unavailable && edition === item.code}
@@ -283,8 +327,11 @@ export function ReportPage() {
               {token && isHttpMode && topic === 'career' && !completeCareerContext && (
                 <p className="report-order__notice">完成三项事业状态后即可生成</p>
               )}
-              {token && isHttpMode && topic !== 'career' && topic !== 'wealth' && (
-                <p className="report-order__notice">综合与感情主题仍在打磨，当前暂不生成</p>
+              {token && isHttpMode && topic === 'relationship' && !relationshipStatus && (
+                <p className="report-order__notice">选择当前关系状态后即可生成</p>
+              )}
+              {token && isHttpMode && topic === 'overall' && (
+                <p className="report-order__notice">综合主题仍在打磨，当前暂不生成</p>
               )}
 
               <ButtonRow>
