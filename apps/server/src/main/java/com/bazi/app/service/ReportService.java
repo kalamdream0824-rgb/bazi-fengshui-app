@@ -18,6 +18,12 @@ import com.bazi.app.report.ReportTopic;
 import com.bazi.app.report.ThreeYearAssessment;
 import com.bazi.app.report.ThreeYearAssessor;
 import com.bazi.app.report.rules.AnnualRuleCatalog;
+import com.bazi.app.report.relationship.RelationshipDimensionEvaluator;
+import com.bazi.app.report.relationship.RelationshipFactExtractor;
+import com.bazi.app.report.relationship.RelationshipNarrativePlan;
+import com.bazi.app.report.relationship.RelationshipNarrativePlanner;
+import com.bazi.app.report.relationship.RelationshipPeriodArbitrator;
+import com.bazi.app.report.relationship.RelationshipStatus;
 import com.bazi.app.report.wealth.WealthFactExtractor;
 import com.bazi.app.report.wealth.WealthNarrativePlan;
 import com.bazi.app.report.wealth.WealthNarrativePlanner;
@@ -37,6 +43,7 @@ public class ReportService {
 
   public static final String CAREER_CONTENT_VERSION = "career-narrative-v3";
   public static final String WEALTH_CONTENT_VERSION = "wealth-narrative-v2";
+  public static final String RELATIONSHIP_CONTENT_VERSION = "relationship-narrative-v1";
 
   private final BaziService baziService;
   private final BaziReportMapper mapper;
@@ -47,6 +54,13 @@ public class ReportService {
   private final WealthNarrativePlanner wealthPlanner = new WealthNarrativePlanner();
   private final WealthFactExtractor wealthFactExtractor = new WealthFactExtractor();
   private final WealthPathEvaluator wealthPathEvaluator = new WealthPathEvaluator();
+  private final RelationshipFactExtractor relationshipFactExtractor = new RelationshipFactExtractor();
+  private final RelationshipDimensionEvaluator relationshipDimensionEvaluator =
+      new RelationshipDimensionEvaluator();
+  private final RelationshipPeriodArbitrator relationshipPeriodArbitrator =
+      new RelationshipPeriodArbitrator();
+  private final RelationshipNarrativePlanner relationshipPlanner =
+      new RelationshipNarrativePlanner();
 
   public ReportService(BaziService baziService, BaziReportMapper mapper, ObjectMapper objectMapper) {
     this.baziService = baziService;
@@ -60,8 +74,10 @@ public class ReportService {
   public ReportDto create(Long userId, ReportPreviewRequest request) throws Exception {
     ReportTopic topic = ReportTopic.fromCode(request.topic());
     ReportEdition edition = ReportEdition.fromCode(request.edition());
-    if (topic != ReportTopic.CAREER && topic != ReportTopic.WEALTH) {
-      throw new BusinessException("REPORT_PAGE_TOPIC_UNSUPPORTED", "当前页面阅读版先开放事业与财富主题");
+    if (topic != ReportTopic.CAREER
+        && topic != ReportTopic.WEALTH
+        && topic != ReportTopic.RELATIONSHIP) {
+      throw new BusinessException("REPORT_PAGE_TOPIC_UNSUPPORTED", "当前页面阅读版尚未开放这个主题");
     }
     if (topic == ReportTopic.CAREER && request.careerContext() == null) {
       throw new BusinessException("CAREER_CONTEXT_REQUIRED", "生成事业命书前，请完成事业状态问卷");
@@ -69,6 +85,23 @@ public class ReportService {
     if (topic == ReportTopic.WEALTH && edition == ReportEdition.PROFESSIONAL) {
       throw new BusinessException(
           "WEALTH_PROFESSIONAL_NOT_AVAILABLE", "财富专业版仍在设计中，当前只开放通俗版");
+    }
+    RelationshipStatus relationshipStatus = null;
+    if (topic == ReportTopic.RELATIONSHIP) {
+      if (edition == ReportEdition.PROFESSIONAL) {
+        throw new BusinessException(
+            "RELATIONSHIP_PROFESSIONAL_NOT_AVAILABLE", "感情专业版仍在设计中，当前只开放通俗版");
+      }
+      if (request.relationshipContext() == null) {
+        throw new BusinessException(
+            "RELATIONSHIP_CONTEXT_REQUIRED", "生成感情命书前，请选择当前关系状态");
+      }
+      try {
+        relationshipStatus = request.relationshipContext().toDomain();
+      } catch (IllegalArgumentException error) {
+        throw new BusinessException(
+            "RELATIONSHIP_STATUS_INVALID", "当前关系状态不在支持范围内");
+      }
     }
     PaipanResultDto chart = baziService.paipan(request.request());
     ReportContent content;
@@ -80,7 +113,7 @@ public class ReportService {
       content = careerPlanner.plan(assessment, context);
       contentVersion = CAREER_CONTENT_VERSION;
       contextRequest = request.careerContext();
-    } else {
+    } else if (topic == ReportTopic.WEALTH) {
       content = wealthPlanner.plan(wealthPathEvaluator.evaluate(wealthFactExtractor.extract(
           chart,
           new AnnualContextFactory(clock)
@@ -89,6 +122,20 @@ public class ReportService {
       contextRequest = Map.of(
           "source", "system",
           "horizonYears", ReportHorizon.WEALTH_PRODUCT.years());
+    } else {
+      RelationshipNarrativePlan relationshipContent = relationshipPlanner.plan(
+          relationshipPeriodArbitrator.arbitrate(
+              relationshipDimensionEvaluator.evaluate(
+                  relationshipFactExtractor.extract(
+                      request.request(),
+                      chart,
+                      new AnnualContextFactory(clock).create(
+                          request.request(), chart, ReportHorizon.RELATIONSHIP_PRODUCT)))),
+          relationshipStatus);
+      validateRelationshipContent(relationshipContent);
+      content = relationshipContent;
+      contentVersion = RELATIONSHIP_CONTENT_VERSION;
+      contextRequest = request.relationshipContext();
     }
     LocalDateTime now = LocalDateTime.now();
 
@@ -125,9 +172,14 @@ public class ReportService {
   }
 
   private ReportDto toDto(BaziReport report) throws Exception {
-    ReportContent content = WEALTH_CONTENT_VERSION.equals(report.getContentVersion())
-        ? objectMapper.readValue(report.getContentJson(), WealthNarrativePlan.class)
-        : objectMapper.readValue(report.getContentJson(), CareerNarrativePlan.class);
+    ReportContent content;
+    if (WEALTH_CONTENT_VERSION.equals(report.getContentVersion())) {
+      content = objectMapper.readValue(report.getContentJson(), WealthNarrativePlan.class);
+    } else if (RELATIONSHIP_CONTENT_VERSION.equals(report.getContentVersion())) {
+      content = objectMapper.readValue(report.getContentJson(), RelationshipNarrativePlan.class);
+    } else {
+      content = objectMapper.readValue(report.getContentJson(), CareerNarrativePlan.class);
+    }
     return new ReportDto(
         report.getId(),
         report.getSubject(),
@@ -142,5 +194,19 @@ public class ReportService {
 
   private String subject(String name) {
     return name == null || name.isBlank() ? "命主" : name.trim();
+  }
+
+  private void validateRelationshipContent(RelationshipNarrativePlan content) {
+    boolean primaryHasEvidence = content.dimensions().stream()
+        .filter(dimension -> dimension.code().equals(content.primaryDimensionCode()))
+        .anyMatch(dimension -> !dimension.supportingEvidenceKeys().isEmpty()
+            || !dimension.limitingEvidenceKeys().isEmpty());
+    if (content.horizonYears() != ReportHorizon.RELATIONSHIP_PRODUCT.years()
+        || content.years().size() != ReportHorizon.RELATIONSHIP_PRODUCT.years()
+        || content.evidenceKeys().isEmpty()
+        || !primaryHasEvidence) {
+      throw new BusinessException(
+          "RELATIONSHIP_CONTENT_INVALID", "感情命书内容校验失败，请稍后重试");
+    }
   }
 }
