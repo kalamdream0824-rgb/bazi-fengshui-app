@@ -2,6 +2,8 @@
 
 一个基于 Web 的八字（四柱）排盘应用，前后端分离架构。前端采用 React 19 + TypeScript，设计语言「朱墨星图」，信息架构参考问真八字（非品牌抄袭）。
 
+当前页面命书已开放事业、财富与感情主题。感情通俗版按单身、交往中、已婚三种阅读角度生成固定三年内容，生成后保存到“我的命书”；当前不提供感情专业版和 PDF 导出。
+
 ## 仓库结构
 
 ```
@@ -37,6 +39,7 @@ npm test          # Vitest 单元测试
 - 产品图文档：`docs/mockups/bazi-app-mockups.md`
 - 前端技术设计：`docs/design/bazi-frontend-design.md`
 - 设计哲学：`docs/mockups/design-philosophy.md`
+- 感情命书 v1 算法与验收：`docs/design/relationship-report-v1.md`
 
 ## 网络说明
 

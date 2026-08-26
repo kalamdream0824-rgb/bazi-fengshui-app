@@ -308,11 +308,11 @@ components:
     ReportEdition:
       type: string
       enum: [plain, professional]
-      description: career 支持两个版本；wealth v2 只开放三年通俗版，professional 返回 WEALTH_PROFESSIONAL_NOT_AVAILABLE。
+      description: career 支持两个版本；wealth v2 与 relationship v1 只开放三年通俗版，各自的 professional 请求返回对应的 NOT_AVAILABLE 错误码。
     ReportPreviewRequest:
       type: object
       required: [request, topic, edition]
-      description: career 必须提交 careerContext；wealth v2 不需要问卷，通俗版固定输出三年，专业版暂未开放。
+      description: career 必须提交 careerContext；wealth v2 不需要问卷；relationship v1 必须提交 relationshipContext。财富和感情通俗版固定输出三年，专业版暂未开放。
       properties:
         request:
           $ref: '#/components/schemas/PaipanRequest'
@@ -327,6 +327,8 @@ components:
           description: 旧版财富问卷兼容字段；可省略，wealth v2 接受但完全忽略，将在后续契约中删除。
           allOf:
             - $ref: '#/components/schemas/WealthContext'
+        relationshipContext:
+          $ref: '#/components/schemas/RelationshipContextRequest'
     CareerContext:
       type: object
       required: [status, goal, pace]
@@ -356,6 +358,15 @@ components:
         pace:
           type: string
           enum: [stable, income_fluctuating, spending_pressure, preparing_adjustment]
+    RelationshipContextRequest:
+      type: object
+      required: [status]
+      description: 感情状态只决定通俗文案的问题角度与行动表达，不参与证据提取、权重、排序、风险或年度趋势计算。
+      properties:
+        status:
+          type: string
+          enum: [single, dating, married]
+          description: single=单身或尚未确定关系；dating=已确认交往关系；married=已婚或长期共同生活。
     ReportInfo:
       type: object
       required: [id, subject, topic, edition, status, contentVersion, content, createdAt, generatedAt]
@@ -367,12 +378,13 @@ components:
         status: { type: string, enum: [ready] }
         contentVersion:
           type: string
-          description: career-narrative-v1/v2/v3、wealth-narrative-v1 使用旧内容结构；wealth-narrative-v2 使用独立财富结构。
+          description: career-narrative-v1/v2/v3、wealth-narrative-v1 使用旧内容结构；wealth-narrative-v2 与 relationship-narrative-v1 使用各自独立结构。
         content:
           oneOf:
             - $ref: '#/components/schemas/CareerNarrativePlan'
             - $ref: '#/components/schemas/WealthNarrativePlan'
-          description: 由 contentVersion 判别；旧事业及财富 v1 使用 CareerNarrativePlan，财富 v2 使用 WealthNarrativePlan。
+            - $ref: '#/components/schemas/RelationshipNarrativePlan'
+          description: 由 contentVersion 判别；旧事业及财富 v1 使用 CareerNarrativePlan，财富 v2 使用 WealthNarrativePlan，感情 v1 使用 RelationshipNarrativePlan。
         createdAt: { type: string, format: date-time }
         generatedAt: { type: string, format: date-time }
     CareerNarrativePlan:
@@ -520,6 +532,134 @@ components:
           maxItems: 2
           items: { type: string }
         transition: { type: string }
+        evidenceKeys:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: { type: string }
+    RelationshipStatus:
+      type: string
+      enum: [single, dating, married]
+    RelationshipDimensionCode:
+      type: string
+      enum: [connection, response, daily_cooperation, boundaries, stability]
+    RelationshipNarrativePlan:
+      type: object
+      description: relationship-narrative-v1 的三年通俗版快照。规则权重只表示规则在本报告中的方向与显著程度，不是统计概率，也不保证现实事件发生。
+      required:
+        - relationshipStatus
+        - relationshipStatusLabel
+        - horizonYears
+        - thesis
+        - summary
+        - dimensions
+        - primaryDimensionCode
+        - secondaryDimensionCode
+        - focusTied
+        - years
+        - evidenceKeys
+      properties:
+        relationshipStatus: { $ref: '#/components/schemas/RelationshipStatus' }
+        relationshipStatusLabel: { type: string }
+        horizonYears:
+          type: integer
+          enum: [3]
+          readOnly: true
+        thesis: { type: string }
+        summary: { type: string }
+        dimensions:
+          type: array
+          minItems: 5
+          maxItems: 5
+          items: { $ref: '#/components/schemas/RelationshipDimensionSummary' }
+        primaryDimensionCode: { $ref: '#/components/schemas/RelationshipDimensionCode' }
+        secondaryDimensionCode: { $ref: '#/components/schemas/RelationshipDimensionCode' }
+        focusTied: { type: boolean }
+        mainRisk:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/RelationshipRiskSummary'
+        years:
+          type: array
+          minItems: 3
+          maxItems: 3
+          items: { $ref: '#/components/schemas/RelationshipYearNarrative' }
+        evidenceKeys:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: { type: string }
+    RelationshipDimensionSummary:
+      type: object
+      required: [code, label, status, tone, judgment, supportingEvidenceKeys, limitingEvidenceKeys]
+      properties:
+        code: { $ref: '#/components/schemas/RelationshipDimensionCode' }
+        label: { type: string }
+        status: { type: string }
+        tone:
+          type: string
+          enum: [supportive, mixed, pressured, quiet]
+        judgment: { type: string }
+        supportingEvidenceKeys:
+          type: array
+          uniqueItems: true
+          items: { type: string }
+        limitingEvidenceKeys:
+          type: array
+          uniqueItems: true
+          items: { type: string }
+    RelationshipRiskSummary:
+      type: object
+      required: [dimensionCode, label, judgment, evidenceKeys]
+      properties:
+        dimensionCode: { $ref: '#/components/schemas/RelationshipDimensionCode' }
+        label: { type: string }
+        judgment: { type: string }
+        evidenceKeys:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: { type: string }
+    RelationshipYearNarrative:
+      type: object
+      required:
+        - year
+        - ganZhi
+        - focus
+        - judgment
+        - realitySignals
+        - actions
+        - transition
+        - primaryDimensionCode
+        - secondaryDimensionCode
+        - evidenceKeys
+      properties:
+        year: { type: integer }
+        ganZhi: { type: string }
+        focus: { type: string }
+        judgment: { type: string }
+        mainLimit:
+          type: string
+          nullable: true
+          description: 仅在该年存在真实负面证据时出现。
+        realitySignals:
+          type: array
+          minItems: 2
+          maxItems: 2
+          items: { type: string }
+        actions:
+          type: array
+          minItems: 2
+          maxItems: 2
+          uniqueItems: true
+          items: { type: string }
+        transition: { type: string }
+        primaryDimensionCode: { $ref: '#/components/schemas/RelationshipDimensionCode' }
+        secondaryDimensionCode: { $ref: '#/components/schemas/RelationshipDimensionCode' }
+        riskDimensionCode:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/RelationshipDimensionCode'
         evidenceKeys:
           type: array
           minItems: 1

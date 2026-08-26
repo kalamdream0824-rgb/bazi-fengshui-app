@@ -1,0 +1,138 @@
+{
+  "cases": [
+    {
+      "id": "male-single",
+      "chartId": "lin-1995-male",
+      "name": "林先生",
+      "gender": "male",
+      "solarDateTime": "1995-10-08T14:30:00",
+      "birthPlace": "上海",
+      "asOf": "2026-08-23",
+      "status": "single",
+      "expectedPrimary": "response",
+      "expectedSecondary": "connection",
+      "expectedRisk": "boundaries",
+      "requiredEvidenceKeys": [
+        "annual.branch.harmony.time.connection",
+        "annual.branch.punishment.dayun.boundaries"
+      ],
+      "requiredText": ["值得继续了解"],
+      "forbiddenText": ["正缘", "烂桃花", "必定结婚", "一定分手", "卡点"]
+    },
+    {
+      "id": "male-dating",
+      "chartId": "lin-1995-male",
+      "name": "林先生",
+      "gender": "male",
+      "solarDateTime": "1995-10-08T14:30:00",
+      "birthPlace": "上海",
+      "asOf": "2026-08-23",
+      "status": "dating",
+      "expectedPrimary": "response",
+      "expectedSecondary": "connection",
+      "expectedRisk": "boundaries",
+      "requiredEvidenceKeys": [
+        "annual.branch.harmony.time.connection",
+        "annual.branch.punishment.dayun.boundaries"
+      ],
+      "requiredText": ["继续走下去", "两个人"],
+      "forbiddenText": ["正缘", "第三者", "必定结婚", "一定分手", "卡点"]
+    },
+    {
+      "id": "male-married",
+      "chartId": "lin-1995-male",
+      "name": "林先生",
+      "gender": "male",
+      "solarDateTime": "1995-10-08T14:30:00",
+      "birthPlace": "上海",
+      "asOf": "2026-08-23",
+      "status": "married",
+      "expectedPrimary": "response",
+      "expectedSecondary": "connection",
+      "expectedRisk": "boundaries",
+      "requiredEvidenceKeys": [
+        "annual.branch.harmony.time.connection",
+        "annual.branch.punishment.dayun.boundaries"
+      ],
+      "requiredText": ["共同生活", "夫妻"],
+      "forbiddenText": ["正缘", "第三者", "不忠", "一定分手", "卡点"]
+    },
+    {
+      "id": "female-single",
+      "chartId": "lin-1995-female",
+      "name": "林女士",
+      "gender": "female",
+      "solarDateTime": "1995-10-08T14:30:00",
+      "birthPlace": "上海",
+      "asOf": "2026-08-23",
+      "status": "single",
+      "expectedPrimary": "response",
+      "expectedSecondary": "stability",
+      "expectedRisk": "boundaries",
+      "requiredEvidenceKeys": [
+        "annual.branch.harmony.time.connection",
+        "annual.branch.punishment.dayun.boundaries"
+      ],
+      "requiredText": ["值得继续了解"],
+      "forbiddenText": ["正缘", "烂桃花", "必定结婚", "一定分手", "卡点"]
+    },
+    {
+      "id": "female-dating",
+      "chartId": "lin-1995-female",
+      "name": "林女士",
+      "gender": "female",
+      "solarDateTime": "1995-10-08T14:30:00",
+      "birthPlace": "上海",
+      "asOf": "2026-08-23",
+      "status": "dating",
+      "expectedPrimary": "response",
+      "expectedSecondary": "stability",
+      "expectedRisk": "boundaries",
+      "requiredEvidenceKeys": [
+        "annual.branch.harmony.time.connection",
+        "annual.branch.punishment.dayun.boundaries"
+      ],
+      "requiredText": ["继续走下去", "两个人"],
+      "forbiddenText": ["正缘", "第三者", "必定结婚", "一定分手", "卡点"]
+    },
+    {
+      "id": "female-married",
+      "chartId": "lin-1995-female",
+      "name": "林女士",
+      "gender": "female",
+      "solarDateTime": "1995-10-08T14:30:00",
+      "birthPlace": "上海",
+      "asOf": "2026-08-23",
+      "status": "married",
+      "expectedPrimary": "response",
+      "expectedSecondary": "stability",
+      "expectedRisk": "boundaries",
+      "requiredEvidenceKeys": [
+        "annual.branch.harmony.time.connection",
+        "annual.branch.punishment.dayun.boundaries"
+      ],
+      "requiredText": ["共同生活", "夫妻"],
+      "forbiddenText": ["正缘", "第三者", "不忠", "一定分手", "卡点"]
+    }
+  ],
+  "syntheticEdges": [
+    {
+      "id": "focus-tie-with-disruptive-risk",
+      "support": [[4, 4, 1, 0, 1], [4, 4, 1, 0, 1], [4, 4, 1, 0, 1]],
+      "limitations": [[0, 0, 0, 2, 2], [0, 0, 0, 2, 2], [0, 0, 0, 2, 2]],
+      "expectedPrimary": "connection",
+      "expectedSecondary": "response",
+      "expectedTied": true,
+      "expectedRisk": "boundaries"
+    },
+    {
+      "id": "no-negative-evidence",
+      "support": [[3, 2, 1, 0, 1], [3, 2, 1, 0, 1], [3, 2, 1, 0, 1]],
+      "limitations": [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]],
+      "expectedPrimary": "connection",
+      "expectedSecondary": "response",
+      "expectedTied": false,
+      "expectedRisk": null
+    }
+  ]
+}
