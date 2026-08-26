@@ -1,7 +1,12 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { getReport, type LegacySavedReport, type WealthV2SavedReport } from '@/services/reportApi'
+import {
+  getReport,
+  type LegacySavedReport,
+  type RelationshipV1SavedReport,
+  type WealthV2SavedReport,
+} from '@/services/reportApi'
 import { ReportReaderPage } from './ReportReaderPage'
 
 vi.mock('@/services/reportApi', async (importOriginal) => ({
@@ -117,6 +122,52 @@ const wealthV2Report: WealthV2SavedReport = {
   },
 }
 
+const relationshipReport: RelationshipV1SavedReport = {
+  id: 38,
+  subject: '林先生',
+  topic: 'relationship',
+  edition: 'plain',
+  status: 'ready',
+  contentVersion: 'relationship-narrative-v1',
+  createdAt: '2026-08-27T08:00:00',
+  generatedAt: '2026-08-27T08:00:00',
+  content: {
+    relationshipStatus: 'dating',
+    relationshipStatusLabel: '已确认交往关系',
+    horizonYears: 3,
+    thesis: '先看两个人能不能稳定回应，再决定是否继续走下去。',
+    summary: '主要看关系连接，其次看回应与表达。',
+    primaryDimensionCode: 'connection',
+    secondaryDimensionCode: 'response',
+    focusTied: false,
+    mainRisk: null,
+    dimensions: ['关系连接', '回应与表达', '日常配合', '矛盾与边界', '长期稳定'].map((label, index) => ({
+      code: ['connection', 'response', 'daily_cooperation', 'boundaries', 'stability'][index],
+      label,
+      status: index < 2 ? '主要内容' : '不是主要内容',
+      tone: 'supportive',
+      judgment: `${label}有具体依据。`,
+      supportingEvidenceKeys: [`relationship.${index}`],
+      limitingEvidenceKeys: [],
+    })),
+    years: [{
+      year: 2026,
+      ganZhi: '丙午',
+      focus: '第一年先看两个人能否稳定回应。',
+      judgment: '今年两个人更容易把想法说清楚。',
+      mainLimit: null,
+      realitySignals: ['你愿意说出真实想法。', '对方愿意认真回答你。'],
+      actions: ['你先说清自己的需要。', '两个人约定下一步安排。'],
+      transition: '下一年继续看两个人能否落实安排。',
+      primaryDimensionCode: 'connection',
+      secondaryDimensionCode: 'response',
+      riskDimensionCode: null,
+      evidenceKeys: ['relationship.0'],
+    }],
+    evidenceKeys: ['relationship.0'],
+  },
+}
+
 function renderReader() {
   return render(
     <MemoryRouter initialEntries={['/reports/18']}>
@@ -228,5 +279,14 @@ describe('ReportReaderPage', () => {
     })
     renderReader()
     expect((await screen.findAllByText('两年总断')).length).toBeGreaterThan(0)
+  })
+
+  it('感情v1进入独立阅读页而不是旧事业结构', async () => {
+    vi.mocked(getReport).mockResolvedValue(relationshipReport)
+    renderReader()
+
+    expect(await screen.findByText('感情命书 · 通俗版')).toBeInTheDocument()
+    expect(screen.getByText('五个方面逐项看')).toBeInTheDocument()
+    expect(screen.queryByText('两年总断')).not.toBeInTheDocument()
   })
 })

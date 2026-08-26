@@ -2,8 +2,14 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { CareerReportReader } from '@/components/report/CareerReportReader'
 import { WealthReportReader } from '@/components/report/WealthReportReader'
+import { RelationshipReportReader } from '@/components/report/RelationshipReportReader'
 import { TopBar } from '@/components/TopBar'
-import { getReport, isWealthV2Report, type SavedReport } from '@/services/reportApi'
+import {
+  getReport,
+  isRelationshipV1Report,
+  isWealthV2Report,
+  type SavedReport,
+} from '@/services/reportApi'
 
 export function ReportReaderPage() {
   const { id } = useParams()
@@ -29,6 +35,8 @@ export function ReportReaderPage() {
         </main>
       ) : !report ? (
         <main className="report-reader__state">正在展开命书…</main>
+      ) : isRelationshipV1Report(report) ? (
+        <RelationshipReportReader report={report} />
       ) : isWealthV2Report(report) ? (
         <WealthReportReader report={report} />
       ) : (

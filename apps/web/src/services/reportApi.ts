@@ -102,6 +102,53 @@ export interface WealthNarrativePlan {
   route: string[]
 }
 
+export interface RelationshipDimensionSummary {
+  code: string
+  label: string
+  status: string
+  tone: string
+  judgment: string
+  supportingEvidenceKeys: string[]
+  limitingEvidenceKeys: string[]
+}
+
+export interface RelationshipRiskSummary {
+  dimensionCode: string
+  label: string
+  judgment: string
+  evidenceKeys: string[]
+}
+
+export interface RelationshipYearNarrative {
+  year: number
+  ganZhi: string
+  focus: string
+  judgment: string
+  mainLimit: string | null
+  realitySignals: string[]
+  actions: string[]
+  transition: string
+  primaryDimensionCode: string
+  secondaryDimensionCode: string
+  riskDimensionCode: string | null
+  evidenceKeys: string[]
+}
+
+export interface RelationshipNarrativePlan {
+  relationshipStatus: RelationshipStatus
+  relationshipStatusLabel: string
+  horizonYears: number
+  thesis: string
+  summary: string
+  dimensions: RelationshipDimensionSummary[]
+  primaryDimensionCode: string
+  secondaryDimensionCode: string
+  focusTied: boolean
+  mainRisk: RelationshipRiskSummary | null
+  years: RelationshipYearNarrative[]
+  evidenceKeys: string[]
+}
+
 interface SavedReportBase {
   id: number
   subject: string
@@ -128,10 +175,21 @@ export interface WealthV2SavedReport extends SavedReportBase {
   content: WealthNarrativePlan
 }
 
-export type SavedReport = LegacySavedReport | WealthV2SavedReport
+export interface RelationshipV1SavedReport extends SavedReportBase {
+  topic: 'relationship'
+  edition: 'plain'
+  contentVersion: 'relationship-narrative-v1'
+  content: RelationshipNarrativePlan
+}
+
+export type SavedReport = LegacySavedReport | WealthV2SavedReport | RelationshipV1SavedReport
 
 export function isWealthV2Report(report: SavedReport): report is WealthV2SavedReport {
   return report.contentVersion === 'wealth-narrative-v2'
+}
+
+export function isRelationshipV1Report(report: SavedReport): report is RelationshipV1SavedReport {
+  return report.contentVersion === 'relationship-narrative-v1'
 }
 
 export async function createReport(

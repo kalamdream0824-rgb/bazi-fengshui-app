@@ -51,6 +51,30 @@ describe('ReportLibraryPage', () => {
       createdAt: '2026-08-24T08:00:00',
       generatedAt: '2026-08-24T08:00:00',
     },
+    {
+      id: 38,
+      subject: '林先生',
+      topic: 'relationship',
+      edition: 'plain',
+      status: 'ready',
+      contentVersion: 'relationship-narrative-v1',
+      content: {
+        relationshipStatus: 'dating',
+        relationshipStatusLabel: '已确认交往关系',
+        horizonYears: 3,
+        thesis: '先看两个人能不能稳定回应，再决定是否继续走下去。',
+        summary: '主要看关系连接。',
+        dimensions: [],
+        primaryDimensionCode: 'connection',
+        secondaryDimensionCode: 'response',
+        focusTied: false,
+        mainRisk: null,
+        years: [],
+        evidenceKeys: [],
+      },
+      createdAt: '2026-08-27T08:00:00',
+      generatedAt: '2026-08-27T08:00:00',
+    },
   ] satisfies SavedReport[]))
 
   it('把已经生成的命书作为可重复打开的报告展示', async () => {
@@ -62,6 +86,10 @@ describe('ReportLibraryPage', () => {
     expect(screen.getByRole('link', { name: /林先生.*财富运势.*通俗版.*先找到真正带来钱/ })).toHaveAttribute(
       'href',
       '/reports/20',
+    )
+    expect(screen.getByRole('link', { name: /林先生.*感情运势.*通俗版.*先看两个人/ })).toHaveAttribute(
+      'href',
+      '/reports/38',
     )
   })
 })
