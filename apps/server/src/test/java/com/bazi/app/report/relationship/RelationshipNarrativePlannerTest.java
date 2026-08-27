@@ -115,14 +115,15 @@ class RelationshipNarrativePlannerTest {
   }
 
   @Test
-  void usesDifferentRoleActionsWhenTheSameDimensionRepeats() {
+  void keepsAdviceStableWhenOnlyTheCalendarPositionChanges() {
     RelationshipNarrativePlan plan = new RelationshipNarrativePlanner().plan(
         repeatedFocusEvaluation(), RelationshipStatus.DATING);
 
     List<String> primaryActions = plan.years().stream()
         .map(year -> year.actions().get(0))
         .toList();
-    assertEquals(3, primaryActions.stream().distinct().count());
+    // A new year alone must not invent a new relationship stage or a different recommendation.
+    assertEquals(1, primaryActions.stream().distinct().count());
   }
 
   private CalculationSignature calculation(RelationshipNarrativePlan plan) {

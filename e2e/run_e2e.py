@@ -4,21 +4,25 @@
 运行：python3 e2e/run_e2e.py
 """
 
+import os
 import re
 import sys
 import uuid
 
 from playwright.sync_api import sync_playwright
 
-BASE = "http://localhost:5173"
+BASE = os.environ.get("E2E_BASE_URL", "http://localhost:5173").rstrip("/")
 USER = f"e2e_{uuid.uuid4().hex[:10]}"
 PASSWORD = "pass123"
 
 
 def main() -> int:
     failures: list[str] = []
+    total = 0
 
     def check(name: str, cond: bool) -> None:
+        nonlocal total
+        total += 1
         print(("PASS: " if cond else "FAIL: ") + name)
         if not cond:
             failures.append(name)
@@ -46,10 +50,12 @@ def main() -> int:
 
         # 3. 感情命书：三种状态都能生成、保存并重新打开
         relationship_statuses = [
-            ("单身或尚未确定关系", "值得继续了解"),
+            ("单身或尚未确定关系", "今年有没有认识人的机会？"),
             ("已确认交往关系", "继续走下去"),
             ("已婚或长期共同生活", "共同生活"),
         ]
+        single_url = ""
+        single_snapshot = ""
         for status_label, required_text in relationship_statuses:
             page.goto(f"{BASE}/report", wait_until="networkidle")
             page.get_by_role("radio", name=re.compile("感情运势")).click()
@@ -61,7 +67,26 @@ def main() -> int:
             page.wait_for_selector(".relationship-reader", timeout=20000)
             reader = page.inner_text("body")
             check(f"{status_label}-生成并打开", status_label in reader and required_text in reader)
+            if status_label == "单身或尚未确定关系":
+                single_url = page.url
+                single_snapshot = page.locator(".relationship-single-reader").inner_text()
+                check("单身-今年详细明年参考", "2026 年重点｜2027 年简短参考" in reader
+                      and "2028" not in reader and "三年总断" not in reader)
+                check("单身-不重复五维卡片与年度全章", "五个方面逐项看" not in reader
+                      and page.locator(".relationship-single-section").count() == 3)
+                check("单身-两种接触情况不增加问卷", "如果你目前没有正在了解的人" in reader
+                      and "如果已经有聊得来的人" in reader)
+                check("单身-明年单独摘要", page.locator(".relationship-single-reader__outlook").count() == 1)
+                page.reload(wait_until="networkidle")
+                page.wait_for_selector(".relationship-single-reader")
+                check("单身-刷新按快照保留正文", page.locator(".relationship-single-reader").inner_text() == single_snapshot)
+                continue
             check(f"{status_label}-三年内容", all(year in reader for year in ("2026", "2027", "2028")))
+            judgments = page.locator(".relationship-year__judgment p").all_text_contents()
+            # This fixture has the same primary/tone in years 2–3 but different annual evidence.
+            check(f"{status_label}-相同重点解释年度差异", len(judgments) == 3 and judgments[1] != judgments[2])
+            check(f"{status_label}-逐年说明与上年比较", len(judgments) == 3 and all("上一年" in text for text in judgments[1:]))
+            check(f"{status_label}-观察提示与最后一年边界", reader.count("现实中可以留意") == 3 and reader.count("阅读提醒：") == 1)
 
         page.goto(f"{BASE}/reports", wait_until="networkidle")
         library = page.inner_text("body")
@@ -72,6 +97,11 @@ def main() -> int:
         page.wait_for_selector(".relationship-reader", timeout=20000)
         check("书架重新打开感情命书", "感情命书 · 通俗版" in page.inner_text("body"))
 
+        page.goto(f"{BASE}/reports", wait_until="networkidle")
+        page.locator(f'a[href="{single_url.removeprefix(BASE)}"]').click()
+        page.wait_for_selector(".relationship-single-reader")
+        check("书架重新打开单身新版", page.locator(".relationship-single-reader").inner_text() == single_snapshot)
+
         page.set_viewport_size({"width": 430, "height": 932})
         page.wait_for_timeout(200)
         no_overflow = page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
@@ -81,10 +111,12 @@ def main() -> int:
         )
         check("感情命书430px无横向溢出", no_overflow)
         check("感情命书纸张与背景对齐", paper_aligned)
-        page.screenshot(path="/tmp/relationship-reader-430.png", full_page=True)
+        page.screenshot(path="/tmp/relationship-single-reader-430.png", full_page=True)
+        page.set_viewport_size({"width": 360, "height": 800})
+        check("单身命书360px无横向溢出", page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth"))
         page.set_viewport_size({"width": 1280, "height": 900})
         page.wait_for_timeout(200)
-        page.screenshot(path="/tmp/relationship-reader-desktop.png", full_page=True)
+        page.screenshot(path="/tmp/relationship-single-reader-desktop.png", full_page=True)
 
         # 4. 会员购买（模拟支付）
         page.goto(f"{BASE}/membership", wait_until="networkidle")
@@ -133,7 +165,6 @@ def main() -> int:
 
         browser.close()
 
-    total = 21
     passed = total - len(failures)
     print(f"\n结果: {passed}/{total} 通过" + (f"，失败: {failures}" if failures else ""))
     return 1 if failures else 0

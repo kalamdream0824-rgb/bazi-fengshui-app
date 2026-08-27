@@ -25,6 +25,8 @@ class ReportContentCompatibilityTest {
     assertEquals("dating", restored.relationshipStatus());
     assertEquals(5, restored.dimensions().size());
     assertEquals(3, restored.years().size());
+    // Legacy snapshots intentionally contain repeated judgments: reads must never rewrite them.
+    assertEquals(original, restored);
   }
 
   @Test

@@ -11,11 +11,19 @@ import com.bazi.app.domain.BaziReport;
 import com.bazi.app.domain.User;
 import com.bazi.app.mapper.BaziReportMapper;
 import com.bazi.app.mapper.UserMapper;
+import com.bazi.app.dto.PaipanRequest;
+import com.bazi.app.report.AnnualContextFactory;
+import com.bazi.app.report.ReportHorizon;
+import com.bazi.app.report.relationship.*;
+import com.bazi.app.service.BaziService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.LocalDateTime;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -205,11 +213,11 @@ class SavedReportIntegrationTest {
   }
 
   @Test
-  void createsReadsAndKeepsCalculationStableAcrossRelationshipStatuses() throws Exception {
+  void createsReadsAndKeepsCalculationStableAcrossPartneredRelationshipStatuses() throws Exception {
     String token = register("saved-relationship-statuses");
     List<JsonNode> reports = new ArrayList<>();
 
-    for (String statusCode : List.of("single", "dating", "married")) {
+    for (String statusCode : List.of("dating", "married")) {
       MvcResult created = mvc.perform(post("/api/v1/reports")
               .header("Authorization", "Bearer " + token)
               .contentType(MediaType.APPLICATION_JSON)
@@ -239,10 +247,79 @@ class SavedReportIntegrationTest {
 
     JsonNode baseline = relationshipCalculation(reports.get(0).get("content"));
     assertEquals(baseline, relationshipCalculation(reports.get(1).get("content")));
-    assertEquals(baseline, relationshipCalculation(reports.get(2).get("content")));
-    assertEquals(3, reports.stream().map(item -> item.at("/content/thesis").asText()).distinct().count());
-    assertEquals(3, reports.stream()
+    assertEquals(2, reports.stream().map(item -> item.at("/content/thesis").asText()).distinct().count());
+    assertEquals(2, reports.stream()
         .map(item -> item.at("/content/years/0/judgment").asText()).distinct().count());
+  }
+
+  @Test
+  void singleReportStoresCurrentYearReadingAndBriefNextYearAsANewSnapshot() throws Exception {
+    String token = register("single-current-year-owner");
+    MvcResult created = mvc.perform(post("/api/v1/reports")
+            .header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(relationshipPayload("plain", "single")))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.contentVersion").value("relationship-single-v1"))
+        .andExpect(jsonPath("$.content.relationshipStatus").value("single"))
+        .andExpect(jsonPath("$.content.horizonYears").value(2))
+        .andExpect(jsonPath("$.content.currentYear").value(2026))
+        .andExpect(jsonPath("$.content.outlookYear").value(2027))
+        .andExpect(jsonPath("$.content.sections.length()").value(3))
+        .andExpect(jsonPath("$.content.sections[0].title").value("今年有没有认识人的机会？"))
+        .andExpect(jsonPath("$.content.evaluations.length()").value(2))
+        .andExpect(jsonPath("$.content.years").doesNotExist())
+        .andReturn();
+    JsonNode snapshot = objectMapper.readTree(created.getResponse().getContentAsString());
+    MvcResult read = mvc.perform(get("/api/v1/reports/{id}", snapshot.get("id").asLong())
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk()).andReturn();
+    assertEquals(snapshot, objectMapper.readTree(read.getResponse().getContentAsString()));
+    mvc.perform(get("/api/v1/reports").header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].contentVersion").value("relationship-single-v1"));
+  }
+
+  @Test
+  void oldSingleSnapshotRemainsThreeYearsAndDoesNotChangeWhenNewReportIsGenerated() throws Exception {
+    String username = "single-legacy-snapshot";
+    String token = register(username);
+    User user = userMapper.selectOne(new QueryWrapper<User>().eq("username", username));
+    var request = new PaipanRequest("旧命主", "male", "1995-10-08T14:30:00", "上海", false);
+    var chart = new BaziService().paipan(request);
+    var clock = Clock.fixed(Instant.parse("2026-08-27T00:00:00Z"), ZoneId.of("Asia/Shanghai"));
+    var legacy = new RelationshipNarrativePlanner().plan(new RelationshipPeriodArbitrator().arbitrate(
+        new RelationshipDimensionEvaluator().evaluate(new RelationshipFactExtractor().extract(request, chart,
+            new AnnualContextFactory(clock).create(request, chart, ReportHorizon.RELATIONSHIP_PRODUCT)))),
+        RelationshipStatus.SINGLE);
+    BaziReport old = new BaziReport();
+    old.setUserId(user.getId());
+    old.setSubject("旧命主");
+    old.setTopic("relationship");
+    old.setEdition("plain");
+    old.setStatus("ready");
+    old.setContentVersion("relationship-narrative-v1");
+    old.setRequestJson("{}");
+    old.setContextJson("{\"status\":\"single\"}");
+    old.setContentJson(objectMapper.writeValueAsString(legacy));
+    old.setCreatedAt(LocalDateTime.now());
+    old.setGeneratedAt(LocalDateTime.now());
+    reportMapper.insert(old);
+
+    mvc.perform(post("/api/v1/reports").header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON).content(relationshipPayload("plain", "single")))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.contentVersion").value("relationship-single-v1"));
+    MvcResult stored = mvc.perform(get("/api/v1/reports/{id}", old.getId())
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.contentVersion").value("relationship-narrative-v1"))
+        .andExpect(jsonPath("$.content.years.length()").value(3))
+        .andReturn();
+    assertEquals(objectMapper.readTree(old.getContentJson()),
+        objectMapper.readTree(stored.getResponse().getContentAsString()).get("content"));
+    mvc.perform(get("/api/v1/reports").header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(2));
   }
 
   @Test

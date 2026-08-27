@@ -96,6 +96,34 @@ export const relationshipReport: RelationshipV1SavedReport = {
 }
 
 describe('RelationshipReportReader', () => {
+  it('把年度信号作为观察提示，最后一年不暗示还有下一年预测', () => {
+    render(<MemoryRouter><RelationshipReportReader report={relationshipReport} /></MemoryRouter>)
+    expect(screen.getAllByRole('heading', { name: '现实中可以留意' })).toHaveLength(3)
+    expect(screen.getAllByText('下一年怎么看：')).toHaveLength(2)
+    expect(screen.getByText('阅读提醒：')).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: '你可能会遇到' })).not.toBeInTheDocument()
+  })
+
+  it('技术上的五年内容不会被写成三年', () => {
+    const fiveYears = {
+      ...relationshipReport,
+      content: {
+        ...relationshipReport.content,
+        horizonYears: 5,
+        years: [
+          ...relationshipReport.content.years,
+          { ...relationshipReport.content.years[2], year: 2029 },
+          { ...relationshipReport.content.years[2], year: 2030 },
+        ],
+      },
+    }
+    render(<MemoryRouter><RelationshipReportReader report={fiveYears} /></MemoryRouter>)
+    expect(screen.getByText(/未来五年/)).toBeInTheDocument()
+    expect(screen.getByText('五年总断')).toBeInTheDocument()
+    expect(screen.getByText('第五年')).toBeInTheDocument()
+    expect(screen.getAllByText('下一年怎么看：')).toHaveLength(4)
+  })
+
   it('展示状态、三年总断、五个维度和三年行动', () => {
     render(<MemoryRouter><RelationshipReportReader report={relationshipReport} /></MemoryRouter>)
 

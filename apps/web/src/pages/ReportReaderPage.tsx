@@ -3,10 +3,12 @@ import { Link, useParams } from 'react-router-dom'
 import { CareerReportReader } from '@/components/report/CareerReportReader'
 import { WealthReportReader } from '@/components/report/WealthReportReader'
 import { RelationshipReportReader } from '@/components/report/RelationshipReportReader'
+import { RelationshipSingleReportReader } from '@/components/report/RelationshipSingleReportReader'
 import { TopBar } from '@/components/TopBar'
 import {
   getReport,
   isRelationshipV1Report,
+  isRelationshipSingleReport,
   isWealthV2Report,
   type SavedReport,
 } from '@/services/reportApi'
@@ -35,6 +37,8 @@ export function ReportReaderPage() {
         </main>
       ) : !report ? (
         <main className="report-reader__state">正在展开命书…</main>
+      ) : isRelationshipSingleReport(report) ? (
+        <RelationshipSingleReportReader report={report} />
       ) : isRelationshipV1Report(report) ? (
         <RelationshipReportReader report={report} />
       ) : isWealthV2Report(report) ? (

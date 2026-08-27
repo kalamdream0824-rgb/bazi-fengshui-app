@@ -24,6 +24,8 @@ import com.bazi.app.report.relationship.RelationshipNarrativePlan;
 import com.bazi.app.report.relationship.RelationshipNarrativePlanner;
 import com.bazi.app.report.relationship.RelationshipPeriodArbitrator;
 import com.bazi.app.report.relationship.RelationshipStatus;
+import com.bazi.app.report.relationship.RelationshipSingleNarrativePlan;
+import com.bazi.app.report.relationship.RelationshipSingleNarrativePlanner;
 import com.bazi.app.report.wealth.WealthFactExtractor;
 import com.bazi.app.report.wealth.WealthNarrativePlan;
 import com.bazi.app.report.wealth.WealthNarrativePlanner;
@@ -44,6 +46,7 @@ public class ReportService {
   public static final String CAREER_CONTENT_VERSION = "career-narrative-v3";
   public static final String WEALTH_CONTENT_VERSION = "wealth-narrative-v2";
   public static final String RELATIONSHIP_CONTENT_VERSION = "relationship-narrative-v1";
+  public static final String RELATIONSHIP_SINGLE_CONTENT_VERSION = "relationship-single-v1";
 
   private final BaziService baziService;
   private final BaziReportMapper mapper;
@@ -123,18 +126,24 @@ public class ReportService {
           "source", "system",
           "horizonYears", ReportHorizon.WEALTH_PRODUCT.years());
     } else {
-      RelationshipNarrativePlan relationshipContent = relationshipPlanner.plan(
-          relationshipPeriodArbitrator.arbitrate(
+      boolean single = relationshipStatus == RelationshipStatus.SINGLE;
+      var period = relationshipPeriodArbitrator.arbitrate(
               relationshipDimensionEvaluator.evaluate(
                   relationshipFactExtractor.extract(
                       request.request(),
                       chart,
                       new AnnualContextFactory(clock).create(
-                          request.request(), chart, ReportHorizon.RELATIONSHIP_PRODUCT)))),
-          relationshipStatus);
-      validateRelationshipContent(relationshipContent);
-      content = relationshipContent;
-      contentVersion = RELATIONSHIP_CONTENT_VERSION;
+                          request.request(), chart, single
+                              ? ReportHorizon.RELATIONSHIP_SINGLE_PRODUCT : ReportHorizon.RELATIONSHIP_PRODUCT))));
+      if (single) {
+        content = new RelationshipSingleNarrativePlanner().plan(period);
+        contentVersion = RELATIONSHIP_SINGLE_CONTENT_VERSION;
+      } else {
+        RelationshipNarrativePlan relationshipContent = relationshipPlanner.plan(period, relationshipStatus);
+        validateRelationshipContent(relationshipContent);
+        content = relationshipContent;
+        contentVersion = RELATIONSHIP_CONTENT_VERSION;
+      }
       contextRequest = request.relationshipContext();
     }
     LocalDateTime now = LocalDateTime.now();
@@ -175,6 +184,8 @@ public class ReportService {
     ReportContent content;
     if (WEALTH_CONTENT_VERSION.equals(report.getContentVersion())) {
       content = objectMapper.readValue(report.getContentJson(), WealthNarrativePlan.class);
+    } else if (RELATIONSHIP_SINGLE_CONTENT_VERSION.equals(report.getContentVersion())) {
+      content = objectMapper.readValue(report.getContentJson(), RelationshipSingleNarrativePlan.class);
     } else if (RELATIONSHIP_CONTENT_VERSION.equals(report.getContentVersion())) {
       content = objectMapper.readValue(report.getContentJson(), RelationshipNarrativePlan.class);
     } else {

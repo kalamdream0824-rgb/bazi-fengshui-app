@@ -9,6 +9,8 @@ import java.util.Objects;
 
 public final class RelationshipNarrativePlanner {
 
+  private final RelationshipAnnualNarrator annualNarrator = new RelationshipAnnualNarrator();
+
   public RelationshipNarrativePlan plan(
       RelationshipPeriodEvaluation period,
       RelationshipStatus relationshipStatus) {
@@ -49,7 +51,8 @@ public final class RelationshipNarrativePlanner {
         relationshipStatus.code(),
         relationshipStatus.label(),
         period.years().size(),
-        RelationshipPlainCopy.get(prefix + ".thesis"),
+        RelationshipPlainCopy.format(prefix + ".thesis", Map.of(
+            "horizon", List.of("二", "三", "四", "五").get(period.years().size() - 2) + "年")),
         RelationshipPlainCopy.format(summaryKey, summaryVariables),
         dimensions,
         period.focus().primaryDimension().code(),
@@ -67,39 +70,26 @@ public final class RelationshipNarrativePlanner {
     RelationshipPeriodEvaluation.Year year = period.years().get(index);
     RelationshipDimension primary = year.focus().primaryDimension();
     RelationshipDimension secondary = year.focus().secondaryDimension();
-    RelationshipDimensionEvaluation primaryEvaluation = year.dimensions().get(primary);
     RelationshipRisk risk = year.mainRisk();
-    String role = role(index);
-    String tone = primaryEvaluation.tone().name().toLowerCase(Locale.ROOT);
     LinkedHashSet<String> evidenceKeys = new LinkedHashSet<>();
     evidenceKeys.addAll(year.focus().primaryEvidenceKeys());
     evidenceKeys.addAll(year.focus().secondaryEvidenceKeys());
     if (risk != null) evidenceKeys.addAll(risk.evidenceKeys());
 
-    String transition;
-    if (index < period.transitions().size()) {
-      String direction = period.transitions().get(index).direction()
-          .name().toLowerCase(Locale.ROOT);
-      transition = RelationshipPlainCopy.get(prefix + ".transition." + direction);
-    } else {
-      transition = RelationshipPlainCopy.get(prefix + ".transition.later");
-    }
+    RelationshipPeriodEvaluation.Year previous = index > 0 ? period.years().get(index - 1) : null;
+    RelationshipPeriodEvaluation.Year next = index + 1 < period.years().size()
+        ? period.years().get(index + 1) : null;
 
     return new RelationshipNarrativePlan.YearNarrative(
         year.year(),
         year.ganZhi(),
-        RelationshipPlainCopy.get(prefix + ".year." + role + ".focus"),
-        RelationshipPlainCopy.get(
-            prefix + ".year.judgment." + primary.code() + "." + tone),
+        annualNarrator.focus(prefix, year),
+        annualNarrator.judgment(prefix, previous, year),
         risk == null ? null : RelationshipPlainCopy.get(
             prefix + ".risk." + risk.dimension().code()),
-        List.of(
-            RelationshipPlainCopy.get(prefix + ".signal." + primary.code()),
-            RelationshipPlainCopy.get(prefix + ".year." + role + ".signal")),
-        List.of(
-            RelationshipPlainCopy.get(prefix + ".action." + primary.code() + "." + role),
-            RelationshipPlainCopy.get(prefix + ".year." + role + ".action")),
-        transition,
+        annualNarrator.signals(prefix, year),
+        annualNarrator.actions(prefix, year),
+        annualNarrator.transition(prefix, year, next),
         primary.code(),
         secondary.code(),
         risk == null ? null : risk.dimension().code(),
@@ -158,12 +148,6 @@ public final class RelationshipNarrativePlanner {
       }
     }
     return List.copyOf(keys);
-  }
-
-  private String role(int index) {
-    if (index == 0) return "first";
-    if (index == 1) return "second";
-    return "later";
   }
 
   private record DimensionTotals(

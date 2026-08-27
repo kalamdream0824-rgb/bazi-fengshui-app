@@ -104,7 +104,10 @@ export function ReportPage() {
   const selectedEdition = EDITIONS.find((item) => item.code === edition) ?? EDITIONS[0]
   const isHttpMode = import.meta.env.VITE_API_MODE === 'http'
   const completeCareerContext = completedCareerContext(careerContext)
-  const reportYears = topic === 'career' ? '未来两年' : '未来三年'
+  const reportYears = topic === 'relationship'
+    ? relationshipStatus === 'single' ? '今年重点＋明年参考'
+      : relationshipStatus ? '未来三年' : '请先选择关系状态'
+    : topic === 'career' ? '未来两年' : '未来三年'
   const canGenerate = Boolean(
     token && isHttpMode && request && (
       (topic === 'career' && completeCareerContext)
@@ -266,7 +269,9 @@ export function ReportPage() {
                     <span aria-hidden="true">缘</span>
                     <div>
                       <h3 id="relationship-context-title">选择当前关系状态</h3>
-                      <p>只改变表达角度，不改变命盘计算结果</p>
+                      <p>{relationshipStatus === 'single'
+                        ? '今年详细展开，明年简短参考；年度解读，不是未来十二个月'
+                        : '按关系状态安排阅读重点，同一年度的命盘计算不变'}</p>
                     </div>
                   </header>
                   <div className="relationship-context__choices" role="radiogroup" aria-labelledby="relationship-context-title">

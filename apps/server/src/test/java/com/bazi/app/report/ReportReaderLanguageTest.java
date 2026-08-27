@@ -44,8 +44,16 @@ class ReportReaderLanguageTest {
       }
       for (String line : lines) {
         assertFalse(line.isBlank());
-        assertTrue(line.length() <= 48, line.length() + " chars: " + line);
+        // Annual judgments now contain a focus and up to two comparisons, not one stock sentence.
+        // Keep the original short-sentence gate; do not allow longer sentences to hide verbosity.
+        for (String sentence : line.split("(?<=[。！？])")) {
+          assertTrue(sentence.length() <= 48, sentence.length() + " chars: " + sentence);
+        }
       }
+      plan.years().forEach(year -> {
+        assertTrue(year.judgment().length() <= 120, year.judgment());
+        assertTrue(year.judgment().split("[。！？]").length <= 3, year.judgment());
+      });
       plan.years().stream()
           .flatMap(year -> Stream.concat(
               year.realitySignals().stream(), year.actions().stream()))

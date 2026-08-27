@@ -6,6 +6,7 @@ public record ReportHorizon(int years) {
   public static final int MAX_YEARS = 5;
   public static final ReportHorizon WEALTH_PRODUCT = new ReportHorizon(3);
   public static final ReportHorizon RELATIONSHIP_PRODUCT = new ReportHorizon(3);
+  public static final ReportHorizon RELATIONSHIP_SINGLE_PRODUCT = new ReportHorizon(2);
 
   public ReportHorizon {
     if (years < MIN_YEARS || years > MAX_YEARS) {

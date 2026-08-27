@@ -182,7 +182,37 @@ export interface RelationshipV1SavedReport extends SavedReportBase {
   content: RelationshipNarrativePlan
 }
 
-export type SavedReport = LegacySavedReport | WealthV2SavedReport | RelationshipV1SavedReport
+export interface RelationshipSingleNarrativePlan {
+  relationshipStatus: 'single'
+  horizonYears: 2
+  thesis: string
+  summary: string
+  currentYear: number
+  outlookYear: number
+  sections: Array<{
+    id: string
+    title: string
+    paragraphs: string[]
+    signals: string[]
+    evidenceKeys: string[]
+  }>
+  outlook: string[]
+  readingNote: string
+  evidenceKeys: string[]
+}
+
+export interface RelationshipSingleSavedReport extends SavedReportBase {
+  topic: 'relationship'
+  edition: 'plain'
+  contentVersion: 'relationship-single-v1'
+  content: RelationshipSingleNarrativePlan
+}
+
+export type SavedReport = LegacySavedReport | WealthV2SavedReport | RelationshipV1SavedReport | RelationshipSingleSavedReport
+
+export function isRelationshipSingleReport(report: SavedReport): report is RelationshipSingleSavedReport {
+  return report.contentVersion === 'relationship-single-v1'
+}
 
 export function isWealthV2Report(report: SavedReport): report is WealthV2SavedReport {
   return report.contentVersion === 'wealth-narrative-v2'

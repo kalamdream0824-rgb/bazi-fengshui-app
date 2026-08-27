@@ -177,6 +177,45 @@ function renderReader() {
 }
 
 describe('ReportReaderPage', () => {
+  it('新版单身报告只展开今年问题，明年为摘要，使用保存时的年份', async () => {
+    vi.mocked(getReport).mockResolvedValue({
+      ...relationshipReport,
+      contentVersion: 'relationship-single-v1',
+      content: {
+        relationshipStatus: 'single', horizonYears: 2,
+        thesis: '今年可以主动认识人。', summary: '刚有好感，不必急着确定关系。',
+        currentYear: 2026, outlookYear: 2027,
+        sections: [{ id: 'opportunities', title: '今年有没有认识人的机会？',
+          paragraphs: ['如果目前没有正在了解的人，可以多给新的认识一些时间。'],
+          signals: [], evidenceKeys: ['annual.connection'] }],
+        outlook: ['明年的重点是说清彼此的想法。'],
+        readingNote: '按年度解读，不预测具体月份。',
+        evidenceKeys: ['annual.connection'],
+      },
+    })
+    renderReader()
+    expect(await screen.findByRole('heading', { name: '今年有没有认识人的机会？' })).toBeInTheDocument()
+    expect(screen.getByText('2026 年重点｜2027 年简短参考')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '2027 年 · 简短参考' })).toBeInTheDocument()
+    expect(screen.getByText('明年的重点是说清彼此的想法。')).toBeInTheDocument()
+    expect(screen.queryByText('三年总断')).not.toBeInTheDocument()
+    expect(screen.queryByText('五个方面逐项看')).not.toBeInTheDocument()
+    expect(screen.queryByText('第三年')).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: '查看我的全部命书' })).toHaveAttribute('href', '/reports')
+  })
+
+  it('旧单身三年快照仍完整显示第三年，不因为状态为单身而被裁短', async () => {
+    vi.mocked(getReport).mockResolvedValue({
+      ...relationshipReport,
+      content: { ...relationshipReport.content, relationshipStatus: 'single',
+        relationshipStatusLabel: '单身或尚未确定关系',
+        years: [2026, 2027, 2028].map((year) => ({ ...relationshipReport.content.years[0], year })),
+      },
+    })
+    renderReader()
+    expect(await screen.findByText('三年总断')).toBeInTheDocument()
+    expect(screen.getByText('第三年')).toBeInTheDocument()
+  })
   beforeEach(() => vi.mocked(getReport).mockResolvedValue(report))
 
   it('首屏先给两年总判断，逐年只展示重点、理由和动作', async () => {

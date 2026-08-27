@@ -126,6 +126,20 @@ describe('ReportPage', () => {
     ))
   })
 
+  it('单身显示今年重点和明年参考，切换状态恢复三年，未选状态不承诺周期', () => {
+    renderPage()
+    fireEvent.click(screen.getByRole('radio', { name: /感情运势/ }))
+    expect(screen.getByLabelText('命书封面')).not.toHaveTextContent('未来三年')
+    fireEvent.click(screen.getByRole('radio', { name: '单身或尚未确定关系' }))
+    expect(screen.getByLabelText('命书封面')).toHaveTextContent('今年重点＋明年参考')
+    expect(screen.getByLabelText('已选命书')).toHaveTextContent('今年重点＋明年参考')
+    expect(screen.getByText(/年度解读，不是未来十二个月/)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('radio', { name: '已婚或长期共同生活' }))
+    expect(screen.getByLabelText('命书封面')).toHaveTextContent('未来三年')
+    fireEvent.click(screen.getByRole('radio', { name: '已确认交往关系' }))
+    expect(screen.getByLabelText('命书封面')).toHaveTextContent('未来三年')
+  })
+
   it('离开感情主题后清除上一次选择', () => {
     renderPage()
     fireEvent.click(screen.getByRole('radio', { name: /感情运势/ }))

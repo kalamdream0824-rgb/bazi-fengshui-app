@@ -1,0 +1,72 @@
+.relationship-single-reader__current {
+  min-width: 0;
+}
+
+.relationship-single-section {
+  padding: 22px 0;
+  border-top: 1px solid rgba(177, 143, 88, 0.35);
+}
+
+.relationship-single-section h2,
+.relationship-single-reader__outlook h2 {
+  margin: 0 0 13px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1.5;
+  color: #514536;
+}
+
+.relationship-single-section p,
+.relationship-single-section li,
+.relationship-single-reader__outlook p {
+  margin: 10px 0 0;
+  color: #514536;
+  font-size: 14px;
+  line-height: 1.95;
+  overflow-wrap: anywhere;
+}
+
+.relationship-single-section ul {
+  margin: 15px 0 0;
+  padding-left: 22px;
+}
+
+.relationship-single-section li::marker {
+  color: #a63c32;
+}
+
+.relationship-single-reader__outlook {
+  margin: 12px 0 20px;
+  padding: 18px 20px;
+  border-left: 3px solid #b8904a;
+  background: rgba(184, 144, 74, 0.07);
+}
+
+.relationship-single-reader__outlook > span {
+  display: block;
+  margin-bottom: 7px;
+  color: #8b775d;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+}
+
+.relationship-single-reader__outlook h2 {
+  font-size: 17px;
+}
+
+.relationship-single-reader__note {
+  margin: 18px 0;
+  color: #796b58;
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+.relationship-single-reader .relationship-reader__evidence,
+.relationship-single-reader .report-reader__footer {
+  margin-left: 0;
+}
+
+@media (max-width: 540px) {
+  .relationship-single-section h2 { font-size: 18px; }
+  .relationship-single-reader__outlook { padding: 16px; }
+}

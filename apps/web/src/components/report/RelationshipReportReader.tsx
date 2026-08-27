@@ -6,6 +6,7 @@ import type {
 import './RelationshipReportReader.css'
 
 const ORDINALS = ['第一年', '第二年', '第三年', '第四年', '第五年']
+const HORIZON_LABELS: Record<number, string> = { 2: '二年', 3: '三年', 4: '四年', 5: '五年' }
 
 function dimensionByCode(report: RelationshipV1SavedReport, code: string) {
   return report.content.dimensions.find((dimension) => dimension.code === code)
@@ -30,24 +31,25 @@ function FocusCard({
 export function RelationshipReportReader({ report }: { report: RelationshipV1SavedReport }) {
   const primary = dimensionByCode(report, report.content.primaryDimensionCode)
   const secondary = dimensionByCode(report, report.content.secondaryDimensionCode)
+  const horizon = HORIZON_LABELS[report.content.horizonYears] ?? `${report.content.horizonYears}年`
 
   return (
     <main className="report-reader__paper relationship-reader">
       <header className="report-reader__masthead">
         <div>
           <span>感情命书 · 通俗版</span>
-          <small>{report.subject} · {report.content.relationshipStatusLabel} · 未来三年</small>
+          <small>{report.subject} · {report.content.relationshipStatusLabel} · 未来{horizon}</small>
         </div>
         <i aria-hidden="true">缘</i>
       </header>
 
       <section className="report-reader__thesis relationship-reader__thesis" aria-labelledby="relationship-report-thesis">
-        <span>三年总断</span>
+        <span>{horizon}总断</span>
         <h1 id="relationship-report-thesis">{report.content.thesis}</h1>
         <p>{report.content.summary}</p>
       </section>
 
-      <section className="relationship-reader__focus" aria-label="三年关系重点">
+      <section className="relationship-reader__focus" aria-label={`${horizon}关系重点`}>
         <FocusCard kind="primary" dimension={primary} />
         <FocusCard kind="secondary" dimension={secondary} />
         {report.content.mainRisk && (
@@ -106,7 +108,7 @@ export function RelationshipReportReader({ report }: { report: RelationshipV1Sav
               )}
 
               <section className="relationship-year__signals">
-                <h3>你可能会遇到</h3>
+                <h3>现实中可以留意</h3>
                 <ol>{year.realitySignals.map((signal) => <li key={signal}>{signal}</li>)}</ol>
               </section>
 
@@ -115,7 +117,10 @@ export function RelationshipReportReader({ report }: { report: RelationshipV1Sav
                 <ol>{year.actions.map((action) => <li key={action}>{action}</li>)}</ol>
               </section>
 
-              <p className="report-year__boundary"><b>下一年怎么看：</b>{year.transition}</p>
+              <p className="report-year__boundary">
+                <b>{index + 1 < report.content.years.length ? '下一年怎么看：' : '阅读提醒：'}</b>
+                {year.transition}
+              </p>
             </div>
           </article>
         ))}
