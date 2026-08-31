@@ -1,0 +1,4377 @@
+{
+  "notice": "手工构造的接口样例，不是新引擎输出；no-risk 用于 v3.3 元数据结构，其余样例保留历史契约。",
+  "examples": [
+    {
+      "name": "no-risk",
+      "report": {
+        "id": 1,
+        "subject": "接口构造样例（非用户）",
+        "topic": "wealth",
+        "edition": "plain",
+        "status": "ready",
+        "contentVersion": "wealth-narrative-v3",
+        "content": {
+          "asOf": "2026-08-29",
+          "zoneId": "Asia/Shanghai",
+          "horizonYears": 3,
+          "calculationVersion": "wealth-path-v2",
+          "policyVersion": "wealth-expression-v1",
+          "copyVersion": "wealth-plain-v3.3",
+          "headlinePlannerVersion": "wealth-headline-v1",
+          "thesis": {
+            "id": "no-risk:thesis",
+            "kind": "interpretation",
+            "years": [
+              2026,
+              2027,
+              2028
+            ],
+            "decisionIds": [
+              "2026:stable_income",
+              "2026:skill_income",
+              "2026:project_income",
+              "2026:cooperation_income",
+              "2026:retention",
+              "2027:stable_income",
+              "2027:skill_income",
+              "2027:project_income",
+              "2027:cooperation_income",
+              "2027:retention",
+              "2028:stable_income",
+              "2028:skill_income",
+              "2028:project_income",
+              "2028:cooperation_income",
+              "2028:retention"
+            ],
+            "templateId": "draft.thesis",
+            "text": "契约构造示例：这是假数据构造，不可作为付费样本交付。"
+          },
+          "summary": {
+            "id": "no-risk:summary",
+            "kind": "interpretation",
+            "years": [
+              2026,
+              2027,
+              2028
+            ],
+            "decisionIds": [
+              "2026:stable_income",
+              "2026:skill_income",
+              "2026:project_income",
+              "2026:cooperation_income",
+              "2026:retention",
+              "2027:stable_income",
+              "2027:skill_income",
+              "2027:project_income",
+              "2027:cooperation_income",
+              "2027:retention",
+              "2028:stable_income",
+              "2028:skill_income",
+              "2028:project_income",
+              "2028:cooperation_income",
+              "2028:retention"
+            ],
+            "templateId": "draft.summary",
+            "text": "契约构造示例：这里只检查接口设计与可空分支。"
+          },
+          "pathSummaries": [
+            {
+              "path": "stable_income",
+              "yearDecisionIds": [
+                "2026:stable_income",
+                "2027:stable_income",
+                "2028:stable_income"
+              ],
+              "reading": {
+                "id": "no-risk:path.stable_income",
+                "kind": "interpretation",
+                "years": [
+                  2026,
+                  2027,
+                  2028
+                ],
+                "decisionIds": [
+                  "2026:stable_income",
+                  "2027:stable_income",
+                  "2028:stable_income"
+                ],
+                "templateId": "draft.path.stable_income",
+                "text": "契约构造示例：每个方向保留对应三年的结论引用。"
+              }
+            },
+            {
+              "path": "skill_income",
+              "yearDecisionIds": [
+                "2026:skill_income",
+                "2027:skill_income",
+                "2028:skill_income"
+              ],
+              "reading": {
+                "id": "no-risk:path.skill_income",
+                "kind": "interpretation",
+                "years": [
+                  2026,
+                  2027,
+                  2028
+                ],
+                "decisionIds": [
+                  "2026:skill_income",
+                  "2027:skill_income",
+                  "2028:skill_income"
+                ],
+                "templateId": "draft.path.skill_income",
+                "text": "契约构造示例：每个方向保留对应三年的结论引用。"
+              }
+            },
+            {
+              "path": "project_income",
+              "yearDecisionIds": [
+                "2026:project_income",
+                "2027:project_income",
+                "2028:project_income"
+              ],
+              "reading": {
+                "id": "no-risk:path.project_income",
+                "kind": "interpretation",
+                "years": [
+                  2026,
+                  2027,
+                  2028
+                ],
+                "decisionIds": [
+                  "2026:project_income",
+                  "2027:project_income",
+                  "2028:project_income"
+                ],
+                "templateId": "draft.path.project_income",
+                "text": "契约构造示例：每个方向保留对应三年的结论引用。"
+              }
+            },
+            {
+              "path": "cooperation_income",
+              "yearDecisionIds": [
+                "2026:cooperation_income",
+                "2027:cooperation_income",
+                "2028:cooperation_income"
+              ],
+              "reading": {
+                "id": "no-risk:path.cooperation_income",
+                "kind": "interpretation",
+                "years": [
+                  2026,
+                  2027,
+                  2028
+                ],
+                "decisionIds": [
+                  "2026:cooperation_income",
+                  "2027:cooperation_income",
+                  "2028:cooperation_income"
+                ],
+                "templateId": "draft.path.cooperation_income",
+                "text": "契约构造示例：每个方向保留对应三年的结论引用。"
+              }
+            },
+            {
+              "path": "retention",
+              "yearDecisionIds": [
+                "2026:retention",
+                "2027:retention",
+                "2028:retention"
+              ],
+              "reading": {
+                "id": "no-risk:path.retention",
+                "kind": "interpretation",
+                "years": [
+                  2026,
+                  2027,
+                  2028
+                ],
+                "decisionIds": [
+                  "2026:retention",
+                  "2027:retention",
+                  "2028:retention"
+                ],
+                "templateId": "draft.path.retention",
+                "text": "契约构造示例：每个方向保留对应三年的结论引用。"
+              }
+            }
+          ],
+          "riskSummary": null,
+          "years": [
+            {
+              "year": 2026,
+              "ganZhi": "丙午",
+              "headlineMeta": {
+                "plannerVersion": "wealth-headline-v1",
+                "themeKey": "project_payment_timing",
+                "pathKey": "project_income",
+                "subjectKey": "project_terms",
+                "angleKey": "support",
+                "objectKey": "payment_timing",
+                "corePhraseKeys": [
+                  "project_payment_timing"
+                ],
+                "selectionReasonCodes": [
+                  "annual_root",
+                  "catalog.70"
+                ]
+              },
+              "facts": [
+                {
+                  "id": "2026:fact:natal",
+                  "kind": "natal",
+                  "code": "synthetic.natal",
+                  "value": "合成原局条件"
+                },
+                {
+                  "id": "2026:fact:annual",
+                  "kind": "annual",
+                  "code": "synthetic.annual",
+                  "value": "合成流年条件"
+                },
+                {
+                  "id": "2026:fact:limit",
+                  "kind": "dayun",
+                  "code": "synthetic.limit",
+                  "value": "合成限制条件"
+                }
+              ],
+              "evidence": [
+                {
+                  "id": "2026:stable_income:support0",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2026:fact:annual"
+                  ],
+                  "weight": 5
+                },
+                {
+                  "id": "2026:stable_income:support1",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support1",
+                  "factKey": "synthetic.fact1",
+                  "family": "NATAL_STRUCTURE",
+                  "rootFactIds": [
+                    "2026:fact:natal"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2026:skill_income:support0",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2026:fact:annual"
+                  ],
+                  "weight": 2
+                },
+                {
+                  "id": "2026:skill_income:support1",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support1",
+                  "factKey": "synthetic.fact1",
+                  "family": "NATAL_STRUCTURE",
+                  "rootFactIds": [
+                    "2026:fact:natal"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2026:project_income:support0",
+                  "path": "project_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2026:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2026:cooperation_income:support0",
+                  "path": "cooperation_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2026:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2026:retention:support0",
+                  "path": "retention",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2026:fact:annual"
+                  ],
+                  "weight": 1
+                }
+              ],
+              "decisions": [
+                {
+                  "id": "2026:stable_income",
+                  "year": 2026,
+                  "path": "stable_income",
+                  "supportWeight": 6,
+                  "limitationWeight": 0,
+                  "netWeight": 6,
+                  "stance": "supportive",
+                  "strength": "pronounced",
+                  "supportingEvidenceIds": [
+                    "2026:stable_income:support0",
+                    "2026:stable_income:support1"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": []
+                },
+                {
+                  "id": "2026:skill_income",
+                  "year": 2026,
+                  "path": "skill_income",
+                  "supportWeight": 3,
+                  "limitationWeight": 0,
+                  "netWeight": 3,
+                  "stance": "supportive",
+                  "strength": "supported",
+                  "supportingEvidenceIds": [
+                    "2026:skill_income:support0",
+                    "2026:skill_income:support1"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": []
+                },
+                {
+                  "id": "2026:project_income",
+                  "year": 2026,
+                  "path": "project_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2026:project_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2026:cooperation_income",
+                  "year": 2026,
+                  "path": "cooperation_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2026:cooperation_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2026:retention",
+                  "year": 2026,
+                  "path": "retention",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2026:retention:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                }
+              ],
+              "focus": {
+                "state": "leading",
+                "primaryCandidates": [
+                  "stable_income"
+                ],
+                "secondaryCandidates": [
+                  "skill_income"
+                ]
+              },
+              "overview": {
+                "id": "no-risk:2026.overview",
+                "kind": "interpretation",
+                "years": [
+                  2026
+                ],
+                "decisionIds": [
+                  "2026:stable_income",
+                  "2026:skill_income",
+                  "2026:project_income",
+                  "2026:cooperation_income",
+                  "2026:retention"
+                ],
+                "templateId": "draft.year.overview",
+                "text": "契约构造示例：只验证数据结构，不是引擎新生成的正文。"
+              },
+              "income": [
+                {
+                  "id": "no-risk:2026.income",
+                  "kind": "interpretation",
+                  "years": [
+                    2026
+                  ],
+                  "decisionIds": [
+                    "2026:stable_income",
+                    "2026:skill_income",
+                    "2026:project_income",
+                    "2026:cooperation_income"
+                  ],
+                  "templateId": "draft.year.income",
+                  "text": "契约构造示例：收入方向的实际措辞待任务六审核。"
+                }
+              ],
+              "retention": {
+                "id": "no-risk:2026.retention",
+                "kind": "interpretation",
+                "years": [
+                  2026
+                ],
+                "decisionIds": [
+                  "2026:retention"
+                ],
+                "templateId": "draft.year.retention",
+                "text": "契约构造示例：留钱判断需要绑定同年对应结论。"
+              },
+              "risk": null,
+              "observations": [
+                {
+                  "id": "no-risk:2026.observation",
+                  "kind": "observation",
+                  "years": [
+                    2026
+                  ],
+                  "decisionIds": [
+                    "2026:stable_income"
+                  ],
+                  "templateId": "draft.year.observation",
+                  "text": "契约构造示例：生活观察不是预测已经得到验证。"
+                }
+              ],
+              "actions": [
+                {
+                  "id": "no-risk:2026.advice",
+                  "kind": "general_advice",
+                  "years": [
+                    2026
+                  ],
+                  "decisionIds": [],
+                  "templateId": "draft.year.advice",
+                  "text": "契约构造示例：一般建议要与个性判断分开。"
+                }
+              ],
+              "comparison": {
+                "toYear": 2027,
+                "direction": "unchanged",
+                "changes": [],
+                "reading": {
+                  "id": "no-risk:2026.comparison",
+                  "kind": "interpretation",
+                  "years": [
+                    2026,
+                    2027
+                  ],
+                  "decisionIds": [
+                    "2026:stable_income",
+                    "2027:stable_income"
+                  ],
+                  "templateId": "draft.year.comparison",
+                  "text": "契约构造示例：没有变化就说明延续，不编造下一年剧情。"
+                }
+              }
+            },
+            {
+              "year": 2027,
+              "ganZhi": "丁未",
+              "headlineMeta": {
+                "plannerVersion": "wealth-headline-v1",
+                "themeKey": "stable_receipt_support",
+                "pathKey": "stable_income",
+                "subjectKey": "stable_receipt",
+                "angleKey": "support",
+                "objectKey": "monthly_receipt",
+                "corePhraseKeys": [
+                  "stable_monthly_receipt"
+                ],
+                "selectionReasonCodes": [
+                  "annual_root",
+                  "catalog.10"
+                ]
+              },
+              "facts": [
+                {
+                  "id": "2027:fact:natal",
+                  "kind": "natal",
+                  "code": "synthetic.natal",
+                  "value": "合成原局条件"
+                },
+                {
+                  "id": "2027:fact:annual",
+                  "kind": "annual",
+                  "code": "synthetic.annual",
+                  "value": "合成流年条件"
+                },
+                {
+                  "id": "2027:fact:limit",
+                  "kind": "dayun",
+                  "code": "synthetic.limit",
+                  "value": "合成限制条件"
+                }
+              ],
+              "evidence": [
+                {
+                  "id": "2027:stable_income:support0",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2027:fact:annual"
+                  ],
+                  "weight": 5
+                },
+                {
+                  "id": "2027:stable_income:support1",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support1",
+                  "factKey": "synthetic.fact1",
+                  "family": "NATAL_STRUCTURE",
+                  "rootFactIds": [
+                    "2027:fact:natal"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2027:skill_income:support0",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2027:fact:annual"
+                  ],
+                  "weight": 2
+                },
+                {
+                  "id": "2027:skill_income:support1",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support1",
+                  "factKey": "synthetic.fact1",
+                  "family": "NATAL_STRUCTURE",
+                  "rootFactIds": [
+                    "2027:fact:natal"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2027:project_income:support0",
+                  "path": "project_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2027:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2027:cooperation_income:support0",
+                  "path": "cooperation_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2027:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2027:retention:support0",
+                  "path": "retention",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2027:fact:annual"
+                  ],
+                  "weight": 1
+                }
+              ],
+              "decisions": [
+                {
+                  "id": "2027:stable_income",
+                  "year": 2027,
+                  "path": "stable_income",
+                  "supportWeight": 6,
+                  "limitationWeight": 0,
+                  "netWeight": 6,
+                  "stance": "supportive",
+                  "strength": "pronounced",
+                  "supportingEvidenceIds": [
+                    "2027:stable_income:support0",
+                    "2027:stable_income:support1"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": []
+                },
+                {
+                  "id": "2027:skill_income",
+                  "year": 2027,
+                  "path": "skill_income",
+                  "supportWeight": 3,
+                  "limitationWeight": 0,
+                  "netWeight": 3,
+                  "stance": "supportive",
+                  "strength": "supported",
+                  "supportingEvidenceIds": [
+                    "2027:skill_income:support0",
+                    "2027:skill_income:support1"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": []
+                },
+                {
+                  "id": "2027:project_income",
+                  "year": 2027,
+                  "path": "project_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2027:project_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2027:cooperation_income",
+                  "year": 2027,
+                  "path": "cooperation_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2027:cooperation_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2027:retention",
+                  "year": 2027,
+                  "path": "retention",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2027:retention:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                }
+              ],
+              "focus": {
+                "state": "leading",
+                "primaryCandidates": [
+                  "stable_income"
+                ],
+                "secondaryCandidates": [
+                  "skill_income"
+                ]
+              },
+              "overview": {
+                "id": "no-risk:2027.overview",
+                "kind": "interpretation",
+                "years": [
+                  2027
+                ],
+                "decisionIds": [
+                  "2027:stable_income",
+                  "2027:skill_income",
+                  "2027:project_income",
+                  "2027:cooperation_income",
+                  "2027:retention"
+                ],
+                "templateId": "draft.year.overview",
+                "text": "契约构造示例：只验证数据结构，不是引擎新生成的正文。"
+              },
+              "income": [
+                {
+                  "id": "no-risk:2027.income",
+                  "kind": "interpretation",
+                  "years": [
+                    2027
+                  ],
+                  "decisionIds": [
+                    "2027:stable_income",
+                    "2027:skill_income",
+                    "2027:project_income",
+                    "2027:cooperation_income"
+                  ],
+                  "templateId": "draft.year.income",
+                  "text": "契约构造示例：收入方向的实际措辞待任务六审核。"
+                }
+              ],
+              "retention": {
+                "id": "no-risk:2027.retention",
+                "kind": "interpretation",
+                "years": [
+                  2027
+                ],
+                "decisionIds": [
+                  "2027:retention"
+                ],
+                "templateId": "draft.year.retention",
+                "text": "契约构造示例：留钱判断需要绑定同年对应结论。"
+              },
+              "risk": null,
+              "observations": [
+                {
+                  "id": "no-risk:2027.observation",
+                  "kind": "observation",
+                  "years": [
+                    2027
+                  ],
+                  "decisionIds": [
+                    "2027:stable_income"
+                  ],
+                  "templateId": "draft.year.observation",
+                  "text": "契约构造示例：生活观察不是预测已经得到验证。"
+                }
+              ],
+              "actions": [
+                {
+                  "id": "no-risk:2027.advice",
+                  "kind": "general_advice",
+                  "years": [
+                    2027
+                  ],
+                  "decisionIds": [],
+                  "templateId": "draft.year.advice",
+                  "text": "契约构造示例：一般建议要与个性判断分开。"
+                }
+              ],
+              "comparison": {
+                "toYear": 2028,
+                "direction": "unchanged",
+                "changes": [],
+                "reading": {
+                  "id": "no-risk:2027.comparison",
+                  "kind": "interpretation",
+                  "years": [
+                    2027,
+                    2028
+                  ],
+                  "decisionIds": [
+                    "2027:stable_income",
+                    "2028:stable_income"
+                  ],
+                  "templateId": "draft.year.comparison",
+                  "text": "契约构造示例：没有变化就说明延续，不编造下一年剧情。"
+                }
+              }
+            },
+            {
+              "year": 2028,
+              "ganZhi": "戊申",
+              "headlineMeta": {
+                "plannerVersion": "wealth-headline-v1",
+                "themeKey": "retention_expense_limit",
+                "pathKey": "retention",
+                "subjectKey": "retention_budget",
+                "angleKey": "balance",
+                "objectKey": "expense_limit",
+                "corePhraseKeys": [
+                  "retention_expense_limit"
+                ],
+                "selectionReasonCodes": [
+                  "annual_root",
+                  "catalog.140"
+                ]
+              },
+              "facts": [
+                {
+                  "id": "2028:fact:natal",
+                  "kind": "natal",
+                  "code": "synthetic.natal",
+                  "value": "合成原局条件"
+                },
+                {
+                  "id": "2028:fact:annual",
+                  "kind": "annual",
+                  "code": "synthetic.annual",
+                  "value": "合成流年条件"
+                },
+                {
+                  "id": "2028:fact:limit",
+                  "kind": "dayun",
+                  "code": "synthetic.limit",
+                  "value": "合成限制条件"
+                }
+              ],
+              "evidence": [
+                {
+                  "id": "2028:stable_income:support0",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2028:fact:annual"
+                  ],
+                  "weight": 5
+                },
+                {
+                  "id": "2028:stable_income:support1",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support1",
+                  "factKey": "synthetic.fact1",
+                  "family": "NATAL_STRUCTURE",
+                  "rootFactIds": [
+                    "2028:fact:natal"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2028:skill_income:support0",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2028:fact:annual"
+                  ],
+                  "weight": 2
+                },
+                {
+                  "id": "2028:skill_income:support1",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support1",
+                  "factKey": "synthetic.fact1",
+                  "family": "NATAL_STRUCTURE",
+                  "rootFactIds": [
+                    "2028:fact:natal"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2028:project_income:support0",
+                  "path": "project_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2028:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2028:cooperation_income:support0",
+                  "path": "cooperation_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2028:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2028:retention:support0",
+                  "path": "retention",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2028:fact:annual"
+                  ],
+                  "weight": 1
+                }
+              ],
+              "decisions": [
+                {
+                  "id": "2028:stable_income",
+                  "year": 2028,
+                  "path": "stable_income",
+                  "supportWeight": 6,
+                  "limitationWeight": 0,
+                  "netWeight": 6,
+                  "stance": "supportive",
+                  "strength": "pronounced",
+                  "supportingEvidenceIds": [
+                    "2028:stable_income:support0",
+                    "2028:stable_income:support1"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": []
+                },
+                {
+                  "id": "2028:skill_income",
+                  "year": 2028,
+                  "path": "skill_income",
+                  "supportWeight": 3,
+                  "limitationWeight": 0,
+                  "netWeight": 3,
+                  "stance": "supportive",
+                  "strength": "supported",
+                  "supportingEvidenceIds": [
+                    "2028:skill_income:support0",
+                    "2028:skill_income:support1"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": []
+                },
+                {
+                  "id": "2028:project_income",
+                  "year": 2028,
+                  "path": "project_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2028:project_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2028:cooperation_income",
+                  "year": 2028,
+                  "path": "cooperation_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2028:cooperation_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2028:retention",
+                  "year": 2028,
+                  "path": "retention",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2028:retention:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                }
+              ],
+              "focus": {
+                "state": "leading",
+                "primaryCandidates": [
+                  "stable_income"
+                ],
+                "secondaryCandidates": [
+                  "skill_income"
+                ]
+              },
+              "overview": {
+                "id": "no-risk:2028.overview",
+                "kind": "interpretation",
+                "years": [
+                  2028
+                ],
+                "decisionIds": [
+                  "2028:stable_income",
+                  "2028:skill_income",
+                  "2028:project_income",
+                  "2028:cooperation_income",
+                  "2028:retention"
+                ],
+                "templateId": "draft.year.overview",
+                "text": "契约构造示例：只验证数据结构，不是引擎新生成的正文。"
+              },
+              "income": [
+                {
+                  "id": "no-risk:2028.income",
+                  "kind": "interpretation",
+                  "years": [
+                    2028
+                  ],
+                  "decisionIds": [
+                    "2028:stable_income",
+                    "2028:skill_income",
+                    "2028:project_income",
+                    "2028:cooperation_income"
+                  ],
+                  "templateId": "draft.year.income",
+                  "text": "契约构造示例：收入方向的实际措辞待任务六审核。"
+                }
+              ],
+              "retention": {
+                "id": "no-risk:2028.retention",
+                "kind": "interpretation",
+                "years": [
+                  2028
+                ],
+                "decisionIds": [
+                  "2028:retention"
+                ],
+                "templateId": "draft.year.retention",
+                "text": "契约构造示例：留钱判断需要绑定同年对应结论。"
+              },
+              "risk": null,
+              "observations": [
+                {
+                  "id": "no-risk:2028.observation",
+                  "kind": "observation",
+                  "years": [
+                    2028
+                  ],
+                  "decisionIds": [
+                    "2028:stable_income"
+                  ],
+                  "templateId": "draft.year.observation",
+                  "text": "契约构造示例：生活观察不是预测已经得到验证。"
+                }
+              ],
+              "actions": [
+                {
+                  "id": "no-risk:2028.advice",
+                  "kind": "general_advice",
+                  "years": [
+                    2028
+                  ],
+                  "decisionIds": [],
+                  "templateId": "draft.year.advice",
+                  "text": "契约构造示例：一般建议要与个性判断分开。"
+                }
+              ],
+              "comparison": null
+            }
+          ],
+          "route": [
+            {
+              "id": "no-risk:route",
+              "kind": "general_advice",
+              "years": [
+                2026,
+                2027,
+                2028
+              ],
+              "decisionIds": [],
+              "templateId": "draft.route",
+              "text": "契约构造示例：总结建议不预设先准备再增收的年序。"
+            }
+          ],
+          "readingNote": {
+            "id": "no-risk:note",
+            "kind": "method_note",
+            "years": [
+              2026,
+              2027,
+              2028
+            ],
+            "decisionIds": [],
+            "templateId": "draft.note",
+            "text": "契约构造示例：规则权重不是现实成功概率。"
+          }
+        },
+        "createdAt": "2026-08-29T00:00:00+08:00",
+        "generatedAt": "2026-08-29T00:00:00+08:00"
+      }
+    },
+    {
+      "name": "tied",
+      "report": {
+        "id": 2,
+        "subject": "接口构造样例（非用户）",
+        "topic": "wealth",
+        "edition": "plain",
+        "status": "ready",
+        "contentVersion": "wealth-narrative-v3",
+        "content": {
+          "asOf": "2026-08-29",
+          "zoneId": "Asia/Shanghai",
+          "horizonYears": 3,
+          "calculationVersion": "wealth-path-v2",
+          "policyVersion": "wealth-expression-v1",
+          "copyVersion": "wealth-plain-v3",
+          "thesis": {
+            "id": "tied:thesis",
+            "kind": "interpretation",
+            "years": [
+              2026,
+              2027,
+              2028
+            ],
+            "decisionIds": [
+              "2026:stable_income",
+              "2026:skill_income",
+              "2026:project_income",
+              "2026:cooperation_income",
+              "2026:retention",
+              "2027:stable_income",
+              "2027:skill_income",
+              "2027:project_income",
+              "2027:cooperation_income",
+              "2027:retention",
+              "2028:stable_income",
+              "2028:skill_income",
+              "2028:project_income",
+              "2028:cooperation_income",
+              "2028:retention"
+            ],
+            "templateId": "draft.thesis",
+            "text": "契约构造示例：这是假数据构造，不可作为付费样本交付。"
+          },
+          "summary": {
+            "id": "tied:summary",
+            "kind": "interpretation",
+            "years": [
+              2026,
+              2027,
+              2028
+            ],
+            "decisionIds": [
+              "2026:stable_income",
+              "2026:skill_income",
+              "2026:project_income",
+              "2026:cooperation_income",
+              "2026:retention",
+              "2027:stable_income",
+              "2027:skill_income",
+              "2027:project_income",
+              "2027:cooperation_income",
+              "2027:retention",
+              "2028:stable_income",
+              "2028:skill_income",
+              "2028:project_income",
+              "2028:cooperation_income",
+              "2028:retention"
+            ],
+            "templateId": "draft.summary",
+            "text": "契约构造示例：这里只检查接口设计与可空分支。"
+          },
+          "pathSummaries": [
+            {
+              "path": "stable_income",
+              "yearDecisionIds": [
+                "2026:stable_income",
+                "2027:stable_income",
+                "2028:stable_income"
+              ],
+              "reading": {
+                "id": "tied:path.stable_income",
+                "kind": "interpretation",
+                "years": [
+                  2026,
+                  2027,
+                  2028
+                ],
+                "decisionIds": [
+                  "2026:stable_income",
+                  "2027:stable_income",
+                  "2028:stable_income"
+                ],
+                "templateId": "draft.path.stable_income",
+                "text": "契约构造示例：每个方向保留对应三年的结论引用。"
+              }
+            },
+            {
+              "path": "skill_income",
+              "yearDecisionIds": [
+                "2026:skill_income",
+                "2027:skill_income",
+                "2028:skill_income"
+              ],
+              "reading": {
+                "id": "tied:path.skill_income",
+                "kind": "interpretation",
+                "years": [
+                  2026,
+                  2027,
+                  2028
+                ],
+                "decisionIds": [
+                  "2026:skill_income",
+                  "2027:skill_income",
+                  "2028:skill_income"
+                ],
+                "templateId": "draft.path.skill_income",
+                "text": "契约构造示例：每个方向保留对应三年的结论引用。"
+              }
+            },
+            {
+              "path": "project_income",
+              "yearDecisionIds": [
+                "2026:project_income",
+                "2027:project_income",
+                "2028:project_income"
+              ],
+              "reading": {
+                "id": "tied:path.project_income",
+                "kind": "interpretation",
+                "years": [
+                  2026,
+                  2027,
+                  2028
+                ],
+                "decisionIds": [
+                  "2026:project_income",
+                  "2027:project_income",
+                  "2028:project_income"
+                ],
+                "templateId": "draft.path.project_income",
+                "text": "契约构造示例：每个方向保留对应三年的结论引用。"
+              }
+            },
+            {
+              "path": "cooperation_income",
+              "yearDecisionIds": [
+                "2026:cooperation_income",
+                "2027:cooperation_income",
+                "2028:cooperation_income"
+              ],
+              "reading": {
+                "id": "tied:path.cooperation_income",
+                "kind": "interpretation",
+                "years": [
+                  2026,
+                  2027,
+                  2028
+                ],
+                "decisionIds": [
+                  "2026:cooperation_income",
+                  "2027:cooperation_income",
+                  "2028:cooperation_income"
+                ],
+                "templateId": "draft.path.cooperation_income",
+                "text": "契约构造示例：每个方向保留对应三年的结论引用。"
+              }
+            },
+            {
+              "path": "retention",
+              "yearDecisionIds": [
+                "2026:retention",
+                "2027:retention",
+                "2028:retention"
+              ],
+              "reading": {
+                "id": "tied:path.retention",
+                "kind": "interpretation",
+                "years": [
+                  2026,
+                  2027,
+                  2028
+                ],
+                "decisionIds": [
+                  "2026:retention",
+                  "2027:retention",
+                  "2028:retention"
+                ],
+                "templateId": "draft.path.retention",
+                "text": "契约构造示例：每个方向保留对应三年的结论引用。"
+              }
+            }
+          ],
+          "riskSummary": null,
+          "years": [
+            {
+              "year": 2026,
+              "ganZhi": "丙午",
+              "facts": [
+                {
+                  "id": "2026:fact:natal",
+                  "kind": "natal",
+                  "code": "synthetic.natal",
+                  "value": "合成原局条件"
+                },
+                {
+                  "id": "2026:fact:annual",
+                  "kind": "annual",
+                  "code": "synthetic.annual",
+                  "value": "合成流年条件"
+                },
+                {
+                  "id": "2026:fact:limit",
+                  "kind": "dayun",
+                  "code": "synthetic.limit",
+                  "value": "合成限制条件"
+                }
+              ],
+              "evidence": [
+                {
+                  "id": "2026:stable_income:support0",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2026:fact:annual"
+                  ],
+                  "weight": 5
+                },
+                {
+                  "id": "2026:stable_income:support1",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support1",
+                  "factKey": "synthetic.fact1",
+                  "family": "NATAL_STRUCTURE",
+                  "rootFactIds": [
+                    "2026:fact:natal"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2026:skill_income:support0",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2026:fact:annual"
+                  ],
+                  "weight": 5
+                },
+                {
+                  "id": "2026:skill_income:support1",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support1",
+                  "factKey": "synthetic.fact1",
+                  "family": "NATAL_STRUCTURE",
+                  "rootFactIds": [
+                    "2026:fact:natal"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2026:project_income:support0",
+                  "path": "project_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2026:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2026:cooperation_income:support0",
+                  "path": "cooperation_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2026:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2026:retention:support0",
+                  "path": "retention",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2026:fact:annual"
+                  ],
+                  "weight": 1
+                }
+              ],
+              "decisions": [
+                {
+                  "id": "2026:stable_income",
+                  "year": 2026,
+                  "path": "stable_income",
+                  "supportWeight": 6,
+                  "limitationWeight": 0,
+                  "netWeight": 6,
+                  "stance": "supportive",
+                  "strength": "pronounced",
+                  "supportingEvidenceIds": [
+                    "2026:stable_income:support0",
+                    "2026:stable_income:support1"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": []
+                },
+                {
+                  "id": "2026:skill_income",
+                  "year": 2026,
+                  "path": "skill_income",
+                  "supportWeight": 6,
+                  "limitationWeight": 0,
+                  "netWeight": 6,
+                  "stance": "supportive",
+                  "strength": "pronounced",
+                  "supportingEvidenceIds": [
+                    "2026:skill_income:support0",
+                    "2026:skill_income:support1"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": []
+                },
+                {
+                  "id": "2026:project_income",
+                  "year": 2026,
+                  "path": "project_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2026:project_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2026:cooperation_income",
+                  "year": 2026,
+                  "path": "cooperation_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2026:cooperation_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2026:retention",
+                  "year": 2026,
+                  "path": "retention",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2026:retention:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                }
+              ],
+              "focus": {
+                "state": "tied",
+                "primaryCandidates": [
+                  "stable_income",
+                  "skill_income"
+                ],
+                "secondaryCandidates": []
+              },
+              "overview": {
+                "id": "tied:2026.overview",
+                "kind": "interpretation",
+                "years": [
+                  2026
+                ],
+                "decisionIds": [
+                  "2026:stable_income",
+                  "2026:skill_income",
+                  "2026:project_income",
+                  "2026:cooperation_income",
+                  "2026:retention"
+                ],
+                "templateId": "draft.year.overview",
+                "text": "契约构造示例：只验证数据结构，不是引擎新生成的正文。"
+              },
+              "income": [
+                {
+                  "id": "tied:2026.income",
+                  "kind": "interpretation",
+                  "years": [
+                    2026
+                  ],
+                  "decisionIds": [
+                    "2026:stable_income",
+                    "2026:skill_income",
+                    "2026:project_income",
+                    "2026:cooperation_income"
+                  ],
+                  "templateId": "draft.year.income",
+                  "text": "契约构造示例：收入方向的实际措辞待任务六审核。"
+                }
+              ],
+              "retention": {
+                "id": "tied:2026.retention",
+                "kind": "interpretation",
+                "years": [
+                  2026
+                ],
+                "decisionIds": [
+                  "2026:retention"
+                ],
+                "templateId": "draft.year.retention",
+                "text": "契约构造示例：留钱判断需要绑定同年对应结论。"
+              },
+              "risk": null,
+              "observations": [
+                {
+                  "id": "tied:2026.observation",
+                  "kind": "observation",
+                  "years": [
+                    2026
+                  ],
+                  "decisionIds": [
+                    "2026:stable_income"
+                  ],
+                  "templateId": "draft.year.observation",
+                  "text": "契约构造示例：生活观察不是预测已经得到验证。"
+                }
+              ],
+              "actions": [
+                {
+                  "id": "tied:2026.advice",
+                  "kind": "general_advice",
+                  "years": [
+                    2026
+                  ],
+                  "decisionIds": [],
+                  "templateId": "draft.year.advice",
+                  "text": "契约构造示例：一般建议要与个性判断分开。"
+                }
+              ],
+              "comparison": {
+                "toYear": 2027,
+                "direction": "unchanged",
+                "changes": [],
+                "reading": {
+                  "id": "tied:2026.comparison",
+                  "kind": "interpretation",
+                  "years": [
+                    2026,
+                    2027
+                  ],
+                  "decisionIds": [
+                    "2026:stable_income",
+                    "2027:stable_income"
+                  ],
+                  "templateId": "draft.year.comparison",
+                  "text": "契约构造示例：没有变化就说明延续，不编造下一年剧情。"
+                }
+              }
+            },
+            {
+              "year": 2027,
+              "ganZhi": "丁未",
+              "facts": [
+                {
+                  "id": "2027:fact:natal",
+                  "kind": "natal",
+                  "code": "synthetic.natal",
+                  "value": "合成原局条件"
+                },
+                {
+                  "id": "2027:fact:annual",
+                  "kind": "annual",
+                  "code": "synthetic.annual",
+                  "value": "合成流年条件"
+                },
+                {
+                  "id": "2027:fact:limit",
+                  "kind": "dayun",
+                  "code": "synthetic.limit",
+                  "value": "合成限制条件"
+                }
+              ],
+              "evidence": [
+                {
+                  "id": "2027:stable_income:support0",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2027:fact:annual"
+                  ],
+                  "weight": 5
+                },
+                {
+                  "id": "2027:stable_income:support1",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support1",
+                  "factKey": "synthetic.fact1",
+                  "family": "NATAL_STRUCTURE",
+                  "rootFactIds": [
+                    "2027:fact:natal"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2027:skill_income:support0",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2027:fact:annual"
+                  ],
+                  "weight": 5
+                },
+                {
+                  "id": "2027:skill_income:support1",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support1",
+                  "factKey": "synthetic.fact1",
+                  "family": "NATAL_STRUCTURE",
+                  "rootFactIds": [
+                    "2027:fact:natal"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2027:project_income:support0",
+                  "path": "project_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2027:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2027:cooperation_income:support0",
+                  "path": "cooperation_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2027:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2027:retention:support0",
+                  "path": "retention",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2027:fact:annual"
+                  ],
+                  "weight": 1
+                }
+              ],
+              "decisions": [
+                {
+                  "id": "2027:stable_income",
+                  "year": 2027,
+                  "path": "stable_income",
+                  "supportWeight": 6,
+                  "limitationWeight": 0,
+                  "netWeight": 6,
+                  "stance": "supportive",
+                  "strength": "pronounced",
+                  "supportingEvidenceIds": [
+                    "2027:stable_income:support0",
+                    "2027:stable_income:support1"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": []
+                },
+                {
+                  "id": "2027:skill_income",
+                  "year": 2027,
+                  "path": "skill_income",
+                  "supportWeight": 6,
+                  "limitationWeight": 0,
+                  "netWeight": 6,
+                  "stance": "supportive",
+                  "strength": "pronounced",
+                  "supportingEvidenceIds": [
+                    "2027:skill_income:support0",
+                    "2027:skill_income:support1"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": []
+                },
+                {
+                  "id": "2027:project_income",
+                  "year": 2027,
+                  "path": "project_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2027:project_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2027:cooperation_income",
+                  "year": 2027,
+                  "path": "cooperation_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2027:cooperation_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2027:retention",
+                  "year": 2027,
+                  "path": "retention",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2027:retention:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                }
+              ],
+              "focus": {
+                "state": "tied",
+                "primaryCandidates": [
+                  "stable_income",
+                  "skill_income"
+                ],
+                "secondaryCandidates": []
+              },
+              "overview": {
+                "id": "tied:2027.overview",
+                "kind": "interpretation",
+                "years": [
+                  2027
+                ],
+                "decisionIds": [
+                  "2027:stable_income",
+                  "2027:skill_income",
+                  "2027:project_income",
+                  "2027:cooperation_income",
+                  "2027:retention"
+                ],
+                "templateId": "draft.year.overview",
+                "text": "契约构造示例：只验证数据结构，不是引擎新生成的正文。"
+              },
+              "income": [
+                {
+                  "id": "tied:2027.income",
+                  "kind": "interpretation",
+                  "years": [
+                    2027
+                  ],
+                  "decisionIds": [
+                    "2027:stable_income",
+                    "2027:skill_income",
+                    "2027:project_income",
+                    "2027:cooperation_income"
+                  ],
+                  "templateId": "draft.year.income",
+                  "text": "契约构造示例：收入方向的实际措辞待任务六审核。"
+                }
+              ],
+              "retention": {
+                "id": "tied:2027.retention",
+                "kind": "interpretation",
+                "years": [
+                  2027
+                ],
+                "decisionIds": [
+                  "2027:retention"
+                ],
+                "templateId": "draft.year.retention",
+                "text": "契约构造示例：留钱判断需要绑定同年对应结论。"
+              },
+              "risk": null,
+              "observations": [
+                {
+                  "id": "tied:2027.observation",
+                  "kind": "observation",
+                  "years": [
+                    2027
+                  ],
+                  "decisionIds": [
+                    "2027:stable_income"
+                  ],
+                  "templateId": "draft.year.observation",
+                  "text": "契约构造示例：生活观察不是预测已经得到验证。"
+                }
+              ],
+              "actions": [
+                {
+                  "id": "tied:2027.advice",
+                  "kind": "general_advice",
+                  "years": [
+                    2027
+                  ],
+                  "decisionIds": [],
+                  "templateId": "draft.year.advice",
+                  "text": "契约构造示例：一般建议要与个性判断分开。"
+                }
+              ],
+              "comparison": {
+                "toYear": 2028,
+                "direction": "unchanged",
+                "changes": [],
+                "reading": {
+                  "id": "tied:2027.comparison",
+                  "kind": "interpretation",
+                  "years": [
+                    2027,
+                    2028
+                  ],
+                  "decisionIds": [
+                    "2027:stable_income",
+                    "2028:stable_income"
+                  ],
+                  "templateId": "draft.year.comparison",
+                  "text": "契约构造示例：没有变化就说明延续，不编造下一年剧情。"
+                }
+              }
+            },
+            {
+              "year": 2028,
+              "ganZhi": "戊申",
+              "facts": [
+                {
+                  "id": "2028:fact:natal",
+                  "kind": "natal",
+                  "code": "synthetic.natal",
+                  "value": "合成原局条件"
+                },
+                {
+                  "id": "2028:fact:annual",
+                  "kind": "annual",
+                  "code": "synthetic.annual",
+                  "value": "合成流年条件"
+                },
+                {
+                  "id": "2028:fact:limit",
+                  "kind": "dayun",
+                  "code": "synthetic.limit",
+                  "value": "合成限制条件"
+                }
+              ],
+              "evidence": [
+                {
+                  "id": "2028:stable_income:support0",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2028:fact:annual"
+                  ],
+                  "weight": 5
+                },
+                {
+                  "id": "2028:stable_income:support1",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support1",
+                  "factKey": "synthetic.fact1",
+                  "family": "NATAL_STRUCTURE",
+                  "rootFactIds": [
+                    "2028:fact:natal"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2028:skill_income:support0",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2028:fact:annual"
+                  ],
+                  "weight": 5
+                },
+                {
+                  "id": "2028:skill_income:support1",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support1",
+                  "factKey": "synthetic.fact1",
+                  "family": "NATAL_STRUCTURE",
+                  "rootFactIds": [
+                    "2028:fact:natal"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2028:project_income:support0",
+                  "path": "project_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2028:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2028:cooperation_income:support0",
+                  "path": "cooperation_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2028:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2028:retention:support0",
+                  "path": "retention",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2028:fact:annual"
+                  ],
+                  "weight": 1
+                }
+              ],
+              "decisions": [
+                {
+                  "id": "2028:stable_income",
+                  "year": 2028,
+                  "path": "stable_income",
+                  "supportWeight": 6,
+                  "limitationWeight": 0,
+                  "netWeight": 6,
+                  "stance": "supportive",
+                  "strength": "pronounced",
+                  "supportingEvidenceIds": [
+                    "2028:stable_income:support0",
+                    "2028:stable_income:support1"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": []
+                },
+                {
+                  "id": "2028:skill_income",
+                  "year": 2028,
+                  "path": "skill_income",
+                  "supportWeight": 6,
+                  "limitationWeight": 0,
+                  "netWeight": 6,
+                  "stance": "supportive",
+                  "strength": "pronounced",
+                  "supportingEvidenceIds": [
+                    "2028:skill_income:support0",
+                    "2028:skill_income:support1"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": []
+                },
+                {
+                  "id": "2028:project_income",
+                  "year": 2028,
+                  "path": "project_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2028:project_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2028:cooperation_income",
+                  "year": 2028,
+                  "path": "cooperation_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2028:cooperation_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2028:retention",
+                  "year": 2028,
+                  "path": "retention",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2028:retention:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                }
+              ],
+              "focus": {
+                "state": "tied",
+                "primaryCandidates": [
+                  "stable_income",
+                  "skill_income"
+                ],
+                "secondaryCandidates": []
+              },
+              "overview": {
+                "id": "tied:2028.overview",
+                "kind": "interpretation",
+                "years": [
+                  2028
+                ],
+                "decisionIds": [
+                  "2028:stable_income",
+                  "2028:skill_income",
+                  "2028:project_income",
+                  "2028:cooperation_income",
+                  "2028:retention"
+                ],
+                "templateId": "draft.year.overview",
+                "text": "契约构造示例：只验证数据结构，不是引擎新生成的正文。"
+              },
+              "income": [
+                {
+                  "id": "tied:2028.income",
+                  "kind": "interpretation",
+                  "years": [
+                    2028
+                  ],
+                  "decisionIds": [
+                    "2028:stable_income",
+                    "2028:skill_income",
+                    "2028:project_income",
+                    "2028:cooperation_income"
+                  ],
+                  "templateId": "draft.year.income",
+                  "text": "契约构造示例：收入方向的实际措辞待任务六审核。"
+                }
+              ],
+              "retention": {
+                "id": "tied:2028.retention",
+                "kind": "interpretation",
+                "years": [
+                  2028
+                ],
+                "decisionIds": [
+                  "2028:retention"
+                ],
+                "templateId": "draft.year.retention",
+                "text": "契约构造示例：留钱判断需要绑定同年对应结论。"
+              },
+              "risk": null,
+              "observations": [
+                {
+                  "id": "tied:2028.observation",
+                  "kind": "observation",
+                  "years": [
+                    2028
+                  ],
+                  "decisionIds": [
+                    "2028:stable_income"
+                  ],
+                  "templateId": "draft.year.observation",
+                  "text": "契约构造示例：生活观察不是预测已经得到验证。"
+                }
+              ],
+              "actions": [
+                {
+                  "id": "tied:2028.advice",
+                  "kind": "general_advice",
+                  "years": [
+                    2028
+                  ],
+                  "decisionIds": [],
+                  "templateId": "draft.year.advice",
+                  "text": "契约构造示例：一般建议要与个性判断分开。"
+                }
+              ],
+              "comparison": null
+            }
+          ],
+          "route": [
+            {
+              "id": "tied:route",
+              "kind": "general_advice",
+              "years": [
+                2026,
+                2027,
+                2028
+              ],
+              "decisionIds": [],
+              "templateId": "draft.route",
+              "text": "契约构造示例：总结建议不预设先准备再增收的年序。"
+            }
+          ],
+          "readingNote": {
+            "id": "tied:note",
+            "kind": "method_note",
+            "years": [
+              2026,
+              2027,
+              2028
+            ],
+            "decisionIds": [],
+            "templateId": "draft.note",
+            "text": "契约构造示例：规则权重不是现实成功概率。"
+          }
+        },
+        "createdAt": "2026-08-29T00:00:00+08:00",
+        "generatedAt": "2026-08-29T00:00:00+08:00"
+      }
+    },
+    {
+      "name": "weak",
+      "report": {
+        "id": 3,
+        "subject": "接口构造样例（非用户）",
+        "topic": "wealth",
+        "edition": "plain",
+        "status": "ready",
+        "contentVersion": "wealth-narrative-v3",
+        "content": {
+          "asOf": "2026-08-29",
+          "zoneId": "Asia/Shanghai",
+          "horizonYears": 3,
+          "calculationVersion": "wealth-path-v2",
+          "policyVersion": "wealth-expression-v1",
+          "copyVersion": "wealth-plain-v3",
+          "thesis": {
+            "id": "weak:thesis",
+            "kind": "interpretation",
+            "years": [
+              2026,
+              2027,
+              2028
+            ],
+            "decisionIds": [
+              "2026:stable_income",
+              "2026:skill_income",
+              "2026:project_income",
+              "2026:cooperation_income",
+              "2026:retention",
+              "2027:stable_income",
+              "2027:skill_income",
+              "2027:project_income",
+              "2027:cooperation_income",
+              "2027:retention",
+              "2028:stable_income",
+              "2028:skill_income",
+              "2028:project_income",
+              "2028:cooperation_income",
+              "2028:retention"
+            ],
+            "templateId": "draft.thesis",
+            "text": "契约构造示例：这是假数据构造，不可作为付费样本交付。"
+          },
+          "summary": {
+            "id": "weak:summary",
+            "kind": "interpretation",
+            "years": [
+              2026,
+              2027,
+              2028
+            ],
+            "decisionIds": [
+              "2026:stable_income",
+              "2026:skill_income",
+              "2026:project_income",
+              "2026:cooperation_income",
+              "2026:retention",
+              "2027:stable_income",
+              "2027:skill_income",
+              "2027:project_income",
+              "2027:cooperation_income",
+              "2027:retention",
+              "2028:stable_income",
+              "2028:skill_income",
+              "2028:project_income",
+              "2028:cooperation_income",
+              "2028:retention"
+            ],
+            "templateId": "draft.summary",
+            "text": "契约构造示例：这里只检查接口设计与可空分支。"
+          },
+          "pathSummaries": [
+            {
+              "path": "stable_income",
+              "yearDecisionIds": [
+                "2026:stable_income",
+                "2027:stable_income",
+                "2028:stable_income"
+              ],
+              "reading": {
+                "id": "weak:path.stable_income",
+                "kind": "interpretation",
+                "years": [
+                  2026,
+                  2027,
+                  2028
+                ],
+                "decisionIds": [
+                  "2026:stable_income",
+                  "2027:stable_income",
+                  "2028:stable_income"
+                ],
+                "templateId": "draft.path.stable_income",
+                "text": "契约构造示例：每个方向保留对应三年的结论引用。"
+              }
+            },
+            {
+              "path": "skill_income",
+              "yearDecisionIds": [
+                "2026:skill_income",
+                "2027:skill_income",
+                "2028:skill_income"
+              ],
+              "reading": {
+                "id": "weak:path.skill_income",
+                "kind": "interpretation",
+                "years": [
+                  2026,
+                  2027,
+                  2028
+                ],
+                "decisionIds": [
+                  "2026:skill_income",
+                  "2027:skill_income",
+                  "2028:skill_income"
+                ],
+                "templateId": "draft.path.skill_income",
+                "text": "契约构造示例：每个方向保留对应三年的结论引用。"
+              }
+            },
+            {
+              "path": "project_income",
+              "yearDecisionIds": [
+                "2026:project_income",
+                "2027:project_income",
+                "2028:project_income"
+              ],
+              "reading": {
+                "id": "weak:path.project_income",
+                "kind": "interpretation",
+                "years": [
+                  2026,
+                  2027,
+                  2028
+                ],
+                "decisionIds": [
+                  "2026:project_income",
+                  "2027:project_income",
+                  "2028:project_income"
+                ],
+                "templateId": "draft.path.project_income",
+                "text": "契约构造示例：每个方向保留对应三年的结论引用。"
+              }
+            },
+            {
+              "path": "cooperation_income",
+              "yearDecisionIds": [
+                "2026:cooperation_income",
+                "2027:cooperation_income",
+                "2028:cooperation_income"
+              ],
+              "reading": {
+                "id": "weak:path.cooperation_income",
+                "kind": "interpretation",
+                "years": [
+                  2026,
+                  2027,
+                  2028
+                ],
+                "decisionIds": [
+                  "2026:cooperation_income",
+                  "2027:cooperation_income",
+                  "2028:cooperation_income"
+                ],
+                "templateId": "draft.path.cooperation_income",
+                "text": "契约构造示例：每个方向保留对应三年的结论引用。"
+              }
+            },
+            {
+              "path": "retention",
+              "yearDecisionIds": [
+                "2026:retention",
+                "2027:retention",
+                "2028:retention"
+              ],
+              "reading": {
+                "id": "weak:path.retention",
+                "kind": "interpretation",
+                "years": [
+                  2026,
+                  2027,
+                  2028
+                ],
+                "decisionIds": [
+                  "2026:retention",
+                  "2027:retention",
+                  "2028:retention"
+                ],
+                "templateId": "draft.path.retention",
+                "text": "契约构造示例：每个方向保留对应三年的结论引用。"
+              }
+            }
+          ],
+          "riskSummary": null,
+          "years": [
+            {
+              "year": 2026,
+              "ganZhi": "丙午",
+              "facts": [
+                {
+                  "id": "2026:fact:natal",
+                  "kind": "natal",
+                  "code": "synthetic.natal",
+                  "value": "合成原局条件"
+                },
+                {
+                  "id": "2026:fact:annual",
+                  "kind": "annual",
+                  "code": "synthetic.annual",
+                  "value": "合成流年条件"
+                },
+                {
+                  "id": "2026:fact:limit",
+                  "kind": "dayun",
+                  "code": "synthetic.limit",
+                  "value": "合成限制条件"
+                }
+              ],
+              "evidence": [
+                {
+                  "id": "2026:stable_income:support0",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2026:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2026:skill_income:support0",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2026:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2026:project_income:support0",
+                  "path": "project_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2026:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2026:cooperation_income:support0",
+                  "path": "cooperation_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2026:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2026:retention:support0",
+                  "path": "retention",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2026:fact:annual"
+                  ],
+                  "weight": 1
+                }
+              ],
+              "decisions": [
+                {
+                  "id": "2026:stable_income",
+                  "year": 2026,
+                  "path": "stable_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2026:stable_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2026:skill_income",
+                  "year": 2026,
+                  "path": "skill_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2026:skill_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2026:project_income",
+                  "year": 2026,
+                  "path": "project_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2026:project_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2026:cooperation_income",
+                  "year": 2026,
+                  "path": "cooperation_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2026:cooperation_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2026:retention",
+                  "year": 2026,
+                  "path": "retention",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2026:retention:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                }
+              ],
+              "focus": {
+                "state": "none",
+                "primaryCandidates": [],
+                "secondaryCandidates": []
+              },
+              "overview": {
+                "id": "weak:2026.overview",
+                "kind": "interpretation",
+                "years": [
+                  2026
+                ],
+                "decisionIds": [
+                  "2026:stable_income",
+                  "2026:skill_income",
+                  "2026:project_income",
+                  "2026:cooperation_income",
+                  "2026:retention"
+                ],
+                "templateId": "draft.year.overview",
+                "text": "契约构造示例：只验证数据结构，不是引擎新生成的正文。"
+              },
+              "income": [
+                {
+                  "id": "weak:2026.income",
+                  "kind": "interpretation",
+                  "years": [
+                    2026
+                  ],
+                  "decisionIds": [
+                    "2026:stable_income",
+                    "2026:skill_income",
+                    "2026:project_income",
+                    "2026:cooperation_income"
+                  ],
+                  "templateId": "draft.year.income",
+                  "text": "契约构造示例：收入方向的实际措辞待任务六审核。"
+                }
+              ],
+              "retention": {
+                "id": "weak:2026.retention",
+                "kind": "interpretation",
+                "years": [
+                  2026
+                ],
+                "decisionIds": [
+                  "2026:retention"
+                ],
+                "templateId": "draft.year.retention",
+                "text": "契约构造示例：留钱判断需要绑定同年对应结论。"
+              },
+              "risk": null,
+              "observations": [
+                {
+                  "id": "weak:2026.observation",
+                  "kind": "observation",
+                  "years": [
+                    2026
+                  ],
+                  "decisionIds": [
+                    "2026:stable_income"
+                  ],
+                  "templateId": "draft.year.observation",
+                  "text": "契约构造示例：生活观察不是预测已经得到验证。"
+                }
+              ],
+              "actions": [
+                {
+                  "id": "weak:2026.advice",
+                  "kind": "general_advice",
+                  "years": [
+                    2026
+                  ],
+                  "decisionIds": [],
+                  "templateId": "draft.year.advice",
+                  "text": "契约构造示例：一般建议要与个性判断分开。"
+                }
+              ],
+              "comparison": {
+                "toYear": 2027,
+                "direction": "unchanged",
+                "changes": [],
+                "reading": {
+                  "id": "weak:2026.comparison",
+                  "kind": "interpretation",
+                  "years": [
+                    2026,
+                    2027
+                  ],
+                  "decisionIds": [
+                    "2026:stable_income",
+                    "2027:stable_income"
+                  ],
+                  "templateId": "draft.year.comparison",
+                  "text": "契约构造示例：没有变化就说明延续，不编造下一年剧情。"
+                }
+              }
+            },
+            {
+              "year": 2027,
+              "ganZhi": "丁未",
+              "facts": [
+                {
+                  "id": "2027:fact:natal",
+                  "kind": "natal",
+                  "code": "synthetic.natal",
+                  "value": "合成原局条件"
+                },
+                {
+                  "id": "2027:fact:annual",
+                  "kind": "annual",
+                  "code": "synthetic.annual",
+                  "value": "合成流年条件"
+                },
+                {
+                  "id": "2027:fact:limit",
+                  "kind": "dayun",
+                  "code": "synthetic.limit",
+                  "value": "合成限制条件"
+                }
+              ],
+              "evidence": [
+                {
+                  "id": "2027:stable_income:support0",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2027:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2027:skill_income:support0",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2027:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2027:project_income:support0",
+                  "path": "project_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2027:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2027:cooperation_income:support0",
+                  "path": "cooperation_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2027:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2027:retention:support0",
+                  "path": "retention",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2027:fact:annual"
+                  ],
+                  "weight": 1
+                }
+              ],
+              "decisions": [
+                {
+                  "id": "2027:stable_income",
+                  "year": 2027,
+                  "path": "stable_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2027:stable_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2027:skill_income",
+                  "year": 2027,
+                  "path": "skill_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2027:skill_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2027:project_income",
+                  "year": 2027,
+                  "path": "project_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2027:project_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2027:cooperation_income",
+                  "year": 2027,
+                  "path": "cooperation_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2027:cooperation_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2027:retention",
+                  "year": 2027,
+                  "path": "retention",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2027:retention:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                }
+              ],
+              "focus": {
+                "state": "none",
+                "primaryCandidates": [],
+                "secondaryCandidates": []
+              },
+              "overview": {
+                "id": "weak:2027.overview",
+                "kind": "interpretation",
+                "years": [
+                  2027
+                ],
+                "decisionIds": [
+                  "2027:stable_income",
+                  "2027:skill_income",
+                  "2027:project_income",
+                  "2027:cooperation_income",
+                  "2027:retention"
+                ],
+                "templateId": "draft.year.overview",
+                "text": "契约构造示例：只验证数据结构，不是引擎新生成的正文。"
+              },
+              "income": [
+                {
+                  "id": "weak:2027.income",
+                  "kind": "interpretation",
+                  "years": [
+                    2027
+                  ],
+                  "decisionIds": [
+                    "2027:stable_income",
+                    "2027:skill_income",
+                    "2027:project_income",
+                    "2027:cooperation_income"
+                  ],
+                  "templateId": "draft.year.income",
+                  "text": "契约构造示例：收入方向的实际措辞待任务六审核。"
+                }
+              ],
+              "retention": {
+                "id": "weak:2027.retention",
+                "kind": "interpretation",
+                "years": [
+                  2027
+                ],
+                "decisionIds": [
+                  "2027:retention"
+                ],
+                "templateId": "draft.year.retention",
+                "text": "契约构造示例：留钱判断需要绑定同年对应结论。"
+              },
+              "risk": null,
+              "observations": [
+                {
+                  "id": "weak:2027.observation",
+                  "kind": "observation",
+                  "years": [
+                    2027
+                  ],
+                  "decisionIds": [
+                    "2027:stable_income"
+                  ],
+                  "templateId": "draft.year.observation",
+                  "text": "契约构造示例：生活观察不是预测已经得到验证。"
+                }
+              ],
+              "actions": [
+                {
+                  "id": "weak:2027.advice",
+                  "kind": "general_advice",
+                  "years": [
+                    2027
+                  ],
+                  "decisionIds": [],
+                  "templateId": "draft.year.advice",
+                  "text": "契约构造示例：一般建议要与个性判断分开。"
+                }
+              ],
+              "comparison": {
+                "toYear": 2028,
+                "direction": "unchanged",
+                "changes": [],
+                "reading": {
+                  "id": "weak:2027.comparison",
+                  "kind": "interpretation",
+                  "years": [
+                    2027,
+                    2028
+                  ],
+                  "decisionIds": [
+                    "2027:stable_income",
+                    "2028:stable_income"
+                  ],
+                  "templateId": "draft.year.comparison",
+                  "text": "契约构造示例：没有变化就说明延续，不编造下一年剧情。"
+                }
+              }
+            },
+            {
+              "year": 2028,
+              "ganZhi": "戊申",
+              "facts": [
+                {
+                  "id": "2028:fact:natal",
+                  "kind": "natal",
+                  "code": "synthetic.natal",
+                  "value": "合成原局条件"
+                },
+                {
+                  "id": "2028:fact:annual",
+                  "kind": "annual",
+                  "code": "synthetic.annual",
+                  "value": "合成流年条件"
+                },
+                {
+                  "id": "2028:fact:limit",
+                  "kind": "dayun",
+                  "code": "synthetic.limit",
+                  "value": "合成限制条件"
+                }
+              ],
+              "evidence": [
+                {
+                  "id": "2028:stable_income:support0",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2028:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2028:skill_income:support0",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2028:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2028:project_income:support0",
+                  "path": "project_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2028:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2028:cooperation_income:support0",
+                  "path": "cooperation_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2028:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2028:retention:support0",
+                  "path": "retention",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2028:fact:annual"
+                  ],
+                  "weight": 1
+                }
+              ],
+              "decisions": [
+                {
+                  "id": "2028:stable_income",
+                  "year": 2028,
+                  "path": "stable_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2028:stable_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2028:skill_income",
+                  "year": 2028,
+                  "path": "skill_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2028:skill_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2028:project_income",
+                  "year": 2028,
+                  "path": "project_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2028:project_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2028:cooperation_income",
+                  "year": 2028,
+                  "path": "cooperation_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2028:cooperation_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2028:retention",
+                  "year": 2028,
+                  "path": "retention",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2028:retention:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                }
+              ],
+              "focus": {
+                "state": "none",
+                "primaryCandidates": [],
+                "secondaryCandidates": []
+              },
+              "overview": {
+                "id": "weak:2028.overview",
+                "kind": "interpretation",
+                "years": [
+                  2028
+                ],
+                "decisionIds": [
+                  "2028:stable_income",
+                  "2028:skill_income",
+                  "2028:project_income",
+                  "2028:cooperation_income",
+                  "2028:retention"
+                ],
+                "templateId": "draft.year.overview",
+                "text": "契约构造示例：只验证数据结构，不是引擎新生成的正文。"
+              },
+              "income": [
+                {
+                  "id": "weak:2028.income",
+                  "kind": "interpretation",
+                  "years": [
+                    2028
+                  ],
+                  "decisionIds": [
+                    "2028:stable_income",
+                    "2028:skill_income",
+                    "2028:project_income",
+                    "2028:cooperation_income"
+                  ],
+                  "templateId": "draft.year.income",
+                  "text": "契约构造示例：收入方向的实际措辞待任务六审核。"
+                }
+              ],
+              "retention": {
+                "id": "weak:2028.retention",
+                "kind": "interpretation",
+                "years": [
+                  2028
+                ],
+                "decisionIds": [
+                  "2028:retention"
+                ],
+                "templateId": "draft.year.retention",
+                "text": "契约构造示例：留钱判断需要绑定同年对应结论。"
+              },
+              "risk": null,
+              "observations": [
+                {
+                  "id": "weak:2028.observation",
+                  "kind": "observation",
+                  "years": [
+                    2028
+                  ],
+                  "decisionIds": [
+                    "2028:stable_income"
+                  ],
+                  "templateId": "draft.year.observation",
+                  "text": "契约构造示例：生活观察不是预测已经得到验证。"
+                }
+              ],
+              "actions": [
+                {
+                  "id": "weak:2028.advice",
+                  "kind": "general_advice",
+                  "years": [
+                    2028
+                  ],
+                  "decisionIds": [],
+                  "templateId": "draft.year.advice",
+                  "text": "契约构造示例：一般建议要与个性判断分开。"
+                }
+              ],
+              "comparison": null
+            }
+          ],
+          "route": [
+            {
+              "id": "weak:route",
+              "kind": "general_advice",
+              "years": [
+                2026,
+                2027,
+                2028
+              ],
+              "decisionIds": [],
+              "templateId": "draft.route",
+              "text": "契约构造示例：总结建议不预设先准备再增收的年序。"
+            }
+          ],
+          "readingNote": {
+            "id": "weak:note",
+            "kind": "method_note",
+            "years": [
+              2026,
+              2027,
+              2028
+            ],
+            "decisionIds": [],
+            "templateId": "draft.note",
+            "text": "契约构造示例：规则权重不是现实成功概率。"
+          }
+        },
+        "createdAt": "2026-08-29T00:00:00+08:00",
+        "generatedAt": "2026-08-29T00:00:00+08:00"
+      }
+    },
+    {
+      "name": "mixed",
+      "report": {
+        "id": 4,
+        "subject": "接口构造样例（非用户）",
+        "topic": "wealth",
+        "edition": "plain",
+        "status": "ready",
+        "contentVersion": "wealth-narrative-v3",
+        "content": {
+          "asOf": "2026-08-29",
+          "zoneId": "Asia/Shanghai",
+          "horizonYears": 3,
+          "calculationVersion": "wealth-path-v2",
+          "policyVersion": "wealth-expression-v1",
+          "copyVersion": "wealth-plain-v3",
+          "thesis": {
+            "id": "mixed:thesis",
+            "kind": "interpretation",
+            "years": [
+              2026,
+              2027,
+              2028
+            ],
+            "decisionIds": [
+              "2026:stable_income",
+              "2026:skill_income",
+              "2026:project_income",
+              "2026:cooperation_income",
+              "2026:retention",
+              "2027:stable_income",
+              "2027:skill_income",
+              "2027:project_income",
+              "2027:cooperation_income",
+              "2027:retention",
+              "2028:stable_income",
+              "2028:skill_income",
+              "2028:project_income",
+              "2028:cooperation_income",
+              "2028:retention"
+            ],
+            "templateId": "draft.thesis",
+            "text": "契约构造示例：这是假数据构造，不可作为付费样本交付。"
+          },
+          "summary": {
+            "id": "mixed:summary",
+            "kind": "interpretation",
+            "years": [
+              2026,
+              2027,
+              2028
+            ],
+            "decisionIds": [
+              "2026:stable_income",
+              "2026:skill_income",
+              "2026:project_income",
+              "2026:cooperation_income",
+              "2026:retention",
+              "2027:stable_income",
+              "2027:skill_income",
+              "2027:project_income",
+              "2027:cooperation_income",
+              "2027:retention",
+              "2028:stable_income",
+              "2028:skill_income",
+              "2028:project_income",
+              "2028:cooperation_income",
+              "2028:retention"
+            ],
+            "templateId": "draft.summary",
+            "text": "契约构造示例：这里只检查接口设计与可空分支。"
+          },
+          "pathSummaries": [
+            {
+              "path": "stable_income",
+              "yearDecisionIds": [
+                "2026:stable_income",
+                "2027:stable_income",
+                "2028:stable_income"
+              ],
+              "reading": {
+                "id": "mixed:path.stable_income",
+                "kind": "interpretation",
+                "years": [
+                  2026,
+                  2027,
+                  2028
+                ],
+                "decisionIds": [
+                  "2026:stable_income",
+                  "2027:stable_income",
+                  "2028:stable_income"
+                ],
+                "templateId": "draft.path.stable_income",
+                "text": "契约构造示例：每个方向保留对应三年的结论引用。"
+              }
+            },
+            {
+              "path": "skill_income",
+              "yearDecisionIds": [
+                "2026:skill_income",
+                "2027:skill_income",
+                "2028:skill_income"
+              ],
+              "reading": {
+                "id": "mixed:path.skill_income",
+                "kind": "interpretation",
+                "years": [
+                  2026,
+                  2027,
+                  2028
+                ],
+                "decisionIds": [
+                  "2026:skill_income",
+                  "2027:skill_income",
+                  "2028:skill_income"
+                ],
+                "templateId": "draft.path.skill_income",
+                "text": "契约构造示例：每个方向保留对应三年的结论引用。"
+              }
+            },
+            {
+              "path": "project_income",
+              "yearDecisionIds": [
+                "2026:project_income",
+                "2027:project_income",
+                "2028:project_income"
+              ],
+              "reading": {
+                "id": "mixed:path.project_income",
+                "kind": "interpretation",
+                "years": [
+                  2026,
+                  2027,
+                  2028
+                ],
+                "decisionIds": [
+                  "2026:project_income",
+                  "2027:project_income",
+                  "2028:project_income"
+                ],
+                "templateId": "draft.path.project_income",
+                "text": "契约构造示例：每个方向保留对应三年的结论引用。"
+              }
+            },
+            {
+              "path": "cooperation_income",
+              "yearDecisionIds": [
+                "2026:cooperation_income",
+                "2027:cooperation_income",
+                "2028:cooperation_income"
+              ],
+              "reading": {
+                "id": "mixed:path.cooperation_income",
+                "kind": "interpretation",
+                "years": [
+                  2026,
+                  2027,
+                  2028
+                ],
+                "decisionIds": [
+                  "2026:cooperation_income",
+                  "2027:cooperation_income",
+                  "2028:cooperation_income"
+                ],
+                "templateId": "draft.path.cooperation_income",
+                "text": "契约构造示例：每个方向保留对应三年的结论引用。"
+              }
+            },
+            {
+              "path": "retention",
+              "yearDecisionIds": [
+                "2026:retention",
+                "2027:retention",
+                "2028:retention"
+              ],
+              "reading": {
+                "id": "mixed:path.retention",
+                "kind": "interpretation",
+                "years": [
+                  2026,
+                  2027,
+                  2028
+                ],
+                "decisionIds": [
+                  "2026:retention",
+                  "2027:retention",
+                  "2028:retention"
+                ],
+                "templateId": "draft.path.retention",
+                "text": "契约构造示例：每个方向保留对应三年的结论引用。"
+              }
+            }
+          ],
+          "riskSummary": {
+            "id": "mixed:riskSummary",
+            "kind": "interpretation",
+            "years": [
+              2026,
+              2027,
+              2028
+            ],
+            "decisionIds": [
+              "2026:stable_income",
+              "2027:stable_income",
+              "2028:stable_income"
+            ],
+            "templateId": "draft.riskSummary",
+            "text": "契约构造示例：具体风险仍以各年度的限制依据为准。"
+          },
+          "years": [
+            {
+              "year": 2026,
+              "ganZhi": "丙午",
+              "facts": [
+                {
+                  "id": "2026:fact:natal",
+                  "kind": "natal",
+                  "code": "synthetic.natal",
+                  "value": "合成原局条件"
+                },
+                {
+                  "id": "2026:fact:annual",
+                  "kind": "annual",
+                  "code": "synthetic.annual",
+                  "value": "合成流年条件"
+                },
+                {
+                  "id": "2026:fact:limit",
+                  "kind": "dayun",
+                  "code": "synthetic.limit",
+                  "value": "合成限制条件"
+                }
+              ],
+              "evidence": [
+                {
+                  "id": "2026:stable_income:support0",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2026:fact:annual"
+                  ],
+                  "weight": 7
+                },
+                {
+                  "id": "2026:stable_income:support1",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support1",
+                  "factKey": "synthetic.fact1",
+                  "family": "NATAL_STRUCTURE",
+                  "rootFactIds": [
+                    "2026:fact:natal"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2026:stable_income:limit",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.limit",
+                  "factKey": "synthetic.limit",
+                  "family": "DAYUN_CONTEXT",
+                  "rootFactIds": [
+                    "2026:fact:limit"
+                  ],
+                  "weight": -8
+                },
+                {
+                  "id": "2026:skill_income:support0",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2026:fact:annual"
+                  ],
+                  "weight": 2
+                },
+                {
+                  "id": "2026:skill_income:support1",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support1",
+                  "factKey": "synthetic.fact1",
+                  "family": "NATAL_STRUCTURE",
+                  "rootFactIds": [
+                    "2026:fact:natal"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2026:project_income:support0",
+                  "path": "project_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2026:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2026:cooperation_income:support0",
+                  "path": "cooperation_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2026:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2026:retention:support0",
+                  "path": "retention",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2026:fact:annual"
+                  ],
+                  "weight": 1
+                }
+              ],
+              "decisions": [
+                {
+                  "id": "2026:stable_income",
+                  "year": 2026,
+                  "path": "stable_income",
+                  "supportWeight": 8,
+                  "limitationWeight": 8,
+                  "netWeight": 0,
+                  "stance": "mixed",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2026:stable_income:support0",
+                    "2026:stable_income:support1"
+                  ],
+                  "limitingEvidenceIds": [
+                    "2026:stable_income:limit"
+                  ],
+                  "reasonCodes": [
+                    "has_limitations"
+                  ]
+                },
+                {
+                  "id": "2026:skill_income",
+                  "year": 2026,
+                  "path": "skill_income",
+                  "supportWeight": 3,
+                  "limitationWeight": 0,
+                  "netWeight": 3,
+                  "stance": "supportive",
+                  "strength": "supported",
+                  "supportingEvidenceIds": [
+                    "2026:skill_income:support0",
+                    "2026:skill_income:support1"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": []
+                },
+                {
+                  "id": "2026:project_income",
+                  "year": 2026,
+                  "path": "project_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2026:project_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2026:cooperation_income",
+                  "year": 2026,
+                  "path": "cooperation_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2026:cooperation_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2026:retention",
+                  "year": 2026,
+                  "path": "retention",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2026:retention:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                }
+              ],
+              "focus": {
+                "state": "leading",
+                "primaryCandidates": [
+                  "skill_income"
+                ],
+                "secondaryCandidates": []
+              },
+              "overview": {
+                "id": "mixed:2026.overview",
+                "kind": "interpretation",
+                "years": [
+                  2026
+                ],
+                "decisionIds": [
+                  "2026:stable_income",
+                  "2026:skill_income",
+                  "2026:project_income",
+                  "2026:cooperation_income",
+                  "2026:retention"
+                ],
+                "templateId": "draft.year.overview",
+                "text": "契约构造示例：只验证数据结构，不是引擎新生成的正文。"
+              },
+              "income": [
+                {
+                  "id": "mixed:2026.income",
+                  "kind": "interpretation",
+                  "years": [
+                    2026
+                  ],
+                  "decisionIds": [
+                    "2026:stable_income",
+                    "2026:skill_income",
+                    "2026:project_income",
+                    "2026:cooperation_income"
+                  ],
+                  "templateId": "draft.year.income",
+                  "text": "契约构造示例：收入方向的实际措辞待任务六审核。"
+                }
+              ],
+              "retention": {
+                "id": "mixed:2026.retention",
+                "kind": "interpretation",
+                "years": [
+                  2026
+                ],
+                "decisionIds": [
+                  "2026:retention"
+                ],
+                "templateId": "draft.year.retention",
+                "text": "契约构造示例：留钱判断需要绑定同年对应结论。"
+              },
+              "risk": {
+                "path": "stable_income",
+                "limitingEvidenceIds": [
+                  "2026:stable_income:limit"
+                ],
+                "reading": {
+                  "id": "mixed:2026.risk",
+                  "kind": "interpretation",
+                  "years": [
+                    2026
+                  ],
+                  "decisionIds": [
+                    "2026:stable_income"
+                  ],
+                  "templateId": "draft.year.risk",
+                  "text": "契约构造示例：风险段落只允许引用负向依据。"
+                }
+              },
+              "observations": [
+                {
+                  "id": "mixed:2026.observation",
+                  "kind": "observation",
+                  "years": [
+                    2026
+                  ],
+                  "decisionIds": [
+                    "2026:stable_income"
+                  ],
+                  "templateId": "draft.year.observation",
+                  "text": "契约构造示例：生活观察不是预测已经得到验证。"
+                }
+              ],
+              "actions": [
+                {
+                  "id": "mixed:2026.advice",
+                  "kind": "general_advice",
+                  "years": [
+                    2026
+                  ],
+                  "decisionIds": [],
+                  "templateId": "draft.year.advice",
+                  "text": "契约构造示例：一般建议要与个性判断分开。"
+                }
+              ],
+              "comparison": {
+                "toYear": 2027,
+                "direction": "unchanged",
+                "changes": [],
+                "reading": {
+                  "id": "mixed:2026.comparison",
+                  "kind": "interpretation",
+                  "years": [
+                    2026,
+                    2027
+                  ],
+                  "decisionIds": [
+                    "2026:stable_income",
+                    "2027:stable_income"
+                  ],
+                  "templateId": "draft.year.comparison",
+                  "text": "契约构造示例：没有变化就说明延续，不编造下一年剧情。"
+                }
+              }
+            },
+            {
+              "year": 2027,
+              "ganZhi": "丁未",
+              "facts": [
+                {
+                  "id": "2027:fact:natal",
+                  "kind": "natal",
+                  "code": "synthetic.natal",
+                  "value": "合成原局条件"
+                },
+                {
+                  "id": "2027:fact:annual",
+                  "kind": "annual",
+                  "code": "synthetic.annual",
+                  "value": "合成流年条件"
+                },
+                {
+                  "id": "2027:fact:limit",
+                  "kind": "dayun",
+                  "code": "synthetic.limit",
+                  "value": "合成限制条件"
+                }
+              ],
+              "evidence": [
+                {
+                  "id": "2027:stable_income:support0",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2027:fact:annual"
+                  ],
+                  "weight": 7
+                },
+                {
+                  "id": "2027:stable_income:support1",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support1",
+                  "factKey": "synthetic.fact1",
+                  "family": "NATAL_STRUCTURE",
+                  "rootFactIds": [
+                    "2027:fact:natal"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2027:stable_income:limit",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.limit",
+                  "factKey": "synthetic.limit",
+                  "family": "DAYUN_CONTEXT",
+                  "rootFactIds": [
+                    "2027:fact:limit"
+                  ],
+                  "weight": -8
+                },
+                {
+                  "id": "2027:skill_income:support0",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2027:fact:annual"
+                  ],
+                  "weight": 2
+                },
+                {
+                  "id": "2027:skill_income:support1",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support1",
+                  "factKey": "synthetic.fact1",
+                  "family": "NATAL_STRUCTURE",
+                  "rootFactIds": [
+                    "2027:fact:natal"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2027:project_income:support0",
+                  "path": "project_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2027:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2027:cooperation_income:support0",
+                  "path": "cooperation_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2027:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2027:retention:support0",
+                  "path": "retention",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2027:fact:annual"
+                  ],
+                  "weight": 1
+                }
+              ],
+              "decisions": [
+                {
+                  "id": "2027:stable_income",
+                  "year": 2027,
+                  "path": "stable_income",
+                  "supportWeight": 8,
+                  "limitationWeight": 8,
+                  "netWeight": 0,
+                  "stance": "mixed",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2027:stable_income:support0",
+                    "2027:stable_income:support1"
+                  ],
+                  "limitingEvidenceIds": [
+                    "2027:stable_income:limit"
+                  ],
+                  "reasonCodes": [
+                    "has_limitations"
+                  ]
+                },
+                {
+                  "id": "2027:skill_income",
+                  "year": 2027,
+                  "path": "skill_income",
+                  "supportWeight": 3,
+                  "limitationWeight": 0,
+                  "netWeight": 3,
+                  "stance": "supportive",
+                  "strength": "supported",
+                  "supportingEvidenceIds": [
+                    "2027:skill_income:support0",
+                    "2027:skill_income:support1"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": []
+                },
+                {
+                  "id": "2027:project_income",
+                  "year": 2027,
+                  "path": "project_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2027:project_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2027:cooperation_income",
+                  "year": 2027,
+                  "path": "cooperation_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2027:cooperation_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2027:retention",
+                  "year": 2027,
+                  "path": "retention",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2027:retention:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                }
+              ],
+              "focus": {
+                "state": "leading",
+                "primaryCandidates": [
+                  "skill_income"
+                ],
+                "secondaryCandidates": []
+              },
+              "overview": {
+                "id": "mixed:2027.overview",
+                "kind": "interpretation",
+                "years": [
+                  2027
+                ],
+                "decisionIds": [
+                  "2027:stable_income",
+                  "2027:skill_income",
+                  "2027:project_income",
+                  "2027:cooperation_income",
+                  "2027:retention"
+                ],
+                "templateId": "draft.year.overview",
+                "text": "契约构造示例：只验证数据结构，不是引擎新生成的正文。"
+              },
+              "income": [
+                {
+                  "id": "mixed:2027.income",
+                  "kind": "interpretation",
+                  "years": [
+                    2027
+                  ],
+                  "decisionIds": [
+                    "2027:stable_income",
+                    "2027:skill_income",
+                    "2027:project_income",
+                    "2027:cooperation_income"
+                  ],
+                  "templateId": "draft.year.income",
+                  "text": "契约构造示例：收入方向的实际措辞待任务六审核。"
+                }
+              ],
+              "retention": {
+                "id": "mixed:2027.retention",
+                "kind": "interpretation",
+                "years": [
+                  2027
+                ],
+                "decisionIds": [
+                  "2027:retention"
+                ],
+                "templateId": "draft.year.retention",
+                "text": "契约构造示例：留钱判断需要绑定同年对应结论。"
+              },
+              "risk": {
+                "path": "stable_income",
+                "limitingEvidenceIds": [
+                  "2027:stable_income:limit"
+                ],
+                "reading": {
+                  "id": "mixed:2027.risk",
+                  "kind": "interpretation",
+                  "years": [
+                    2027
+                  ],
+                  "decisionIds": [
+                    "2027:stable_income"
+                  ],
+                  "templateId": "draft.year.risk",
+                  "text": "契约构造示例：风险段落只允许引用负向依据。"
+                }
+              },
+              "observations": [
+                {
+                  "id": "mixed:2027.observation",
+                  "kind": "observation",
+                  "years": [
+                    2027
+                  ],
+                  "decisionIds": [
+                    "2027:stable_income"
+                  ],
+                  "templateId": "draft.year.observation",
+                  "text": "契约构造示例：生活观察不是预测已经得到验证。"
+                }
+              ],
+              "actions": [
+                {
+                  "id": "mixed:2027.advice",
+                  "kind": "general_advice",
+                  "years": [
+                    2027
+                  ],
+                  "decisionIds": [],
+                  "templateId": "draft.year.advice",
+                  "text": "契约构造示例：一般建议要与个性判断分开。"
+                }
+              ],
+              "comparison": {
+                "toYear": 2028,
+                "direction": "unchanged",
+                "changes": [],
+                "reading": {
+                  "id": "mixed:2027.comparison",
+                  "kind": "interpretation",
+                  "years": [
+                    2027,
+                    2028
+                  ],
+                  "decisionIds": [
+                    "2027:stable_income",
+                    "2028:stable_income"
+                  ],
+                  "templateId": "draft.year.comparison",
+                  "text": "契约构造示例：没有变化就说明延续，不编造下一年剧情。"
+                }
+              }
+            },
+            {
+              "year": 2028,
+              "ganZhi": "戊申",
+              "facts": [
+                {
+                  "id": "2028:fact:natal",
+                  "kind": "natal",
+                  "code": "synthetic.natal",
+                  "value": "合成原局条件"
+                },
+                {
+                  "id": "2028:fact:annual",
+                  "kind": "annual",
+                  "code": "synthetic.annual",
+                  "value": "合成流年条件"
+                },
+                {
+                  "id": "2028:fact:limit",
+                  "kind": "dayun",
+                  "code": "synthetic.limit",
+                  "value": "合成限制条件"
+                }
+              ],
+              "evidence": [
+                {
+                  "id": "2028:stable_income:support0",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2028:fact:annual"
+                  ],
+                  "weight": 7
+                },
+                {
+                  "id": "2028:stable_income:support1",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.support1",
+                  "factKey": "synthetic.fact1",
+                  "family": "NATAL_STRUCTURE",
+                  "rootFactIds": [
+                    "2028:fact:natal"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2028:stable_income:limit",
+                  "path": "stable_income",
+                  "ruleKey": "synthetic.limit",
+                  "factKey": "synthetic.limit",
+                  "family": "DAYUN_CONTEXT",
+                  "rootFactIds": [
+                    "2028:fact:limit"
+                  ],
+                  "weight": -8
+                },
+                {
+                  "id": "2028:skill_income:support0",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2028:fact:annual"
+                  ],
+                  "weight": 2
+                },
+                {
+                  "id": "2028:skill_income:support1",
+                  "path": "skill_income",
+                  "ruleKey": "synthetic.support1",
+                  "factKey": "synthetic.fact1",
+                  "family": "NATAL_STRUCTURE",
+                  "rootFactIds": [
+                    "2028:fact:natal"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2028:project_income:support0",
+                  "path": "project_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2028:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2028:cooperation_income:support0",
+                  "path": "cooperation_income",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2028:fact:annual"
+                  ],
+                  "weight": 1
+                },
+                {
+                  "id": "2028:retention:support0",
+                  "path": "retention",
+                  "ruleKey": "synthetic.support0",
+                  "factKey": "synthetic.fact0",
+                  "family": "ANNUAL_TRIGGER",
+                  "rootFactIds": [
+                    "2028:fact:annual"
+                  ],
+                  "weight": 1
+                }
+              ],
+              "decisions": [
+                {
+                  "id": "2028:stable_income",
+                  "year": 2028,
+                  "path": "stable_income",
+                  "supportWeight": 8,
+                  "limitationWeight": 8,
+                  "netWeight": 0,
+                  "stance": "mixed",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2028:stable_income:support0",
+                    "2028:stable_income:support1"
+                  ],
+                  "limitingEvidenceIds": [
+                    "2028:stable_income:limit"
+                  ],
+                  "reasonCodes": [
+                    "has_limitations"
+                  ]
+                },
+                {
+                  "id": "2028:skill_income",
+                  "year": 2028,
+                  "path": "skill_income",
+                  "supportWeight": 3,
+                  "limitationWeight": 0,
+                  "netWeight": 3,
+                  "stance": "supportive",
+                  "strength": "supported",
+                  "supportingEvidenceIds": [
+                    "2028:skill_income:support0",
+                    "2028:skill_income:support1"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": []
+                },
+                {
+                  "id": "2028:project_income",
+                  "year": 2028,
+                  "path": "project_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2028:project_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2028:cooperation_income",
+                  "year": 2028,
+                  "path": "cooperation_income",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2028:cooperation_income:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                },
+                {
+                  "id": "2028:retention",
+                  "year": 2028,
+                  "path": "retention",
+                  "supportWeight": 1,
+                  "limitationWeight": 0,
+                  "netWeight": 1,
+                  "stance": "supportive",
+                  "strength": "limited",
+                  "supportingEvidenceIds": [
+                    "2028:retention:support0"
+                  ],
+                  "limitingEvidenceIds": [],
+                  "reasonCodes": [
+                    "limited_net_support"
+                  ]
+                }
+              ],
+              "focus": {
+                "state": "leading",
+                "primaryCandidates": [
+                  "skill_income"
+                ],
+                "secondaryCandidates": []
+              },
+              "overview": {
+                "id": "mixed:2028.overview",
+                "kind": "interpretation",
+                "years": [
+                  2028
+                ],
+                "decisionIds": [
+                  "2028:stable_income",
+                  "2028:skill_income",
+                  "2028:project_income",
+                  "2028:cooperation_income",
+                  "2028:retention"
+                ],
+                "templateId": "draft.year.overview",
+                "text": "契约构造示例：只验证数据结构，不是引擎新生成的正文。"
+              },
+              "income": [
+                {
+                  "id": "mixed:2028.income",
+                  "kind": "interpretation",
+                  "years": [
+                    2028
+                  ],
+                  "decisionIds": [
+                    "2028:stable_income",
+                    "2028:skill_income",
+                    "2028:project_income",
+                    "2028:cooperation_income"
+                  ],
+                  "templateId": "draft.year.income",
+                  "text": "契约构造示例：收入方向的实际措辞待任务六审核。"
+                }
+              ],
+              "retention": {
+                "id": "mixed:2028.retention",
+                "kind": "interpretation",
+                "years": [
+                  2028
+                ],
+                "decisionIds": [
+                  "2028:retention"
+                ],
+                "templateId": "draft.year.retention",
+                "text": "契约构造示例：留钱判断需要绑定同年对应结论。"
+              },
+              "risk": {
+                "path": "stable_income",
+                "limitingEvidenceIds": [
+                  "2028:stable_income:limit"
+                ],
+                "reading": {
+                  "id": "mixed:2028.risk",
+                  "kind": "interpretation",
+                  "years": [
+                    2028
+                  ],
+                  "decisionIds": [
+                    "2028:stable_income"
+                  ],
+                  "templateId": "draft.year.risk",
+                  "text": "契约构造示例：风险段落只允许引用负向依据。"
+                }
+              },
+              "observations": [
+                {
+                  "id": "mixed:2028.observation",
+                  "kind": "observation",
+                  "years": [
+                    2028
+                  ],
+                  "decisionIds": [
+                    "2028:stable_income"
+                  ],
+                  "templateId": "draft.year.observation",
+                  "text": "契约构造示例：生活观察不是预测已经得到验证。"
+                }
+              ],
+              "actions": [
+                {
+                  "id": "mixed:2028.advice",
+                  "kind": "general_advice",
+                  "years": [
+                    2028
+                  ],
+                  "decisionIds": [],
+                  "templateId": "draft.year.advice",
+                  "text": "契约构造示例：一般建议要与个性判断分开。"
+                }
+              ],
+              "comparison": null
+            }
+          ],
+          "route": [
+            {
+              "id": "mixed:route",
+              "kind": "general_advice",
+              "years": [
+                2026,
+                2027,
+                2028
+              ],
+              "decisionIds": [],
+              "templateId": "draft.route",
+              "text": "契约构造示例：总结建议不预设先准备再增收的年序。"
+            }
+          ],
+          "readingNote": {
+            "id": "mixed:note",
+            "kind": "method_note",
+            "years": [
+              2026,
+              2027,
+              2028
+            ],
+            "decisionIds": [],
+            "templateId": "draft.note",
+            "text": "契约构造示例：规则权重不是现实成功概率。"
+          }
+        },
+        "createdAt": "2026-08-29T00:00:00+08:00",
+        "generatedAt": "2026-08-29T00:00:00+08:00"
+      }
+    }
+  ]
+}

@@ -4,7 +4,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { listReports, type SavedReport } from '@/services/reportApi'
 import { ReportLibraryPage } from './ReportLibraryPage'
 
-vi.mock('@/services/reportApi', () => ({ listReports: vi.fn() }))
+vi.mock('@/services/reportApi', async (importOriginal) => ({
+  ...await importOriginal<typeof import('@/services/reportApi')>(),
+  listReports: vi.fn(),
+}))
 
 describe('ReportLibraryPage', () => {
   beforeEach(() => vi.mocked(listReports).mockResolvedValue([
@@ -75,6 +78,19 @@ describe('ReportLibraryPage', () => {
       createdAt: '2026-08-27T08:00:00',
       generatedAt: '2026-08-27T08:00:00',
     },
+    {
+      id: 48,
+      subject: '林先生',
+      topic: 'wealth',
+      edition: 'plain',
+      status: 'ready',
+      contentVersion: 'wealth-narrative-v3',
+      content: {
+        thesis: { text: '三年里每年的收入重点不同，先逐年看清楚。' },
+      },
+      createdAt: '2026-08-29T08:00:00',
+      generatedAt: '2026-08-29T08:00:00',
+    } as unknown as SavedReport,
   ] satisfies SavedReport[]))
 
   it('把已经生成的命书作为可重复打开的报告展示', async () => {
@@ -90,6 +106,10 @@ describe('ReportLibraryPage', () => {
     expect(screen.getByRole('link', { name: /林先生.*感情运势.*通俗版.*先看两个人/ })).toHaveAttribute(
       'href',
       '/reports/38',
+    )
+    expect(screen.getByRole('link', { name: /林先生.*财富运势.*通俗版.*三年里每年的收入重点不同/ })).toHaveAttribute(
+      'href',
+      '/reports/48',
     )
   })
 })

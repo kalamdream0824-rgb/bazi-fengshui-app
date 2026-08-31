@@ -1,6 +1,7 @@
 package com.bazi.app;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -20,9 +21,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.time.LocalDateTime;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,6 +90,86 @@ class SavedReportIntegrationTest {
   }
 
   @Test
+  void createsAndReadsAStoredOverallPlainReportSnapshot() throws Exception {
+    String token = register("saved-overall-report-owner");
+
+    MvcResult created = mvc.perform(post("/api/v1/reports")
+            .header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(overallPayload("plain")))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.subject").value("林先生"))
+        .andExpect(jsonPath("$.topic").value("overall"))
+        .andExpect(jsonPath("$.edition").value("plain"))
+        .andExpect(jsonPath("$.contentVersion").value("overall-narrative-v1.1"))
+        .andExpect(jsonPath("$.content.horizonYears").value(3))
+        .andExpect(jsonPath("$.content.years.length()").value(3))
+        .andExpect(jsonPath("$.content.years[0].dimensions.length()").value(4))
+        .andExpect(jsonPath("$.content.years[0].actions.length()").value(2))
+        .andExpect(jsonPath("$.content.years[0].primaryCode").isString())
+        .andExpect(jsonPath("$.content.years[0].linkage").isNotEmpty())
+        .andExpect(jsonPath("$.content.years[0].evidenceKeys").isNotEmpty())
+        .andReturn();
+
+    JsonNode snapshot = objectMapper.readTree(created.getResponse().getContentAsString());
+    long id = snapshot.get("id").asLong();
+    BaziReport stored = reportMapper.selectById(id);
+    assertEquals(objectMapper.createObjectNode().put("source", "system").put("horizonYears", 3),
+        objectMapper.readTree(stored.getContextJson()));
+    assertEquals(snapshot.get("content"), objectMapper.readTree(stored.getContentJson()));
+
+    MvcResult read = mvc.perform(get("/api/v1/reports/{id}", id)
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.contentVersion").value("overall-narrative-v1.1"))
+        .andReturn();
+    assertEquals(snapshot, objectMapper.readTree(read.getResponse().getContentAsString()));
+  }
+
+  @Test
+  void readsAStoredOverallV1SnapshotWithoutLinkage() throws Exception {
+    String username = "saved-overall-v1-fixture";
+    String token = register(username);
+    User user = userMapper.selectOne(new QueryWrapper<User>().eq("username", username));
+    MvcResult current = mvc.perform(post("/api/v1/reports")
+            .header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(overallPayload("plain")))
+        .andExpect(status().isOk())
+        .andReturn();
+    ObjectNode legacyContent = (ObjectNode) objectMapper.readTree(
+        current.getResponse().getContentAsString()).get("content");
+    legacyContent.withArray("years").forEach(year -> ((ObjectNode) year).remove("linkage"));
+    BaziReport legacy = storedReport(
+        user.getId(), "旧版综合命主", "overall", "overall-narrative-v1",
+        objectMapper.writeValueAsString(legacyContent));
+    reportMapper.insert(legacy);
+
+    mvc.perform(get("/api/v1/reports/{id}", legacy.getId())
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.contentVersion").value("overall-narrative-v1"))
+        .andExpect(jsonPath("$.content.years[0].linkage").value(""));
+  }
+
+  @Test
+  void rejectsOverallProfessionalWithoutSavingAReport() throws Exception {
+    String token = register("saved-overall-professional");
+
+    mvc.perform(post("/api/v1/reports")
+            .header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(overallPayload("professional")))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("OVERALL_PROFESSIONAL_NOT_AVAILABLE"));
+
+    mvc.perform(get("/api/v1/reports")
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(0));
+  }
+
+  @Test
   void reportOwnershipIsolatedBetweenUsers() throws Exception {
     String owner = register("saved-report-private-owner");
     String stranger = register("saved-report-stranger");
@@ -122,6 +204,8 @@ class SavedReportIntegrationTest {
   @Test
   void createsAndReadsAStoredWealthReportSnapshot() throws Exception {
     String token = register("saved-wealth-report-owner");
+    ZoneId wealthZone = ZoneId.of("Asia/Shanghai");
+    LocalDate beforeCreate = LocalDate.now(wealthZone);
 
     MvcResult created = mvc.perform(post("/api/v1/reports")
             .header("Authorization", "Bearer " + token)
@@ -130,25 +214,56 @@ class SavedReportIntegrationTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.subject").value("林先生"))
         .andExpect(jsonPath("$.topic").value("wealth"))
-        .andExpect(jsonPath("$.contentVersion").value("wealth-narrative-v2"))
-        .andExpect(jsonPath("$.content.paths.length()").value(5))
+        .andExpect(jsonPath("$.contentVersion").value("wealth-narrative-v3"))
+        .andExpect(jsonPath("$.content.zoneId").value("Asia/Shanghai"))
+        .andExpect(jsonPath("$.content.calculationVersion").value("wealth-path-v2"))
+        .andExpect(jsonPath("$.content.policyVersion").value("wealth-expression-v1"))
+        .andExpect(jsonPath("$.content.copyVersion").value("wealth-plain-v3.3"))
+        .andExpect(jsonPath("$.content.headlinePlannerVersion").value("wealth-headline-v1"))
+        .andExpect(jsonPath("$.content.pathSummaries.length()").value(5))
         .andExpect(jsonPath("$.content.years.length()").value(3))
-        .andExpect(jsonPath("$.content.years[0].year").value(2026))
-        .andExpect(jsonPath("$.content.years[1].year").value(2027))
-        .andExpect(jsonPath("$.content.years[2].year").value(2028))
-        .andExpect(jsonPath("$.content.years[0].evidenceKeys").isArray())
+        .andExpect(jsonPath("$.content.years[0].facts").isArray())
+        .andExpect(jsonPath("$.content.years[0].evidence").isArray())
+        .andExpect(jsonPath("$.content.years[0].decisions.length()").value(5))
+        .andExpect(jsonPath("$.content.years[0].headlineMeta.themeKey").isString())
+        .andExpect(jsonPath("$.content.years[1].headlineMeta.themeKey").isString())
+        .andExpect(jsonPath("$.content.years[2].headlineMeta.themeKey").isString())
         .andReturn();
 
-    long id = objectMapper.readTree(created.getResponse().getContentAsString()).get("id").asLong();
-    mvc.perform(get("/api/v1/reports/{id}", id)
+    JsonNode createdSnapshot = objectMapper.readTree(created.getResponse().getContentAsString());
+    LocalDate afterCreate = LocalDate.now(wealthZone);
+    LocalDate asOf = LocalDate.parse(createdSnapshot.at("/content/asOf").asText());
+    assertFalse(asOf.isBefore(beforeCreate));
+    assertFalse(asOf.isAfter(afterCreate));
+    int startYear = asOf.getYear();
+    assertEquals(startYear, createdSnapshot.at("/content/years/0/year").asInt());
+    assertEquals(startYear + 1, createdSnapshot.at("/content/years/1/year").asInt());
+    assertEquals(startYear + 2, createdSnapshot.at("/content/years/2/year").asInt());
+    assertEquals(startYear + 1, createdSnapshot.at("/content/years/0/comparison/toYear").asInt());
+    long id = createdSnapshot.get("id").asLong();
+    BaziReport stored = reportMapper.selectById(id);
+    assertEquals(createdSnapshot.get("content"), objectMapper.readTree(stored.getContentJson()));
+    ObjectNode expectedContext = objectMapper.createObjectNode()
+        .put("source", "system")
+        .put("horizonYears", 3)
+        .put("asOf", asOf.toString())
+        .put("calculationVersion", "wealth-path-v2")
+        .put("policyVersion", "wealth-expression-v1")
+        .put("copyVersion", "wealth-plain-v3.3");
+    assertEquals(expectedContext, objectMapper.readTree(stored.getContextJson()));
+
+    MvcResult read = mvc.perform(get("/api/v1/reports/{id}", id)
             .header("Authorization", "Bearer " + token))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.topic").value("wealth"))
-        .andExpect(jsonPath("$.content.years[2].year").value(2028));
+        .andExpect(jsonPath("$.contentVersion").value("wealth-narrative-v3"))
+        .andExpect(jsonPath("$.content.years[2].year").value(startYear + 2))
+        .andReturn();
+    assertEquals(createdSnapshot, objectMapper.readTree(read.getResponse().getContentAsString()));
   }
 
   @Test
-  void legacyWealthContextIsAcceptedButCannotChangeV2Content() throws Exception {
+  void legacyWealthContextIsAcceptedButCannotChangeV3Content() throws Exception {
     String token = register("saved-wealth-legacy-context");
     MvcResult withoutContext = mvc.perform(post("/api/v1/reports")
             .header("Authorization", "Bearer " + token)
@@ -166,6 +281,42 @@ class SavedReportIntegrationTest {
     JsonNode first = objectMapper.readTree(withoutContext.getResponse().getContentAsString());
     JsonNode second = objectMapper.readTree(withContext.getResponse().getContentAsString());
     assertEquals(first.get("content"), second.get("content"));
+  }
+
+  @Test
+  void readsAStoredWealthV2SnapshotWithoutRecalculatingOrRewritingIt() throws Exception {
+    String username = "saved-wealth-v2-fixture";
+    String token = register(username);
+    User user = userMapper.selectOne(new QueryWrapper<User>().eq("username", username));
+    JsonNode baseline;
+    try (var input = getClass().getResourceAsStream("/report/wealth-v2-baseline-20260829.json")) {
+      baseline = objectMapper.readTree(input).get("cases").get(0).get("content");
+    }
+    BaziReport report = storedReport(user.getId(), "旧版财富命主", "wealth", "wealth-narrative-v2",
+        objectMapper.writeValueAsString(baseline));
+    reportMapper.insert(report);
+
+    MvcResult read = mvc.perform(get("/api/v1/reports/{id}", report.getId())
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.contentVersion").value("wealth-narrative-v2"))
+        .andReturn();
+    assertEquals(baseline, objectMapper.readTree(read.getResponse().getContentAsString()).get("content"));
+    assertEquals(baseline, objectMapper.readTree(reportMapper.selectById(report.getId()).getContentJson()));
+  }
+
+  @Test
+  void unknownContentVersionIsNotSilentlyReadAsACareerReport() throws Exception {
+    String username = "saved-unknown-version";
+    String token = register(username);
+    User user = userMapper.selectOne(new QueryWrapper<User>().eq("username", username));
+    BaziReport report = storedReport(user.getId(), "未知版本", "wealth", "wealth-narrative-v99", "{}");
+    reportMapper.insert(report);
+
+    mvc.perform(get("/api/v1/reports/{id}", report.getId())
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("REPORT_CONTENT_VERSION_UNSUPPORTED"));
   }
 
   @Test
@@ -369,6 +520,10 @@ class SavedReportIntegrationTest {
             .content("{\"username\":\"" + username + "\",\"password\":\"pass123\"}"))
         .andExpect(status().isOk())
         .andReturn();
+    User user = userMapper.selectOne(new QueryWrapper<User>().eq("username", username));
+    user.setPlan("member_1m");
+    user.setMemberExpireAt(LocalDateTime.now().plusDays(1));
+    userMapper.updateById(user);
     return objectMapper.readTree(result.getResponse().getContentAsString()).get("token").asText();
   }
 
@@ -389,6 +544,22 @@ class SavedReportIntegrationTest {
             "goal": "promotion",
             "pace": "smooth"
           }
+        }
+        """.formatted(edition);
+  }
+
+  private String overallPayload(String edition) {
+    return """
+        {
+          "request": {
+            "name": "林先生",
+            "gender": "male",
+            "solarDateTime": "1995-10-08T14:30:00",
+            "birthPlace": "上海",
+            "trueSolarTime": false
+          },
+          "topic": "overall",
+          "edition": "%s"
         }
         """.formatted(edition);
   }
@@ -542,5 +713,22 @@ class SavedReportIntegrationTest {
           "route": ["旧版路线"]
         }
         """;
+  }
+
+  private BaziReport storedReport(Long userId, String subject, String topic, String version, String content) {
+    LocalDateTime now = LocalDateTime.now();
+    BaziReport report = new BaziReport();
+    report.setUserId(userId);
+    report.setSubject(subject);
+    report.setTopic(topic);
+    report.setEdition("plain");
+    report.setStatus("ready");
+    report.setContentVersion(version);
+    report.setRequestJson("{}");
+    report.setContextJson("{}");
+    report.setContentJson(content);
+    report.setCreatedAt(now);
+    report.setGeneratedAt(now);
+    return report;
   }
 }

@@ -1,0 +1,410 @@
+{
+  "baselineCommit": "95223a4",
+  "zoneId": "Asia/Shanghai",
+  "frozenAsOf": "2026-08-29",
+  "notice": "完整出生输入均为开发测试数据，不代表真实用户或实际经历；合成边界仅用于评分后的仲裁/文案，不用于证明事实提取或现实准确性。原始计算和旧正文均仅记录现状，不代表认可其语义。",
+  "fullBirthCases": [
+    {
+      "id": "R01",
+      "kind": "full_birth_input",
+      "asOf": "2026-08-29",
+      "horizonYears": 3,
+      "request": {
+        "name": "测试命盘R01",
+        "gender": "male",
+        "solarDateTime": "1995-10-08T14:30:00",
+        "birthPlace": "上海",
+        "trueSolarTime": false
+      }
+    },
+    {
+      "id": "R02",
+      "kind": "full_birth_input",
+      "asOf": "2026-08-29",
+      "horizonYears": 3,
+      "request": {
+        "name": "测试命盘R02",
+        "gender": "female",
+        "solarDateTime": "1995-10-08T14:30:00",
+        "birthPlace": "上海",
+        "trueSolarTime": false
+      }
+    },
+    {
+      "id": "R03",
+      "kind": "full_birth_input",
+      "asOf": "2026-08-29",
+      "horizonYears": 3,
+      "request": {
+        "name": "测试命盘R03",
+        "gender": "male",
+        "solarDateTime": "1988-02-04T10:00:00",
+        "birthPlace": "北京",
+        "trueSolarTime": false
+      }
+    },
+    {
+      "id": "R04",
+      "kind": "full_birth_input",
+      "asOf": "2026-08-29",
+      "horizonYears": 3,
+      "request": {
+        "name": "测试命盘R04",
+        "gender": "female",
+        "solarDateTime": "1988-02-04T23:30:00",
+        "birthPlace": "北京",
+        "trueSolarTime": false
+      }
+    },
+    {
+      "id": "R05",
+      "kind": "full_birth_input",
+      "asOf": "2026-08-29",
+      "horizonYears": 3,
+      "request": {
+        "name": "测试命盘R05",
+        "gender": "female",
+        "solarDateTime": "1992-07-18T06:15:00",
+        "birthPlace": "广州",
+        "trueSolarTime": false
+      }
+    },
+    {
+      "id": "R06",
+      "kind": "full_birth_input",
+      "asOf": "2026-08-29",
+      "horizonYears": 3,
+      "request": {
+        "name": "测试命盘R06",
+        "gender": "male",
+        "solarDateTime": "1980-12-25T18:45:00",
+        "birthPlace": "成都",
+        "trueSolarTime": false
+      }
+    },
+    {
+      "id": "R07",
+      "kind": "full_birth_input",
+      "asOf": "2026-08-29",
+      "horizonYears": 3,
+      "request": {
+        "name": "测试命盘R07",
+        "gender": "female",
+        "solarDateTime": "1975-05-06T04:30:00",
+        "birthPlace": "杭州",
+        "trueSolarTime": false
+      }
+    },
+    {
+      "id": "R08",
+      "kind": "full_birth_input",
+      "asOf": "2026-08-29",
+      "horizonYears": 3,
+      "request": {
+        "name": "测试命盘R08",
+        "gender": "male",
+        "solarDateTime": "2001-01-01T00:10:00",
+        "birthPlace": "南京",
+        "trueSolarTime": false
+      }
+    },
+    {
+      "id": "R09",
+      "kind": "full_birth_input",
+      "asOf": "2026-08-29",
+      "horizonYears": 3,
+      "request": {
+        "name": "测试命盘R09",
+        "gender": "female",
+        "solarDateTime": "1990-09-21T11:50:00",
+        "birthPlace": "武汉",
+        "trueSolarTime": false
+      }
+    },
+    {
+      "id": "R10",
+      "kind": "full_birth_input",
+      "asOf": "2026-08-29",
+      "horizonYears": 3,
+      "request": {
+        "name": "测试命盘R10",
+        "gender": "male",
+        "solarDateTime": "1966-03-12T15:20:00",
+        "birthPlace": "西安",
+        "trueSolarTime": false
+      }
+    },
+    {
+      "id": "R11",
+      "kind": "full_birth_input",
+      "asOf": "2026-08-29",
+      "horizonYears": 3,
+      "request": {
+        "name": "测试命盘R11",
+        "gender": "female",
+        "solarDateTime": "2004-11-05T21:45:00",
+        "birthPlace": "深圳",
+        "trueSolarTime": false
+      }
+    },
+    {
+      "id": "R12",
+      "kind": "full_birth_input",
+      "asOf": "2026-08-29",
+      "horizonYears": 3,
+      "request": {
+        "name": "测试命盘R12",
+        "gender": "male",
+        "solarDateTime": "1985-06-30T09:00:00",
+        "birthPlace": "长沙",
+        "trueSolarTime": false
+      }
+    }
+  ],
+  "technicalCases": [
+    {
+      "id": "H02",
+      "basedOn": "R01",
+      "asOf": "2026-08-29",
+      "horizonYears": 2
+    },
+    {
+      "id": "H05",
+      "basedOn": "R01",
+      "asOf": "2026-08-29",
+      "horizonYears": 5
+    },
+    {
+      "id": "Y27",
+      "basedOn": "R01",
+      "asOf": "2027-08-29",
+      "horizonYears": 3
+    }
+  ],
+  "syntheticCases": [
+    {
+      "id": "S01",
+      "kind": "synthetic_scored_evidence",
+      "purpose": "全部无依据（仅用于下游边界，不表示有效命盘可无事实）",
+      "weights": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "changeSourceByYear": false
+    },
+    {
+      "id": "S02",
+      "kind": "synthetic_scored_evidence",
+      "purpose": "全部弱支持，不应强选收入主线",
+      "weights": [
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0
+        ]
+      ],
+      "changeSourceByYear": false
+    },
+    {
+      "id": "S03",
+      "kind": "synthetic_scored_evidence",
+      "purpose": "稳定与能力收入并列",
+      "weights": [
+        [
+          6,
+          0
+        ],
+        [
+          6,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "changeSourceByYear": false
+    },
+    {
+      "id": "S04",
+      "kind": "synthetic_scored_evidence",
+      "purpose": "稳定收入同时存在明显支持和限制",
+      "weights": [
+        [
+          8,
+          8
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "changeSourceByYear": false
+    },
+    {
+      "id": "S05",
+      "kind": "synthetic_scored_evidence",
+      "purpose": "只有支持，没有负向依据",
+      "weights": [
+        [
+          7,
+          0
+        ],
+        [
+          4,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          3,
+          0
+        ]
+      ],
+      "changeSourceByYear": false
+    },
+    {
+      "id": "S06",
+      "kind": "synthetic_scored_evidence",
+      "purpose": "分数相同，年度依据来源改变",
+      "weights": [
+        [
+          4,
+          0
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ]
+      ],
+      "changeSourceByYear": true
+    },
+    {
+      "id": "S07",
+      "kind": "synthetic_scored_evidence",
+      "purpose": "三年计算相同，旧正文仍按年序改变",
+      "weights": [
+        [
+          5,
+          0
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          2,
+          1
+        ]
+      ],
+      "changeSourceByYear": false
+    },
+    {
+      "id": "S08",
+      "kind": "synthetic_scored_evidence",
+      "purpose": "全部受限，不应包装出增收主线",
+      "weights": [
+        [
+          0,
+          3
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          5
+        ]
+      ],
+      "changeSourceByYear": false
+    }
+  ]
+}

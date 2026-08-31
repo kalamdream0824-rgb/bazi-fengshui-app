@@ -1,0 +1,22 @@
+{
+  "notice": "Synthetic planner boundaries only. No real user data.",
+  "plannerCases": [
+    { "id": "normal", "sourceCase": "S02", "expected": "success" },
+    { "id": "deterministic_tie", "sourceCase": "S07", "expected": "success" },
+    { "id": "insufficient", "sourceCase": "S01", "expected": "insufficient_diversity" }
+  ],
+  "semanticCases": [
+    {
+      "id": "same_subject_is_conflict",
+      "first": { "subjectKey": "project_terms", "objectKey": "payment_timing" },
+      "second": { "subjectKey": "project_terms", "objectKey": "pending_cash" },
+      "expected": "conflict"
+    },
+    {
+      "id": "same_path_with_distinct_semantics_is_allowed",
+      "first": { "subjectKey": "project_terms", "objectKey": "payment_timing" },
+      "second": { "subjectKey": "project_cost", "objectKey": "small_investment" },
+      "expected": "allowed"
+    }
+  ]
+}

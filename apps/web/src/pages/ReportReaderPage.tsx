@@ -2,14 +2,19 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { CareerReportReader } from '@/components/report/CareerReportReader'
 import { WealthReportReader } from '@/components/report/WealthReportReader'
+import { WealthV3ReportReader } from '@/components/report/WealthV3ReportReader'
 import { RelationshipReportReader } from '@/components/report/RelationshipReportReader'
 import { RelationshipSingleReportReader } from '@/components/report/RelationshipSingleReportReader'
+import { OverallReportReader } from '@/components/report/OverallReportReader'
 import { TopBar } from '@/components/TopBar'
 import {
   getReport,
+  isOverallReport,
+  isLegacyReport,
   isRelationshipV1Report,
   isRelationshipSingleReport,
   isWealthV2Report,
+  isWealthV3Report,
   type SavedReport,
 } from '@/services/reportApi'
 
@@ -37,14 +42,24 @@ export function ReportReaderPage() {
         </main>
       ) : !report ? (
         <main className="report-reader__state">正在展开命书…</main>
+      ) : isOverallReport(report) ? (
+        <OverallReportReader report={report} />
       ) : isRelationshipSingleReport(report) ? (
         <RelationshipSingleReportReader report={report} />
       ) : isRelationshipV1Report(report) ? (
         <RelationshipReportReader report={report} />
       ) : isWealthV2Report(report) ? (
         <WealthReportReader report={report} />
-      ) : (
+      ) : isWealthV3Report(report) ? (
+        <WealthV3ReportReader report={report} />
+      ) : isLegacyReport(report) ? (
         <CareerReportReader report={report} />
+      ) : (
+        <main className="report-reader__state">
+          <h1>暂不支持读取这份命书</h1>
+          <p>这份命书来自当前页面尚未支持的内容版本。</p>
+          <Link to="/reports">返回我的命书</Link>
+        </main>
       )}
     </div>
   )

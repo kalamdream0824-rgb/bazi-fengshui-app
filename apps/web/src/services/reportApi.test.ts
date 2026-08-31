@@ -1,7 +1,8 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import type { PaipanRequest } from '@/types/bazi'
 import { useAuthStore } from '@/store/useAuthStore'
 import { createReport, fetchReportPreview, getReport, listReports } from './reportApi'
+import type { WealthContentV3, WealthHeadlineMetaV3 } from './reportApi'
 
 const request: PaipanRequest = {
   name: '林先生',
@@ -12,6 +13,33 @@ const request: PaipanRequest = {
 }
 
 describe('reportApi', () => {
+  it('财富 v3.3 类型增加标题规划元数据并兼容历史版本', () => {
+    const metadata: WealthHeadlineMetaV3 = {
+      plannerVersion: 'wealth-headline-v1',
+      themeKey: 'project_payment_timing',
+      pathKey: 'project_income',
+      subjectKey: 'project_terms',
+      angleKey: 'support',
+      objectKey: 'payment_timing',
+      corePhraseKeys: ['project_payment_timing'],
+      selectionReasonCodes: ['annual_root', 'catalog.70'],
+    }
+    const historical: Pick<WealthContentV3, 'copyVersion' | 'headlinePlannerVersion'> = {
+      copyVersion: 'wealth-plain-v3.2',
+    }
+    const current: Pick<WealthContentV3, 'copyVersion' | 'headlinePlannerVersion'> = {
+      copyVersion: 'wealth-plain-v3.3',
+      headlinePlannerVersion: 'wealth-headline-v1',
+    }
+
+    expect(metadata.pathKey).toBe('project_income')
+    expect(historical.headlinePlannerVersion).toBeUndefined()
+    expect(current.headlinePlannerVersion).toBe('wealth-headline-v1')
+    expectTypeOf<WealthContentV3['copyVersion']>().toEqualTypeOf<
+      'wealth-plain-v3' | 'wealth-plain-v3.1' | 'wealth-plain-v3.2' | 'wealth-plain-v3.3'
+    >()
+  })
+
   it('生成事业命书后返回可保存的页面报告', async () => {
     useAuthStore.getState().setAuth('report-token', 'tester')
     const report = {
@@ -134,6 +162,27 @@ describe('reportApi', () => {
     ))
 
     await expect(fetchReportPreview(request, 'wealth', 'plain')).rejects.toThrow('不支持的命书主题')
+  })
+
+  it('生成接口保留业务错误码供页面选择安全文案', async () => {
+    useAuthStore.getState().setAuth('report-token', 'tester')
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({
+        code: 'REPORT_GENERATION_UNAVAILABLE',
+        message: '本次命书暂未生成成功',
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    ))
+
+    const error = await createReport(request, 'wealth', 'plain').catch((reason: unknown) => reason)
+
+    expect(error).toBeInstanceOf(Error)
+    expect(error).toMatchObject({
+      code: 'REPORT_GENERATION_UNAVAILABLE',
+      message: '本次命书暂未生成成功',
+    })
   })
 
   it('事业主题单独携带完整现实状态问卷', async () => {

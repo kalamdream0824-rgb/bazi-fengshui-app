@@ -28,6 +28,9 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Validate wealth v3 contract
+        run: node ../../contracts/tests/wealth-v3-contract.test.cjs
+
       - name: Lint
         run: npm run lint
 

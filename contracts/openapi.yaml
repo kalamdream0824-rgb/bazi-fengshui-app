@@ -2,7 +2,40 @@ openapi: 3.0.3
 info:
   title: 八字排盘 App API
   version: 0.1.0
-  description: 前后端契约草案。开发期前端使用 MockBaziApi，后端就绪后按本契约实现。
+  description: 八字排盘与命书生成的前后端接口契约。
+x-planned-contracts:
+  wealth-narrative-v3:
+    status: implemented
+    schema: ./drafts/wealth-v3.schema.json
+    types: ./drafts/wealth-v3.ts
+    design: ../docs/design/wealth-v3-expression-contract.md
+    description: 后端生成、快照保存读取及前端独立阅读分支均已接入；系统级浏览器与 MySQL 验证留待任务 9。
+x-report-products:
+  pricingAuthority: server
+  currency: CNY
+  paymentMode: mock-only
+  description: 单份命书的价格只能由服务端商品目录决定；客户端不得提交或覆盖金额。当前模拟支付不能代表真实扣款。
+  available:
+    - topic: career
+      edition: plain
+      amountCents: 690
+    - topic: wealth
+      edition: plain
+      amountCents: 690
+    - topic: relationship
+      edition: plain
+      amountCents: 690
+  unavailable:
+    - topic: overall
+      edition: plain
+    - topic: overall
+      edition: professional
+    - topic: career
+      edition: professional
+    - topic: wealth
+      edition: professional
+    - topic: relationship
+      edition: professional
 servers:
   - url: /api/v1
 paths:
@@ -159,7 +192,8 @@ paths:
                 $ref: '#/components/schemas/PaipanResult'
   /reports:
     post:
-      summary: 创建一份文字型命书（需 Bearer token）
+      summary: 使用会员权益创建文字型命书（需 Bearer token）
+      description: 仅有效会员可直接调用；会员每天最多成功生成三份。非会员返回 REPORT_PAYMENT_REQUIRED，必须改走 /reports/checkout，不能用本接口绕过购买。
       requestBody:
         required: true
         content:
@@ -173,8 +207,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportInfo'
+        '400':
+          description: 非会员需购买（REPORT_PAYMENT_REQUIRED）、会员当日额度已用完（MEMBER_DAILY_REPORT_LIMIT）或内容生成失败。
     get:
-      summary: 我的命书列表（需 Bearer token）
+      summary: 我的命书列表（需 Bearer token；只返回 ready 报告）
+      description: locked 报告在支付完成前不会出现在列表中。
       responses:
         '200':
           description: 报告列表
@@ -184,6 +221,44 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ReportInfo'
+  /reports/checkout:
+    post:
+      summary: 创建单份命书订单和锁定报告（需 Bearer token）
+      description: 金额由服务端商品目录决定，客户端不提交价格。命书先完成生成并保存为 locked；支付前 locked 报告不可通过列表或详情读取。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportPreviewRequest'
+      responses:
+        '200':
+          description: 待支付订单与其唯一关联的锁定报告
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportCheckoutInfo'
+        '400':
+          description: 商品未开放（REPORT_PRODUCT_UNAVAILABLE）或命书生成失败；失败时不创建可收费订单。
+  /reports/checkout/{orderId}/mock-pay:
+    post:
+      summary: 模拟支付并解锁单份命书（仅非生产环境，需 Bearer token）
+      description: 仅非生产环境可用；操作幂等，重复确认不会重复创建或解锁。成功后返回 checkout 时生成的同一份命书，而不是重新生成。
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 已变为 ready 的同一份命书
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportInfo'
+        '400':
+          description: 订单不存在、状态异常、模拟支付被禁用或命书解锁失败。
   /reports/preview:
     post:
       deprecated: true
@@ -212,6 +287,7 @@ paths:
   /reports/{id}:
     get:
       summary: 命书详情（需 Bearer token）
+      description: 仅报告所有者可以读取 ready 报告；locked 报告统一返回 404，避免未支付内容泄露。
       parameters:
         - name: id
           in: path
@@ -308,11 +384,11 @@ components:
     ReportEdition:
       type: string
       enum: [plain, professional]
-      description: career 支持两个版本；wealth v2 与 relationship v1 只开放三年通俗版，各自的 professional 请求返回对应的 NOT_AVAILABLE 错误码。
+      description: 当前单份商品只开放事业、财富、感情通俗版；综合通俗版仅向会员开放内容验收，尚未进入单份商品目录；所有专业版均未开放。
     ReportPreviewRequest:
       type: object
       required: [request, topic, edition]
-      description: career 必须提交 careerContext；wealth v2 不需要问卷；relationship v1 必须提交 relationshipContext。财富和感情通俗版固定输出三年，专业版暂未开放。
+      description: overall v1.1 和 wealth v3 不需要问卷；career 必须提交 careerContext；relationship v1 必须提交 relationshipContext。综合与财富通俗版固定输出三年；感情单身版输出今年重点与明年参考，交往中和已婚版输出三年；专业版暂未开放。综合通俗版当前仅供会员验收，不支持单份购买；历史 overall v1 报告继续可读。
       properties:
         request:
           $ref: '#/components/schemas/PaipanRequest'
@@ -367,6 +443,26 @@ components:
           type: string
           enum: [single, dating, married]
           description: single=单身或尚未确定关系；dating=已确认交往关系；married=已婚或长期共同生活。
+    ReportCheckoutInfo:
+      type: object
+      required: [orderId, reportId, topic, edition, amountCents, status]
+      properties:
+        orderId:
+          type: integer
+        reportId:
+          type: integer
+          description: checkout 时已经生成并锁定的报告 ID；支付成功后解锁的仍是此 ID。
+        topic:
+          $ref: '#/components/schemas/ReportTopic'
+        edition:
+          $ref: '#/components/schemas/ReportEdition'
+        amountCents:
+          type: integer
+          readOnly: true
+          description: 服务端商品目录确定的人民币分值；当前开放商品均为 690。
+        status:
+          type: string
+          enum: [pending]
     ReportInfo:
       type: object
       required: [id, subject, topic, edition, status, contentVersion, content, createdAt, generatedAt]
@@ -378,13 +474,14 @@ components:
         status: { type: string, enum: [ready] }
         contentVersion:
           type: string
-          description: career-narrative-v1/v2/v3、wealth-narrative-v1 使用旧内容结构；wealth-narrative-v2 与 relationship-narrative-v1 使用各自独立结构。
+          description: career-narrative-v1/v2/v3、wealth-narrative-v1 使用旧内容结构；wealth-narrative-v2/v3 与 relationship-narrative-v1 使用各自独立结构。新生成的财富通俗版为 wealth-narrative-v3。
         content:
           oneOf:
             - $ref: '#/components/schemas/CareerNarrativePlan'
             - $ref: '#/components/schemas/WealthNarrativePlan'
             - $ref: '#/components/schemas/RelationshipNarrativePlan'
-          description: 由 contentVersion 判别；旧事业及财富 v1 使用 CareerNarrativePlan，财富 v2 使用 WealthNarrativePlan，感情 v1 使用 RelationshipNarrativePlan。
+            - $ref: './drafts/wealth-v3.schema.json#/definitions/Content'
+          description: 由 contentVersion 判别；旧事业及财富 v1 使用 CareerNarrativePlan，财富 v2 使用 WealthNarrativePlan，财富 v3 使用独立 Content，感情 v1 使用 RelationshipNarrativePlan。
         createdAt: { type: string, format: date-time }
         generatedAt: { type: string, format: date-time }
     CareerNarrativePlan:

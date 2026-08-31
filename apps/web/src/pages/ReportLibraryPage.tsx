@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { TopBar } from '@/components/TopBar'
-import { listReports, type SavedReport } from '@/services/reportApi'
+import { listReports, reportHeadline, type SavedReport } from '@/services/reportApi'
 
 const TOPIC_META = {
   career: { label: '事业运势', seal: '业' },
@@ -49,7 +49,7 @@ export function ReportLibraryPage() {
               <span className="report-library__seal" aria-hidden="true">{TOPIC_META[report.topic].seal}</span>
               <span className="report-library__copy">
                 <small>{report.subject} · {TOPIC_META[report.topic].label} · {report.edition === 'plain' ? '通俗版' : '专业版'}</small>
-                <strong>{report.content.thesis}</strong>
+                <strong>{reportHeadline(report)}</strong>
                 <time>{new Date(report.generatedAt).toLocaleDateString('zh-CN')}</time>
               </span>
               <i aria-hidden="true">›</i>

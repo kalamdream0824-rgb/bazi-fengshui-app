@@ -1,7 +1,9 @@
 package com.bazi.app.controller;
 
+import com.bazi.app.dto.ReportCheckoutDto;
 import com.bazi.app.dto.ReportDto;
 import com.bazi.app.dto.ReportPreviewRequest;
+import com.bazi.app.service.ReportCheckoutService;
 import com.bazi.app.service.ReportService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -19,9 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReportController {
 
   private final ReportService reportService;
+  private final ReportCheckoutService checkoutService;
 
-  public ReportController(ReportService reportService) {
+  public ReportController(ReportService reportService, ReportCheckoutService checkoutService) {
     this.reportService = reportService;
+    this.checkoutService = checkoutService;
   }
 
   @PostMapping
@@ -29,6 +33,20 @@ public class ReportController {
       @Valid @RequestBody ReportPreviewRequest request,
       HttpServletRequest httpRequest) throws Exception {
     return reportService.create(userId(httpRequest), request);
+  }
+
+  @PostMapping("/checkout")
+  public ReportCheckoutDto checkout(
+      @Valid @RequestBody ReportPreviewRequest request,
+      HttpServletRequest httpRequest) throws Exception {
+    return checkoutService.prepare(userId(httpRequest), request);
+  }
+
+  @PostMapping("/checkout/{orderId}/mock-pay")
+  public ReportDto mockPayCheckout(
+      @PathVariable Long orderId,
+      HttpServletRequest httpRequest) throws Exception {
+    return checkoutService.mockPayAndUnlock(userId(httpRequest), orderId);
   }
 
   @GetMapping

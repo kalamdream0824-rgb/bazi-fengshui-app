@@ -1,0 +1,884 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:bazi:wealth-narrative-v3",
+  "title": "财富 v3 页面报告",
+  "description": "财富 v3 的正式接口结构。结构校验不替代证据引用、权重一致性、语气和年度语义校验。",
+  "x-status": "implemented",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "subject": {
+      "type": "string",
+      "minLength": 1
+    },
+    "topic": {
+      "const": "wealth"
+    },
+    "edition": {
+      "const": "plain"
+    },
+    "status": {
+      "const": "ready"
+    },
+    "contentVersion": {
+      "const": "wealth-narrative-v3"
+    },
+    "content": {
+      "$ref": "#/definitions/Content"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "id",
+    "subject",
+    "topic",
+    "edition",
+    "status",
+    "contentVersion",
+    "content",
+    "createdAt",
+    "generatedAt"
+  ],
+  "definitions": {
+    "Path": {
+      "type": "string",
+      "enum": [
+        "stable_income",
+        "skill_income",
+        "project_income",
+        "cooperation_income",
+        "retention"
+      ]
+    },
+    "IncomePath": {
+      "type": "string",
+      "enum": [
+        "stable_income",
+        "skill_income",
+        "project_income",
+        "cooperation_income"
+      ]
+    },
+    "Block": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "interpretation",
+            "observation",
+            "general_advice",
+            "method_note"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "templateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "years": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 1,
+          "maxItems": 3,
+          "uniqueItems": true
+        },
+        "decisionIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "text",
+        "templateId",
+        "years",
+        "decisionIds"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "interpretation"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "decisionIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Focus": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "state": {
+              "const": "none"
+            },
+            "primaryCandidates": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/IncomePath"
+              },
+              "minItems": 0,
+              "maxItems": 0,
+              "uniqueItems": true
+            },
+            "secondaryCandidates": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/IncomePath"
+              },
+              "minItems": 0,
+              "maxItems": 0,
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "state",
+            "primaryCandidates",
+            "secondaryCandidates"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "state": {
+              "const": "leading"
+            },
+            "primaryCandidates": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/IncomePath"
+              },
+              "minItems": 1,
+              "maxItems": 1,
+              "uniqueItems": true
+            },
+            "secondaryCandidates": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/IncomePath"
+              },
+              "minItems": 0,
+              "maxItems": 3,
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "state",
+            "primaryCandidates",
+            "secondaryCandidates"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "state": {
+              "const": "tied"
+            },
+            "primaryCandidates": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/IncomePath"
+              },
+              "minItems": 2,
+              "maxItems": 4,
+              "uniqueItems": true
+            },
+            "secondaryCandidates": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/IncomePath"
+              },
+              "minItems": 0,
+              "maxItems": 0,
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "state",
+            "primaryCandidates",
+            "secondaryCandidates"
+          ]
+        }
+      ]
+    },
+    "Fact": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "natal",
+            "annual",
+            "dayun"
+          ]
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "code",
+        "value"
+      ]
+    },
+    "Evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "$ref": "#/definitions/Path"
+        },
+        "ruleKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "factKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "family": {
+          "enum": [
+            "NATAL_STRUCTURE",
+            "NATAL_COMBINATION",
+            "DAYUN_CONTEXT",
+            "ANNUAL_TRIGGER"
+          ]
+        },
+        "rootFactIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "weight": {
+          "type": "integer",
+          "not": {
+            "const": 0
+          }
+        }
+      },
+      "required": [
+        "id",
+        "path",
+        "ruleKey",
+        "factKey",
+        "family",
+        "rootFactIds",
+        "weight"
+      ]
+    },
+    "Decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "year": {
+          "type": "integer"
+        },
+        "path": {
+          "$ref": "#/definitions/Path"
+        },
+        "supportWeight": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "limitationWeight": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "netWeight": {
+          "type": "integer"
+        },
+        "stance": {
+          "enum": [
+            "quiet",
+            "supportive",
+            "restricted",
+            "mixed"
+          ]
+        },
+        "strength": {
+          "enum": [
+            "none",
+            "limited",
+            "supported",
+            "pronounced"
+          ]
+        },
+        "supportingEvidenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "limitingEvidenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "reasonCodes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "no_evidence",
+              "limited_net_support",
+              "single_origin",
+              "has_limitations",
+              "legacy_provenance_unresolved"
+            ]
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "year",
+        "path",
+        "supportWeight",
+        "limitationWeight",
+        "netWeight",
+        "stance",
+        "strength",
+        "supportingEvidenceIds",
+        "limitingEvidenceIds",
+        "reasonCodes"
+      ]
+    },
+    "Risk": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "$ref": "#/definitions/Path"
+        },
+        "limitingEvidenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "reading": {
+          "$ref": "#/definitions/Block"
+        }
+      },
+      "required": [
+        "path",
+        "limitingEvidenceIds",
+        "reading"
+      ]
+    },
+    "Change": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "$ref": "#/definitions/Path"
+        },
+        "supportDelta": {
+          "type": "integer"
+        },
+        "limitationDelta": {
+          "type": "integer"
+        },
+        "addedEvidenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "removedEvidenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "path",
+        "supportDelta",
+        "limitationDelta",
+        "addedEvidenceIds",
+        "removedEvidenceIds"
+      ]
+    },
+    "Comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "toYear": {
+          "type": "integer"
+        },
+        "direction": {
+          "enum": [
+            "unchanged",
+            "changed"
+          ]
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Change"
+          },
+          "minItems": 0,
+          "maxItems": 5
+        },
+        "reading": {
+          "$ref": "#/definitions/Block"
+        }
+      },
+      "required": [
+        "toYear",
+        "direction",
+        "changes",
+        "reading"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "direction": {
+                "const": "unchanged"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "changes": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/Change"
+                },
+                "minItems": 0,
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "direction": {
+                "const": "changed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "changes": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/Change"
+                },
+                "minItems": 1,
+                "maxItems": 5
+              }
+            }
+          }
+        }
+      ]
+    },
+    "HeadlineMeta": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "plannerVersion": {
+          "const": "wealth-headline-v1"
+        },
+        "themeKey": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$"
+        },
+        "pathKey": {
+          "$ref": "#/definitions/Path"
+        },
+        "subjectKey": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$"
+        },
+        "angleKey": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$"
+        },
+        "objectKey": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$"
+        },
+        "corePhraseKeys": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "selectionReasonCodes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9_.-]+$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "plannerVersion",
+        "themeKey",
+        "pathKey",
+        "subjectKey",
+        "angleKey",
+        "objectKey",
+        "corePhraseKeys",
+        "selectionReasonCodes"
+      ]
+    },
+    "Year": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "year": {
+          "type": "integer"
+        },
+        "ganZhi": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 2
+        },
+        "facts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Fact"
+          },
+          "minItems": 0
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Evidence"
+          },
+          "minItems": 0
+        },
+        "decisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Decision"
+          },
+          "minItems": 5,
+          "maxItems": 5
+        },
+        "focus": {
+          "$ref": "#/definitions/Focus"
+        },
+        "headlineMeta": {
+          "$ref": "#/definitions/HeadlineMeta"
+        },
+        "overview": {
+          "$ref": "#/definitions/Block"
+        },
+        "income": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Block"
+          },
+          "minItems": 1,
+          "maxItems": 2
+        },
+        "retention": {
+          "$ref": "#/definitions/Block"
+        },
+        "risk": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Risk"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Block"
+          },
+          "minItems": 0,
+          "maxItems": 2
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Block"
+          },
+          "minItems": 1,
+          "maxItems": 2
+        },
+        "comparison": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Comparison"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "year",
+        "ganZhi",
+        "facts",
+        "evidence",
+        "decisions",
+        "focus",
+        "overview",
+        "income",
+        "retention",
+        "risk",
+        "observations",
+        "actions",
+        "comparison"
+      ]
+    },
+    "PathSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "$ref": "#/definitions/Path"
+        },
+        "reading": {
+          "$ref": "#/definitions/Block"
+        },
+        "yearDecisionIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "path",
+        "reading",
+        "yearDecisionIds"
+      ]
+    },
+    "Content": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "asOf": {
+          "type": "string",
+          "format": "date"
+        },
+        "zoneId": {
+          "const": "Asia/Shanghai"
+        },
+        "horizonYears": {
+          "const": 3
+        },
+        "calculationVersion": {
+          "const": "wealth-path-v2"
+        },
+        "policyVersion": {
+          "const": "wealth-expression-v1"
+        },
+        "copyVersion": {
+          "enum": [
+            "wealth-plain-v3",
+            "wealth-plain-v3.1",
+            "wealth-plain-v3.2",
+            "wealth-plain-v3.3"
+          ]
+        },
+        "headlinePlannerVersion": {
+          "const": "wealth-headline-v1"
+        },
+        "thesis": {
+          "$ref": "#/definitions/Block"
+        },
+        "summary": {
+          "$ref": "#/definitions/Block"
+        },
+        "pathSummaries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PathSummary"
+          },
+          "minItems": 5,
+          "maxItems": 5
+        },
+        "riskSummary": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Block"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "years": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Year"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "route": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Block"
+          },
+          "minItems": 1,
+          "maxItems": 3
+        },
+        "readingNote": {
+          "$ref": "#/definitions/Block"
+        }
+      },
+      "required": [
+        "asOf",
+        "zoneId",
+        "horizonYears",
+        "calculationVersion",
+        "policyVersion",
+        "copyVersion",
+        "thesis",
+        "summary",
+        "pathSummaries",
+        "riskSummary",
+        "years",
+        "route",
+        "readingNote"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "copyVersion": {
+                "const": "wealth-plain-v3.3"
+              }
+            },
+            "required": [
+              "copyVersion"
+            ]
+          },
+          "then": {
+            "required": [
+              "headlinePlannerVersion"
+            ],
+            "properties": {
+              "years": {
+                "type": "array",
+                "items": {
+                  "allOf": [
+                    {
+                      "$ref": "#/definitions/Year"
+                    },
+                    {
+                      "required": [
+                        "headlineMeta"
+                      ]
+                    }
+                  ]
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

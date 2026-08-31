@@ -4,8 +4,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   getReport,
   type LegacySavedReport,
+  type OverallSavedReport,
   type RelationshipV1SavedReport,
+  type SavedReport,
   type WealthV2SavedReport,
+  type WealthV3SavedReport,
 } from '@/services/reportApi'
 import { ReportReaderPage } from './ReportReaderPage'
 
@@ -42,6 +45,64 @@ const report: LegacySavedReport = {
       counterEvidence: [],
       confidence: '高',
     }],
+  },
+}
+
+const overallReport: OverallSavedReport = {
+  id: 58,
+  subject: '林先生',
+  topic: 'overall',
+  edition: 'plain',
+  status: 'ready',
+  contentVersion: 'overall-narrative-v1',
+  createdAt: '2026-08-31T08:00:00',
+  generatedAt: '2026-08-31T08:00:00',
+  content: {
+    horizonYears: 3,
+    thesis: '这三年先处理生活节奏，随后重点会转到钱财安排；其他方面也要同时照看，但不必平均用力。',
+    summary: '2027年相对更适合推进已有计划；2026年更需要控制负担。',
+    readingNote: '这份综合命书用于比较三年的生活重点和处理顺序。',
+    evidenceKeys: ['annual.stem.group.output'],
+    route: ['只设一个年度重点。', '确认工作成果。', '保留日常用钱。'],
+    years: [2026, 2027, 2028].map((year, index) => ({
+      year,
+      ganZhi: ['丙午', '丁未', '戊申'][index],
+      primaryCode: (['rhythm', 'career', 'wealth'] as const)[index],
+      primaryLabel: ['生活节奏', '事业责任', '钱财安排'][index],
+      secondaryCode: 'relationship',
+      secondaryLabel: '关系支持',
+      headline: [
+        '压力偏重，先把精力放在一件要紧事上',
+        '条件较顺，把成果做实，别让忙碌代替进展',
+        '机会与牵制并存，收入与花费一起看',
+      ][index],
+      verdict: '这一年先处理最影响日常的一件事，同时照看其他方面。',
+      dimensions: ([
+        ['rhythm', '生活节奏', '需收紧', '事情容易挤在一起，休息不足会影响判断。'],
+        ['career', '事业责任', '较顺', '工作较容易得到任务或责任上的机会。'],
+        ['wealth', '钱财安排', '平稳', '收入和支出大体平稳，先守住日常余量。'],
+        ['relationship', '关系支持', '有机会也有牵制', '关系既有支持，也有需要说清的分歧。'],
+      ] as const).map(([code, label, stance, judgment]) => ({
+        code, label, stance, judgment, evidenceKeys: [`${year}.${code}.evidence`],
+      })),
+      priorityIssue: '最先要处理的是安排过满：每天都没有恢复时间，其他计划很难完成。',
+      actions: ['删掉一个可以延后的安排。', '把下一步计划说具体。'],
+      changeCondition: '如果连续两周办事效率变差，就要继续减少安排。',
+      transition: index < 2 ? '下一年重点会转向其他方面。' : '这是本次三年判断的最后一年。',
+      evidenceKeys: [`${year}.evidence`],
+    })),
+  },
+}
+
+const overallV11Report: OverallSavedReport = {
+  ...overallReport,
+  contentVersion: 'overall-narrative-v1.1',
+  content: {
+    ...overallReport.content,
+    years: overallReport.content.years.map((year) => ({
+      ...year,
+      linkage: `先看清${year.primaryLabel}，因为它会直接影响${year.secondaryLabel}的实际安排。`,
+    })),
   },
 }
 
@@ -121,6 +182,96 @@ const wealthV2Report: WealthV2SavedReport = {
     route: ['确认真实收入来源。', '保留重复收费的事情。', '让每月结余稳定下来。'],
   },
 }
+
+const wealthBlock = (id: string, text: string, years = [2026, 2027, 2028]) => ({
+  id,
+  kind: 'interpretation' as const,
+  text,
+  templateId: id,
+  years,
+  decisionIds: years.map((year) => `${year}.decision.stable_income`),
+})
+
+const wealthV3Report = {
+  id: 48,
+  subject: '林先生',
+  topic: 'wealth',
+  edition: 'plain',
+  status: 'ready',
+  contentVersion: 'wealth-narrative-v3',
+  createdAt: '2026-08-29T08:00:00',
+  generatedAt: '2026-08-29T08:00:00',
+  content: {
+    asOf: '2026-08-29',
+    zoneId: 'Asia/Shanghai',
+    horizonYears: 3,
+    calculationVersion: 'wealth-path-v2',
+    policyVersion: 'wealth-expression-v1',
+    copyVersion: 'wealth-plain-v3',
+    thesis: wealthBlock('wealth.thesis', '这三年每年的收入重点不同，不必硬套成一条路。'),
+    summary: wealthBlock('wealth.summary', '先看收入从哪里来，再看最后能留下多少。'),
+    pathSummaries: [
+      ['stable_income', '稳定收入', '三年里，固定工资和长期收入可以逐年核对。'],
+      ['skill_income', '靠能力赚钱', '能解决什么问题，是这条收入要看的重点。'],
+      ['project_income', '项目和额外收入', '额外项目要把成本和收款时间一起算清。'],
+      ['cooperation_income', '合作带来的收入', '合作收入要先说清分账和付款。'],
+      ['retention', '把钱留下', '进账不等于结余，要看最终能留下多少。'],
+    ].map(([path, label, text]) => ({
+      path,
+      label,
+      reading: wealthBlock(`wealth.path.${path}`, text),
+      yearDecisionIds: [2026, 2027, 2028].map((year) => `${year}.decision.${path}`),
+    })),
+    riskSummary: null,
+    years: [
+      {
+        year: 2026,
+        ganZhi: '丙午',
+        facts: [], evidence: [], decisions: [],
+        focus: { state: 'tied', primaryCandidates: ['stable_income', 'skill_income'], secondaryCandidates: [] },
+        overview: wealthBlock('2026.overview', '稳定收入和靠能力赚钱可以一起关注。', [2026]),
+        income: [wealthBlock('2026.income', '一边看固定收入，一边看别人愿意为什么能力付钱。', [2026])],
+        retention: wealthBlock('2026.retention', '收入到账后，先留出日常必需开支。', [2026]),
+        risk: null,
+        observations: [{ ...wealthBlock('2026.observation', '可以留意同一类收入能否重复出现。', [2026]), kind: 'observation' }],
+        actions: [{ ...wealthBlock('2026.action', '记录每笔实际到账和对应成本。', [2026]), kind: 'general_advice' }],
+        comparison: {
+          toYear: 2027, direction: 'changed', changes: [],
+          reading: wealthBlock('2026.comparison', '到2027年，收入方向会换一批条件来判断。', [2026, 2027]),
+        },
+      },
+      {
+        year: 2027,
+        ganZhi: '丁未',
+        facts: [], evidence: [], decisions: [],
+        focus: { state: 'none', primaryCandidates: [], secondaryCandidates: [] },
+        overview: wealthBlock('2027.overview', '这一年没有特别突出的收入方向。', [2027]),
+        income: [wealthBlock('2027.income', '已有收入各有条件，不必强行选出第一名。', [2027])],
+        retention: wealthBlock('2027.retention', '先确认每个月实际能留下多少。', [2027]),
+        risk: null, observations: [],
+        actions: [{ ...wealthBlock('2027.action', '把固定开支和临时开支分开记录。', [2027]), kind: 'general_advice' }],
+        comparison: {
+          toYear: 2028, direction: 'unchanged', changes: [],
+          reading: wealthBlock('2027.comparison', '到2028年，现有条件没有明显变化。', [2027, 2028]),
+        },
+      },
+      {
+        year: 2028,
+        ganZhi: '戊申',
+        facts: [], evidence: [], decisions: [],
+        focus: { state: 'leading', primaryCandidates: ['project_income'], secondaryCandidates: [] },
+        overview: wealthBlock('2028.overview', '项目和额外收入相对更值得看看。', [2028]),
+        income: [wealthBlock('2028.income', '额外项目要先看扣除成本后的实际收入。', [2028])],
+        retention: wealthBlock('2028.retention', '新增进账不要立刻变成新增开支。', [2028]),
+        risk: null, observations: [],
+        actions: [{ ...wealthBlock('2028.action', '接项目前先写清价格和付款时间。', [2028]), kind: 'general_advice' }],
+        comparison: null,
+      },
+    ],
+    route: [{ ...wealthBlock('wealth.route', '先记清真实进账，再决定保留哪种收入。'), kind: 'general_advice' }],
+    readingNote: { ...wealthBlock('wealth.note', '这是按年度整理的传统命理参考，不预测具体月份。'), kind: 'method_note' },
+  },
+} as unknown as WealthV3SavedReport
 
 const relationshipReport: RelationshipV1SavedReport = {
   id: 38,
@@ -294,6 +445,38 @@ describe('ReportReaderPage', () => {
     expect(screen.getByText('最需留意')).toBeInTheDocument()
   })
 
+  it('综合v1先给三年主线，再按年份完整展示四个生活方面', async () => {
+    vi.mocked(getReport).mockResolvedValue(overallReport)
+    renderReader()
+
+    expect(await screen.findByText('综合命书 · 通俗版')).toBeInTheDocument()
+    expect(screen.getByText('三年总看')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: overallReport.content.thesis })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '2028 · 戊申' })).toBeInTheDocument()
+    for (const label of ['生活节奏', '事业责任', '钱财安排', '关系支持']) {
+      expect(screen.getAllByRole('heading', { name: label })).toHaveLength(3)
+    }
+    expect(screen.getAllByRole('heading', { name: '这一年先处理什么' })).toHaveLength(3)
+    expect(screen.getAllByText('删掉一个可以延后的安排。')).toHaveLength(3)
+    expect(screen.getByRole('heading', { name: '接下来三年，按这个顺序做' })).toBeInTheDocument()
+    expect(screen.getByText(overallReport.content.readingNote)).toBeInTheDocument()
+    expect(screen.queryByText('2026.rhythm.evidence')).not.toBeInTheDocument()
+    expect(screen.queryByText(/分数|权重/)).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: '为什么先看这件事' })).not.toBeInTheDocument()
+  })
+
+  it('综合v1.1展示主焦点如何影响次焦点', async () => {
+    vi.mocked(getReport).mockResolvedValue(overallV11Report)
+    renderReader()
+
+    expect(await screen.findByText('综合命书 · 通俗版')).toBeInTheDocument()
+    expect(screen.getAllByRole('heading', { name: '为什么先看这件事' })).toHaveLength(3)
+    for (const year of overallV11Report.content.years) {
+      expect(year.linkage).toBeDefined()
+      expect(screen.getByText(year.linkage!)).toBeInTheDocument()
+    }
+  })
+
   it('财富v2按通用序号渲染三年内容和2028年结论', async () => {
     vi.mocked(getReport).mockResolvedValue(wealthV2Report)
     renderReader()
@@ -307,6 +490,104 @@ describe('ReportReaderPage', () => {
     expect(screen.queryByText('wealth.2028')).not.toBeInTheDocument()
   })
 
+  it('财富v3读取保存的三年正文，并完整展示五条钱路', async () => {
+    vi.mocked(getReport).mockResolvedValue(wealthV3Report)
+    renderReader()
+
+    expect(await screen.findByRole('heading', { name: '这三年每年的收入重点不同，不必硬套成一条路。' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '2026 · 丙午' })).toBeInTheDocument()
+    expect(screen.getByText('一边看固定收入，一边看别人愿意为什么能力付钱。')).toBeInTheDocument()
+    for (const label of ['稳定收入', '靠能力赚钱', '项目和额外收入', '合作带来的收入', '把钱留下']) {
+      expect(screen.getByText(label, { selector: '.wealth-path strong' })).toBeInTheDocument()
+    }
+    expect(screen.queryByText('两年总断')).not.toBeInTheDocument()
+  })
+
+  it('财富v3并列方向使用中性标题，不重新包装成最旺钱路', async () => {
+    vi.mocked(getReport).mockResolvedValue(wealthV3Report)
+    renderReader()
+
+    expect(await screen.findByRole('heading', { name: '可以一起关注的方向' })).toBeInTheDocument()
+    expect(screen.getByText('稳定收入、靠能力赚钱')).toBeInTheDocument()
+    expect(screen.getByText('这一年没有特别突出的收入方向。')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '相对更值得关注的方向' })).toBeInTheDocument()
+    expect(screen.getByText('项目和额外收入', { selector: '.wealth-v3-year__focus p' })).toBeInTheDocument()
+    expect(screen.queryByText('最旺钱路')).not.toBeInTheDocument()
+    expect(screen.queryByText('主要钱路')).not.toBeInTheDocument()
+    expect(screen.queryByText('辅助钱路')).not.toBeInTheDocument()
+  })
+
+  it('财富v3有真实限制时才显示三年提醒和年度提醒', async () => {
+    const riskReading = wealthBlock('2026.risk', '共同开销增加时，要先说清各自承担多少。', [2026])
+    vi.mocked(getReport).mockResolvedValue({
+      ...wealthV3Report,
+      content: {
+        ...wealthV3Report.content,
+        riskSummary: wealthBlock('wealth.risk', '2026年需要留意共同开销。', [2026]),
+        years: [
+          {
+            ...wealthV3Report.content.years[0],
+            risk: { path: 'retention', limitingEvidenceIds: ['2026.evidence.retention'], reading: riskReading },
+          },
+          ...wealthV3Report.content.years.slice(1),
+        ],
+      },
+    })
+    renderReader()
+
+    expect(await screen.findByRole('heading', { name: '三年里需要留意' })).toBeInTheDocument()
+    expect(screen.getByText('2026年需要留意共同开销。')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '需要留意的一项' })).toBeInTheDocument()
+    expect(screen.getByText('共同开销增加时，要先说清各自承担多少。')).toBeInTheDocument()
+  })
+
+  it('财富v3把观察事项明确标成现实参考，不包装成预测验证', async () => {
+    vi.mocked(getReport).mockResolvedValue(wealthV3Report)
+    renderReader()
+
+    expect(await screen.findByRole('heading', { name: '可以留意的现实情况' })).toBeInTheDocument()
+    expect(screen.getByText('可以留意同一类收入能否重复出现。')).toBeInTheDocument()
+    expect(screen.queryByText('现实里出现这些情况，就说明方向正在发生')).not.toBeInTheDocument()
+  })
+
+  it('财富v3按年份展示留钱、行动、年度变化和阅读说明', async () => {
+    vi.mocked(getReport).mockResolvedValue(wealthV3Report)
+    renderReader()
+
+    expect(await screen.findAllByRole('heading', { name: '钱能不能留下' })).toHaveLength(3)
+    expect(screen.getByText('收入到账后，先留出日常必需开支。')).toBeInTheDocument()
+    expect(screen.getAllByRole('heading', { name: '可以先做这些事' })).toHaveLength(3)
+    expect(screen.getByText('记录每笔实际到账和对应成本。')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '和 2027 年相比' })).toBeInTheDocument()
+    expect(screen.getByText('到2027年，收入方向会换一批条件来判断。')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '接下来三年，可以这样安排' })).toBeInTheDocument()
+    expect(screen.getByText('先记清真实进账，再决定保留哪种收入。')).toBeInTheDocument()
+    expect(screen.getByText('这是按年度整理的传统命理参考，不预测具体月份。')).toBeInTheDocument()
+  })
+
+  it('财富v3没有负向依据时不渲染提醒卡片或空占位', async () => {
+    vi.mocked(getReport).mockResolvedValue(wealthV3Report)
+    renderReader()
+
+    await screen.findByRole('heading', { name: '这三年每年的收入重点不同，不必硬套成一条路。' })
+    expect(screen.queryByRole('heading', { name: '三年里需要留意' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: '需要留意的一项' })).not.toBeInTheDocument()
+    expect(screen.queryByText('暂无风险')).not.toBeInTheDocument()
+    expect(document.querySelector('.wealth-v3-risk-summary')).not.toBeInTheDocument()
+    expect(document.querySelector('.wealth-v3-year__risk')).not.toBeInTheDocument()
+  })
+
+  it('财富v3通俗正文不直接暴露内部版本、分数和依据记录', async () => {
+    vi.mocked(getReport).mockResolvedValue(wealthV3Report)
+    renderReader()
+
+    await screen.findByRole('heading', { name: '这三年每年的收入重点不同，不必硬套成一条路。' })
+    expect(screen.queryByText('wealth-path-v2')).not.toBeInTheDocument()
+    expect(screen.queryByText('2026.decision.stable_income')).not.toBeInTheDocument()
+    expect(screen.queryByText(/净分/)).not.toBeInTheDocument()
+    expect(screen.queryByText('专业依据')).not.toBeInTheDocument()
+  })
+
   it('事业与财富v1继续使用旧版两年阅读结构', async () => {
     renderReader()
     expect(await screen.findByText('两年总断')).toBeInTheDocument()
@@ -318,6 +599,20 @@ describe('ReportReaderPage', () => {
     })
     renderReader()
     expect((await screen.findAllByText('两年总断')).length).toBeGreaterThan(0)
+  })
+
+  it('未知内容版本明确提示不支持，不默认套用事业阅读结构', async () => {
+    vi.mocked(getReport).mockResolvedValue({
+      ...report,
+      topic: 'wealth',
+      contentVersion: 'wealth-narrative-v99',
+    } as unknown as SavedReport)
+    renderReader()
+
+    expect(await screen.findByRole('heading', { name: '暂不支持读取这份命书' })).toBeInTheDocument()
+    expect(screen.getByText('这份命书来自当前页面尚未支持的内容版本。')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: '返回我的命书' })).toHaveAttribute('href', '/reports')
+    expect(screen.queryByText('两年总断')).not.toBeInTheDocument()
   })
 
   it('感情v1进入独立阅读页而不是旧事业结构', async () => {

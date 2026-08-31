@@ -1,6 +1,13 @@
 import type { PaipanRequest } from '@/types/bazi'
 import { authFetch } from './http'
 
+export class ReportApiError extends Error {
+  constructor(public readonly code: string, message: string) {
+    super(message)
+    this.name = 'ReportApiError'
+  }
+}
+
 export type ReportTopicCode = 'overall' | 'career' | 'wealth' | 'relationship'
 export type ReportEditionCode = 'plain' | 'professional'
 export type CareerStatusCode = 'employed' | 'self_employed' | 'job_seeking' | 'studying'
@@ -102,6 +109,133 @@ export interface WealthNarrativePlan {
   route: string[]
 }
 
+export type WealthPathV3 =
+  | 'stable_income'
+  | 'skill_income'
+  | 'project_income'
+  | 'cooperation_income'
+  | 'retention'
+export type WealthIncomePathV3 = Exclude<WealthPathV3, 'retention'>
+
+export interface WealthBlockV3 {
+  id: string
+  kind: 'interpretation' | 'observation' | 'general_advice' | 'method_note'
+  text: string
+  templateId: string
+  years: number[]
+  decisionIds: string[]
+}
+
+export type WealthFocusV3 =
+  | { state: 'none'; primaryCandidates: []; secondaryCandidates: [] }
+  | { state: 'leading'; primaryCandidates: [WealthIncomePathV3]; secondaryCandidates: WealthIncomePathV3[] }
+  | { state: 'tied'; primaryCandidates: [WealthIncomePathV3, WealthIncomePathV3, ...WealthIncomePathV3[]]; secondaryCandidates: [] }
+
+export interface WealthFactV3 {
+  id: string
+  kind: 'natal' | 'annual' | 'dayun'
+  code: string
+  value: string
+}
+
+export interface WealthEvidenceV3 {
+  id: string
+  path: WealthPathV3
+  ruleKey: string
+  factKey: string
+  family: 'NATAL_STRUCTURE' | 'NATAL_COMBINATION' | 'DAYUN_CONTEXT' | 'ANNUAL_TRIGGER'
+  rootFactIds: string[]
+  weight: number
+}
+
+export interface WealthDecisionV3 {
+  id: string
+  year: number
+  path: WealthPathV3
+  supportWeight: number
+  limitationWeight: number
+  netWeight: number
+  stance: 'quiet' | 'supportive' | 'restricted' | 'mixed'
+  strength: 'none' | 'limited' | 'supported' | 'pronounced'
+  supportingEvidenceIds: string[]
+  limitingEvidenceIds: string[]
+  reasonCodes: Array<
+    | 'no_evidence'
+    | 'limited_net_support'
+    | 'single_origin'
+    | 'has_limitations'
+    | 'legacy_provenance_unresolved'
+  >
+}
+
+export interface WealthRiskV3 {
+  path: WealthPathV3
+  limitingEvidenceIds: string[]
+  reading: WealthBlockV3
+}
+
+export interface WealthComparisonV3 {
+  toYear: number
+  direction: 'unchanged' | 'changed'
+  changes: Array<{
+    path: WealthPathV3
+    supportDelta: number
+    limitationDelta: number
+    addedEvidenceIds: string[]
+    removedEvidenceIds: string[]
+  }>
+  reading: WealthBlockV3
+}
+
+export interface WealthHeadlineMetaV3 {
+  plannerVersion: 'wealth-headline-v1'
+  themeKey: string
+  pathKey: WealthPathV3
+  subjectKey: string
+  angleKey: string
+  objectKey: string
+  corePhraseKeys: string[]
+  selectionReasonCodes: string[]
+}
+
+export interface WealthYearV3 {
+  year: number
+  ganZhi: string
+  facts: WealthFactV3[]
+  evidence: WealthEvidenceV3[]
+  decisions: WealthDecisionV3[]
+  focus: WealthFocusV3
+  headlineMeta?: WealthHeadlineMetaV3
+  overview: WealthBlockV3
+  income: WealthBlockV3[]
+  retention: WealthBlockV3
+  risk: WealthRiskV3 | null
+  observations: WealthBlockV3[]
+  actions: WealthBlockV3[]
+  comparison: WealthComparisonV3 | null
+}
+
+export interface WealthContentV3 {
+  asOf: string
+  zoneId: 'Asia/Shanghai'
+  horizonYears: 3
+  calculationVersion: 'wealth-path-v2'
+  policyVersion: 'wealth-expression-v1'
+  copyVersion: 'wealth-plain-v3' | 'wealth-plain-v3.1' | 'wealth-plain-v3.2' | 'wealth-plain-v3.3'
+  headlinePlannerVersion?: 'wealth-headline-v1'
+  thesis: WealthBlockV3
+  summary: WealthBlockV3
+  pathSummaries: Array<{
+    path: WealthPathV3
+    reading: WealthBlockV3
+    yearDecisionIds: string[]
+  }>
+  riskSummary: WealthBlockV3 | null
+  years: WealthYearV3[]
+  route: WealthBlockV3[]
+  readingNote: WealthBlockV3
+}
+
 export interface RelationshipDimensionSummary {
   code: string
   label: string
@@ -149,6 +283,38 @@ export interface RelationshipNarrativePlan {
   evidenceKeys: string[]
 }
 
+export interface OverallNarrativePlan {
+  horizonYears: 3
+  thesis: string
+  summary: string
+  years: Array<{
+    year: number
+    ganZhi: string
+    primaryCode: 'rhythm' | 'career' | 'wealth' | 'relationship'
+    primaryLabel: string
+    secondaryCode: 'rhythm' | 'career' | 'wealth' | 'relationship'
+    secondaryLabel: string
+    headline: string
+    verdict: string
+    linkage?: string
+    dimensions: Array<{
+      code: 'rhythm' | 'career' | 'wealth' | 'relationship'
+      label: string
+      stance: string
+      judgment: string
+      evidenceKeys: string[]
+    }>
+    priorityIssue: string
+    actions: string[]
+    changeCondition: string
+    transition: string
+    evidenceKeys: string[]
+  }>
+  route: string[]
+  readingNote: string
+  evidenceKeys: string[]
+}
+
 interface SavedReportBase {
   id: number
   subject: string
@@ -173,6 +339,21 @@ export interface WealthV2SavedReport extends SavedReportBase {
   edition: 'plain'
   contentVersion: 'wealth-narrative-v2'
   content: WealthNarrativePlan
+}
+
+export interface OverallSavedReport extends SavedReportBase {
+  topic: 'overall'
+  edition: 'plain'
+  contentVersion: 'overall-narrative-v1' | 'overall-narrative-v1.1'
+  content: OverallNarrativePlan
+}
+
+export interface WealthV3SavedReport extends SavedReportBase {
+  topic: 'wealth'
+  edition: 'plain'
+  status: 'ready'
+  contentVersion: 'wealth-narrative-v3'
+  content: WealthContentV3
 }
 
 export interface RelationshipV1SavedReport extends SavedReportBase {
@@ -208,18 +389,51 @@ export interface RelationshipSingleSavedReport extends SavedReportBase {
   content: RelationshipSingleNarrativePlan
 }
 
-export type SavedReport = LegacySavedReport | WealthV2SavedReport | RelationshipV1SavedReport | RelationshipSingleSavedReport
+export type SavedReport =
+  | OverallSavedReport
+  | LegacySavedReport
+  | WealthV2SavedReport
+  | WealthV3SavedReport
+  | RelationshipV1SavedReport
+  | RelationshipSingleSavedReport
 
 export function isRelationshipSingleReport(report: SavedReport): report is RelationshipSingleSavedReport {
   return report.contentVersion === 'relationship-single-v1'
+}
+
+export function isOverallReport(report: SavedReport): report is OverallSavedReport {
+  return report.contentVersion === 'overall-narrative-v1'
+    || report.contentVersion === 'overall-narrative-v1.1'
 }
 
 export function isWealthV2Report(report: SavedReport): report is WealthV2SavedReport {
   return report.contentVersion === 'wealth-narrative-v2'
 }
 
+export function isWealthV3Report(report: SavedReport): report is WealthV3SavedReport {
+  return report.contentVersion === 'wealth-narrative-v3'
+}
+
 export function isRelationshipV1Report(report: SavedReport): report is RelationshipV1SavedReport {
   return report.contentVersion === 'relationship-narrative-v1'
+}
+
+export function isLegacyReport(report: SavedReport): report is LegacySavedReport {
+  return [
+    'career-narrative-v1',
+    'career-narrative-v2',
+    'career-narrative-v3',
+    'wealth-narrative-v1',
+  ].includes(report.contentVersion)
+}
+
+export function reportHeadline(report: SavedReport): string {
+  const thesis: unknown = report.content.thesis
+  if (typeof thesis === 'string') return thesis
+  if (thesis && typeof thesis === 'object' && 'text' in thesis && typeof thesis.text === 'string') {
+    return thesis.text
+  }
+  return '这份命书需要新版页面读取'
 }
 
 export async function createReport(
@@ -318,8 +532,11 @@ function fallbackName(topic: ReportTopicCode, edition: ReportEditionCode): strin
 async function reportJson<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await authFetch(path, init)
   if (!response.ok) {
-    const body = (await response.json().catch(() => null)) as { message?: string } | null
-    throw new Error(body?.message || `命书读取失败（HTTP ${response.status}）`)
+    const body = (await response.json().catch(() => null)) as { code?: string; message?: string } | null
+    throw new ReportApiError(
+      body?.code || `HTTP_${response.status}`,
+      body?.message || `命书读取失败（HTTP ${response.status}）`,
+    )
   }
   return response.json() as Promise<T>
 }

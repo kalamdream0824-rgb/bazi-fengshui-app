@@ -1,10 +1,12 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Button, ButtonRow } from '@/components/Button'
 import { EmptyState } from '@/components/EmptyState'
 import { FooterNote } from '@/components/FooterNote'
 import { TopBar } from '@/components/TopBar'
 import { useBaziWithFallback } from '@/hooks/useBaziWithFallback'
+import { getMe } from '@/services/membershipApi'
+import { mockPayReportCheckout, prepareReportCheckout } from '@/services/payApi'
 import {
   createReport,
   type CareerContextInput,
@@ -14,6 +16,7 @@ import {
 } from '@/services/reportApi'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useToastStore } from '@/store/useToastStore'
+import type { MembershipInfo } from '@/types/bazi'
 
 const TOPICS: Array<{ code: ReportTopicCode; seal: string; label: string; note: string }> = [
   { code: 'overall', seal: '总', label: '综合运势', note: '三年主线与年度节奏' },
@@ -88,21 +91,46 @@ function completedCareerContext(
   return { status: value.status, goal: value.goal, pace: value.pace }
 }
 
+function generationFailureMessage(error: unknown): string {
+  const code = error instanceof Error && 'code' in error
+    ? String((error as Error & { code: unknown }).code)
+    : ''
+  if (code === 'MEMBER_DAILY_REPORT_LIMIT') {
+    return '今天的3份会员命书已全部生成；继续生成需单独购买，本次未扣费'
+  }
+  if (code === 'REPORT_GENERATION_UNAVAILABLE') {
+    return '本次命书暂未生成成功，未扣除费用或使用次数，请稍后再试'
+  }
+  return '命书暂未生成成功，请稍后再试；本次不会扣除费用或使用次数'
+}
+
 export function ReportPage() {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const token = useAuthStore((state) => state.token)
   const toast = useToastStore((state) => state.show)
   const { request, result } = useBaziWithFallback()
-  const [topic, setTopic] = useState<ReportTopicCode>('career')
+  const isHttpMode = import.meta.env.VITE_API_MODE === 'http'
+  const [topic, setTopic] = useState<ReportTopicCode>(() => {
+    const requestedTopic = searchParams.get('topic')
+    return TOPICS.some((item) => item.code === requestedTopic)
+      ? requestedTopic as ReportTopicCode
+      : 'career'
+  })
   const [edition, setEdition] = useState<ReportEditionCode>('plain')
   const [careerContext, setCareerContext] = useState<Partial<CareerContextInput>>({})
   const [relationshipStatus, setRelationshipStatus] = useState<RelationshipStatus | null>(null)
   const [generating, setGenerating] = useState(false)
   const [status, setStatus] = useState('')
+  const [purchaseAvailable, setPurchaseAvailable] = useState(false)
+  const [overallDailyLimitReached, setOverallDailyLimitReached] = useState(false)
+  const [membership, setMembership] = useState<MembershipInfo | null>(null)
+  const [membershipStatus, setMembershipStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>(
+    token && isHttpMode ? 'loading' : 'idle',
+  )
 
   const selectedTopic = TOPICS.find((item) => item.code === topic) ?? TOPICS[0]
   const selectedEdition = EDITIONS.find((item) => item.code === edition) ?? EDITIONS[0]
-  const isHttpMode = import.meta.env.VITE_API_MODE === 'http'
   const completeCareerContext = completedCareerContext(careerContext)
   const reportYears = topic === 'relationship'
     ? relationshipStatus === 'single' ? '今年重点＋明年参考'
@@ -111,42 +139,114 @@ export function ReportPage() {
   const canGenerate = Boolean(
     token && isHttpMode && request && (
       (topic === 'career' && completeCareerContext)
+      || (topic === 'overall' && membership?.isMember && !overallDailyLimitReached)
       || topic === 'wealth'
       || (topic === 'relationship' && relationshipStatus)
     ),
   )
+  const canOpenMembership = Boolean(
+    token
+      && isHttpMode
+      && topic === 'overall'
+      && membershipStatus === 'ready'
+      && membership
+      && !membership.isMember,
+  )
+
+  useEffect(() => {
+    let active = true
+    if (!token || !isHttpMode) {
+      return () => { active = false }
+    }
+
+    getMe()
+      .then((info) => {
+        if (!active) return
+        setMembership(info)
+        setMembershipStatus('ready')
+      })
+      .catch(() => {
+        if (!active) return
+        setMembership(null)
+        setMembershipStatus('error')
+      })
+
+    return () => { active = false }
+  }, [isHttpMode, token])
 
   const handleTopicChange = (nextTopic: ReportTopicCode) => {
     setTopic(nextTopic)
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current)
+      next.set('topic', nextTopic)
+      return next
+    }, { replace: true })
     setRelationshipStatus(null)
-    if (nextTopic === 'wealth' || nextTopic === 'relationship') setEdition('plain')
+    setEdition('plain')
+    setPurchaseAvailable(false)
+    setOverallDailyLimitReached(false)
+    setStatus('')
   }
 
   const handleGenerate = async () => {
-    if (!request || !canGenerate || generating) return
+    if (!request || !canGenerate || generating || membershipStatus !== 'ready' || !membership) return
     setGenerating(true)
     setStatus('')
+    let purchaseStage: 'none' | 'preparing' | 'paying' = purchaseAvailable ? 'preparing' : 'none'
     try {
-      const report = topic === 'career'
-        ? await createReport(request, topic, edition, {
-            careerContext: completeCareerContext ?? undefined,
-          })
+      const options = topic === 'career'
+        ? { careerContext: completeCareerContext ?? undefined }
         : topic === 'relationship' && relationshipStatus
-          ? await createReport(request, topic, edition, {
-              relationshipContext: { status: relationshipStatus },
-            })
+          ? { relationshipContext: { status: relationshipStatus } }
+          : undefined
+      if (!purchaseAvailable && !membership.isMember) purchaseStage = 'preparing'
+
+      let report
+      if (purchaseStage === 'none') {
+        report = options
+          ? await createReport(request, topic, edition, options)
           : await createReport(request, topic, edition)
-      const message = `${selectedEdition.label}命书已生成并保存`
+      } else {
+        const checkout = options
+          ? await prepareReportCheckout(request, topic, edition, options)
+          : await prepareReportCheckout(request, topic, edition)
+        purchaseStage = 'paying'
+        report = await mockPayReportCheckout(checkout.orderId)
+      }
+      const message = purchaseStage === 'paying'
+        ? `模拟支付完成，${selectedEdition.label}命书已解锁并保存`
+        : `${selectedEdition.label}命书已生成并保存`
       setStatus(message)
       toast(message)
       navigate(`/reports/${report.id}`)
     } catch (error) {
-      const message = error instanceof Error ? error.message : '命书生成失败，请重试'
+      const code = error instanceof Error && 'code' in error
+        ? String((error as Error & { code: unknown }).code)
+        : ''
+      if (code === 'MEMBER_DAILY_REPORT_LIMIT') {
+        if (topic === 'overall') setOverallDailyLimitReached(true)
+        else setPurchaseAvailable(true)
+      }
+      const message = topic === 'overall' && code === 'MEMBER_DAILY_REPORT_LIMIT'
+        ? '今天的3份会员命书已全部生成；综合版内测期间暂不支持单独购买，本次未扣费'
+        : purchaseStage === 'paying'
+        ? '支付未完成，命书尚未解锁，请稍后再试'
+        : purchaseStage === 'preparing' && code !== 'REPORT_GENERATION_UNAVAILABLE'
+          ? '命书暂未生成成功，本次未付款，请稍后再试'
+          : generationFailureMessage(error)
       setStatus(message)
       toast(message)
     } finally {
       setGenerating(false)
     }
+  }
+
+  const handlePrimaryAction = () => {
+    if (canOpenMembership) {
+      navigate('/membership')
+      return
+    }
+    void handleGenerate()
   }
 
   return (
@@ -296,8 +396,7 @@ export function ReportPage() {
 
               <div className="report-edition-plates" role="radiogroup" aria-label="命书版本">
                 {EDITIONS.map((item) => {
-                  const unavailable = (topic === 'wealth' || topic === 'relationship')
-                    && item.code === 'professional'
+                  const unavailable = item.code === 'professional'
                   return (
                     <button
                       aria-checked={!unavailable && edition === item.code}
@@ -311,9 +410,13 @@ export function ReportPage() {
                     >
                       <span className="report-edition-plate__topline">
                         <strong>{item.label}</strong>
-                        {unavailable ? <em>设计中 · 暂未开放</em> : <b>¥{item.price}</b>}
+                        {unavailable
+                          ? <em>设计中 · 暂未开放</em>
+                          : topic === 'overall' ? <em>会员内测</em> : <b>¥{item.price}</b>}
                       </span>
-                      <small>{unavailable ? '专业内容标准尚未完成验收' : item.note}</small>
+                      <small>{unavailable
+                        ? '专业内容标准尚未完成验收'
+                        : topic === 'overall' ? '四维逐年判断 · 暂不单独售卖' : item.note}</small>
                     </button>
                   )
                 })}
@@ -322,12 +425,27 @@ export function ReportPage() {
               <aside className="report-order__summary" aria-label="已选命书">
                 <span>已选</span>
                 <strong>{selectedTopic.label} · {selectedEdition.label}</strong>
-                <small>{reportYears} · 联调预览 · 当前不扣费 · 生成后自动保存并打开正文</small>
+                <small>
+                  {reportYears}
+                  {membershipStatus === 'loading' && ' · 正在确认会员权益'}
+                  {membershipStatus === 'error' && ' · 暂时无法确认会员权益'}
+                  {membershipStatus === 'ready' && topic === 'overall' && membership?.isMember
+                    && ' · 会员内测 · 成功后计入今日次数'}
+                  {membershipStatus === 'ready' && topic === 'overall' && !membership?.isMember
+                    && ' · 内测中 · 暂不单独售卖'}
+                  {membershipStatus === 'ready' && topic !== 'overall' && membership?.isMember
+                    && ' · 会员额度内免单 · 成功后计入今日次数'}
+                  {membershipStatus === 'ready' && topic !== 'overall' && !membership?.isMember
+                    && ` · 单份购买 ¥${selectedEdition.price} · 当前为模拟支付`}
+                </small>
               </aside>
 
               {!token && <p className="report-order__notice">后端联调生成需要先登录</p>}
               {token && !isHttpMode && (
                 <p className="report-order__notice">请使用 VITE_API_MODE=http 启动前端以连接报告服务</p>
+              )}
+              {token && isHttpMode && membershipStatus === 'error' && (
+                <p className="report-order__notice">暂时无法确认会员权益，请刷新页面后重试</p>
               )}
               {token && isHttpMode && topic === 'career' && !completeCareerContext && (
                 <p className="report-order__notice">完成三项事业状态后即可生成</p>
@@ -335,17 +453,35 @@ export function ReportPage() {
               {token && isHttpMode && topic === 'relationship' && !relationshipStatus && (
                 <p className="report-order__notice">选择当前关系状态后即可生成</p>
               )}
-              {token && isHttpMode && topic === 'overall' && (
-                <p className="report-order__notice">综合主题仍在打磨，当前暂不生成</p>
+              {token && isHttpMode && topic === 'overall' && membershipStatus === 'ready' && (
+                <p className="report-order__notice">{membership?.isMember
+                  ? '综合通俗版内测中，可使用会员额度生成；暂不单独售卖'
+                  : '综合通俗版内测中，会员可生成；暂不支持单份购买'}</p>
               )}
 
               <ButtonRow>
-                <Button variant="primary" onClick={handleGenerate} disabled={!canGenerate || generating}>
+                <Button
+                  variant="primary"
+                  onClick={handlePrimaryAction}
+                  disabled={(!canGenerate && !canOpenMembership) || generating || membershipStatus !== 'ready'}
+                >
                   {!token
                     ? '登录后生成命书'
                     : generating
                       ? `正在生成${selectedEdition.label}…`
-                      : `生成${selectedEdition.label}命书 · ¥${selectedEdition.price}`}
+                      : membershipStatus === 'loading'
+                        ? '正在确认会员权益…'
+                      : membershipStatus === 'error'
+                          ? '暂时无法确认会员权益'
+                      : topic === 'overall' && overallDailyLimitReached
+                        ? '今日会员次数已用完'
+                      : topic === 'overall' && !membership?.isMember
+                        ? '开通会员后生成综合命书'
+                      : purchaseAvailable
+                        ? `单独购买${selectedEdition.label}命书 · ¥${selectedEdition.price}`
+                        : membership?.isMember
+                          ? `使用会员权益生成${selectedEdition.label}命书`
+                          : `购买并生成${selectedEdition.label}命书 · ¥${selectedEdition.price}`}
                 </Button>
                 <Button onClick={() => window.history.back()}>返回</Button>
               </ButtonRow>

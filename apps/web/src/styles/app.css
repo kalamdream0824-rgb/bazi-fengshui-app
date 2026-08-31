@@ -2569,6 +2569,293 @@ select.input-box {
   margin: 0;
 }
 
+/* 财富 v3：沿用月白账册与朱批时间轨，只为新版语义补充必要层级 */
+.wealth-v3-risk-summary {
+  margin: -7px 0 30px 42px;
+  padding: 15px 16px;
+  border: 1px solid rgba(166, 60, 50, 0.34);
+  border-left: 3px solid #a63c32;
+  background: rgba(185, 65, 56, 0.055);
+}
+
+.wealth-v3-risk-summary h2 {
+  margin-bottom: 7px;
+  color: #8f332b;
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+}
+
+.wealth-v3-risk-summary p,
+.wealth-v3-year__focus p,
+.wealth-v3-year__retention p,
+.wealth-v3-year__risk p,
+.wealth-v3-year__comparison p {
+  color: #574b3f;
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.wealth-v3-year__focus {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -3px 0 12px;
+  padding: 9px 12px;
+  border-left: 3px solid #b8904a;
+  background: rgba(238, 224, 198, 0.46);
+}
+
+.wealth-v3-year__focus h3 {
+  margin: 0;
+}
+
+.wealth-v3-year__focus p {
+  color: #302820;
+  font-weight: 700;
+  text-align: right;
+}
+
+.wealth-v3-year__retention {
+  margin: 10px 0;
+  padding: 12px 13px;
+  border: 1px solid rgba(177, 143, 88, 0.36);
+  border-left: 3px solid #b8904a;
+  background: rgba(247, 237, 218, 0.62);
+}
+
+.wealth-v3-year__risk {
+  margin: 10px 0;
+  padding: 12px 13px;
+  border: 1px solid rgba(166, 60, 50, 0.34);
+  border-left: 3px solid #a63c32;
+  background: rgba(185, 65, 56, 0.055);
+}
+
+.wealth-v3-year__risk p {
+  color: #82372f;
+}
+
+.wealth-v3-year__observations {
+  margin: 14px 2px 0;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(177, 143, 88, 0.5);
+}
+
+.wealth-v3-year__observations ul,
+.wealth-v3-year__actions ol {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.wealth-v3-year__observations li {
+  color: #6f6254;
+}
+
+.wealth-v3-year__actions {
+  margin-top: 11px;
+  padding: 13px;
+  border-left: 3px solid #b8904a;
+  background: #f7edda;
+}
+
+.wealth-v3-year__actions li {
+  color: #302820;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.wealth-v3-year__comparison {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(177, 143, 88, 0.4);
+}
+
+.wealth-v3-year__comparison h3 {
+  color: #9d352c;
+}
+
+.wealth-v3-reader__route h2 {
+  margin-bottom: 11px;
+  color: #d7b572;
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: 0.08em;
+}
+
+.wealth-v3-reader__note {
+  margin: 18px 0 0 42px;
+  color: #7a6b5b;
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+/* 综合 v1：以“四面批注”承载完整性，朱批只标主次，不使用分数仪表盘 */
+.overall-reader__summary {
+  position: relative;
+  z-index: 1;
+  max-width: 92%;
+  margin-top: 10px;
+  color: rgba(249, 236, 208, 0.76);
+  font-size: 11px;
+  line-height: 1.75;
+}
+
+.overall-year__headline {
+  margin: 14px 0 0;
+  color: #9d352c;
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.035em;
+}
+
+.overall-year__linkage {
+  position: relative;
+  margin: 12px 0;
+  padding: 10px 12px 10px 36px;
+  border: 1px solid rgba(177, 143, 88, 0.42);
+  background: rgba(238, 224, 198, 0.3);
+}
+
+.overall-year__linkage::before {
+  position: absolute;
+  top: 11px;
+  left: 11px;
+  color: #a63c32;
+  content: '联';
+  font-family: var(--font-glyph);
+  font-size: 13px;
+}
+
+.overall-year__linkage h3 {
+  margin: 0 0 4px;
+  color: #8a672e;
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.overall-year__linkage p {
+  margin: 0;
+  color: #5d5043;
+  font-size: 11px;
+  line-height: 1.72;
+}
+
+.overall-year__dimensions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.overall-dimension {
+  min-width: 0;
+  padding: 11px 11px 10px;
+  border: 1px solid rgba(177, 143, 88, 0.36);
+  background: rgba(255, 253, 247, 0.74);
+}
+
+.overall-dimension > header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.overall-dimension > header > span {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  place-items: center;
+  border: 1px solid rgba(128, 107, 82, 0.5);
+  color: #806b52;
+  font-family: var(--font-glyph);
+  font-size: 9px;
+  transform: rotate(-2deg);
+}
+
+.overall-dimension h3 {
+  margin: 0;
+  color: #302820;
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.overall-dimension small {
+  display: block;
+  margin-top: 2px;
+  color: #8c795f;
+  font-size: 8px;
+}
+
+.overall-dimension p {
+  color: #625548;
+  font-size: 10.5px;
+  line-height: 1.7;
+}
+
+.overall-dimension.is-primary {
+  border-left: 3px solid #a63c32;
+  background: rgba(185, 65, 56, 0.055);
+}
+
+.overall-dimension.is-primary > header > span {
+  border-color: #a63c32;
+  color: #fff8e9;
+  background: #a63c32;
+}
+
+.overall-dimension.is-secondary {
+  border-left: 3px solid #b8904a;
+  background: rgba(238, 224, 198, 0.38);
+}
+
+.overall-dimension.is-secondary > header > span {
+  border-color: #b8904a;
+  color: #8a672e;
+}
+
+.overall-year__priority {
+  margin-top: 11px;
+  padding: 13px;
+  border-top: 2px solid #a63c32;
+  background: rgba(185, 65, 56, 0.055);
+}
+
+.overall-year__priority p {
+  color: #82372f;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.75;
+}
+
+.overall-year__transition {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(177, 143, 88, 0.48);
+  color: #6f6051;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.overall-reader .report-reader__route h2 {
+  margin-bottom: 10px;
+  color: #f7e9cd;
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: 0.06em;
+}
+
+.overall-reader__note {
+  margin: 18px 0 0 42px;
+  color: #7a6b5b;
+  font-size: 10px;
+  line-height: 1.7;
+}
+
 .report-year {
   display: grid;
   grid-template-columns: 30px minmax(0, 1fr);
@@ -2930,9 +3217,20 @@ select.input-box {
   }
   .wealth-reader__directions,
   .wealth-reader__paths,
+  .wealth-v3-risk-summary,
+  .wealth-v3-reader__note,
+  .overall-reader__note,
   .wealth-reader .report-reader__route,
   .wealth-reader .report-reader__footer {
     margin-left: 40px;
+  }
+  .wealth-v3-year__focus {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .wealth-v3-year__focus p {
+    text-align: left;
   }
   .wealth-reader__paths > header {
     align-items: flex-start;
