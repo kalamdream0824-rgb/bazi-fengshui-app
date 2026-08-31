@@ -41,32 +41,46 @@ public final class AnnualContextFactory {
     Objects.requireNonNull(horizon, "horizon");
     ReportAnalysis analysis = ReportAnalysis.from(request, chart);
     int firstYear = LocalDate.now(clock).getYear();
-    String dayStem = chart.pillars().get("day").gan();
     List<AnnualContext> contexts = new ArrayList<>();
     for (int year = firstYear; year < firstYear + horizon.years(); year++) {
-      String ganZhi = Solar.fromYmdHms(year, 7, 1, 12, 0, 0)
-          .getLunar()
-          .getYearInGanZhiExact();
-      String annualStem = ganZhi.substring(0, 1);
-      String annualBranch = ganZhi.substring(1, 2);
-      String tenGod = LunarUtil.SHI_SHEN.get(dayStem + annualStem);
-      if (tenGod == null || tenGod.isBlank()) {
-        throw new IllegalStateException("cannot derive annual stem Ten God for " + dayStem + annualStem);
-      }
-      TenGodGroup group = TenGodGroup.fromTenGod(tenGod);
-      DaYunDto activeDaYun = activeDaYun(chart.daYun(), year);
-      contexts.add(new AnnualContext(
-          year,
-          ganZhi,
-          tenGod,
-          group,
-          activeDaYun,
-          structuredFacts(request, chart, analysis, activeDaYun, year, dayStem),
-          natalRelations(annualBranch, chart),
-          dayunRelations(annualBranch, activeDaYun),
-          analysis));
+      contexts.add(createYear(request, chart, analysis, year));
     }
     return List.copyOf(contexts);
+  }
+
+  public AnnualContext createYear(PaipanRequest request, PaipanResultDto chart, int year) {
+    Objects.requireNonNull(request, "request");
+    Objects.requireNonNull(chart, "chart");
+    return createYear(request, chart, ReportAnalysis.from(request, chart), year);
+  }
+
+  private AnnualContext createYear(
+      PaipanRequest request,
+      PaipanResultDto chart,
+      ReportAnalysis analysis,
+      int year) {
+    String dayStem = chart.pillars().get("day").gan();
+    String ganZhi = Solar.fromYmdHms(year, 7, 1, 12, 0, 0)
+        .getLunar()
+        .getYearInGanZhiExact();
+    String annualStem = ganZhi.substring(0, 1);
+    String annualBranch = ganZhi.substring(1, 2);
+    String tenGod = LunarUtil.SHI_SHEN.get(dayStem + annualStem);
+    if (tenGod == null || tenGod.isBlank()) {
+      throw new IllegalStateException("cannot derive annual stem Ten God for " + dayStem + annualStem);
+    }
+    TenGodGroup group = TenGodGroup.fromTenGod(tenGod);
+    DaYunDto activeDaYun = activeDaYun(chart.daYun(), year);
+    return new AnnualContext(
+        year,
+        ganZhi,
+        tenGod,
+        group,
+        activeDaYun,
+        structuredFacts(request, chart, analysis, activeDaYun, year, dayStem),
+        natalRelations(annualBranch, chart),
+        dayunRelations(annualBranch, activeDaYun),
+        analysis);
   }
 
   private static List<AnnualFact> structuredFacts(

@@ -43,6 +43,22 @@ class AnnualContextFactoryTest {
   }
 
   @Test
+  void createsThePreviousCompleteYearWithItsOwnDayunAndEvidence() {
+    PaipanRequest request = fixtureRequest();
+    PaipanResultDto chart = new BaziService().paipan(request);
+
+    AnnualContext context = new AnnualContextFactory(CLOCK).createYear(request, chart, 2025);
+
+    assertEquals(2025, context.year());
+    assertEquals("乙巳", context.ganZhi());
+    assertEquals("伤官", context.yearStemTenGod());
+    assertNotNull(context.activeDaYun());
+    assertEquals(AnnualContextFactory.activeDaYun(chart.daYun(), 2025), context.activeDaYun());
+    assertTrue(context.factKeys().contains("annual.stem.group.output"));
+    assertTrue(context.factKeys().stream().anyMatch(key -> key.startsWith("annual.branch.")));
+  }
+
+  @Test
   void buildsFiveAnnualContextsWhenTheTechnicalHorizonRequestsFiveYears() {
     PaipanRequest request = fixtureRequest();
     PaipanResultDto chart = new BaziService().paipan(request);
