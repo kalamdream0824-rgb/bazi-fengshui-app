@@ -7,13 +7,22 @@ public record CareerNarrativePlan(
     String thesis,
     String contextSummary,
     List<YearNarrative> years,
-    List<String> route) implements ReportContent {
+    List<String> route,
+    NarrativeTimeline timeline) implements ReportContent {
 
   public CareerNarrativePlan {
     Objects.requireNonNull(thesis, "thesis");
     Objects.requireNonNull(contextSummary, "contextSummary");
     years = years == null ? List.of() : List.copyOf(years);
     route = route == null ? List.of() : List.copyOf(route);
+  }
+
+  public CareerNarrativePlan(
+      String thesis,
+      String contextSummary,
+      List<YearNarrative> years,
+      List<String> route) {
+    this(thesis, contextSummary, years, route, null);
   }
 
   public record YearNarrative(

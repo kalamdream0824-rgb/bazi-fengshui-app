@@ -38,12 +38,8 @@ public final class AnnualPeriodAssessor {
       ReportTopic topic,
       ReportHorizon horizon,
       CareerContext careerContext) {
-    CareerContextualizer contextualizer = new CareerContextualizer();
     List<YearAssessment> years = new AnnualContextFactory(clock).create(request, chart, horizon).stream()
-        .map(context -> assess(context, topic))
-        .map(year -> topic == ReportTopic.CAREER && careerContext != null
-            ? contextualizer.apply(year, careerContext)
-            : year)
+        .map(context -> assessYear(context, topic, careerContext))
         .toList();
     List<AnnualTransition> transitions = new ArrayList<>();
     for (int index = 0; index < years.size() - 1; index++) {
@@ -66,6 +62,22 @@ public final class AnnualPeriodAssessor {
         priorities);
   }
 
+  public YearAssessment assessYear(AnnualContext context, ReportTopic topic) {
+    return assessYear(context, topic, null);
+  }
+
+  public YearAssessment assessYear(
+      AnnualContext context,
+      ReportTopic topic,
+      CareerContext careerContext) {
+    Objects.requireNonNull(context, "context");
+    Objects.requireNonNull(topic, "topic");
+    YearAssessment year = assessRules(context, topic);
+    return topic == ReportTopic.CAREER && careerContext != null
+        ? new CareerContextualizer().apply(year, careerContext)
+        : year;
+  }
+
   private String relation(AnnualStage current, AnnualStage next) {
     if (current == next) return "延续";
     if (current == AnnualStage.TRANSITION || next == AnnualStage.TRANSITION) return "转折";
@@ -86,7 +98,7 @@ public final class AnnualPeriodAssessor {
     };
   }
 
-  private YearAssessment assess(AnnualContext context, ReportTopic topic) {
+  private YearAssessment assessRules(AnnualContext context, ReportTopic topic) {
     AnnualRuleEvaluation evaluation = engine.evaluateYear(context, topic, catalog.rulesFor(topic));
     if (evaluation.results().isEmpty()) return insufficient(context, evaluation);
 

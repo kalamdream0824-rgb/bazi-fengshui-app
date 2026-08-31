@@ -4,10 +4,18 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public final class CareerNarrativePlanner {
 
   public CareerNarrativePlan plan(ThreeYearAssessment assessment, CareerContext context) {
+    return plan(assessment, context, null);
+  }
+
+  public CareerNarrativePlan plan(
+      ThreeYearAssessment assessment,
+      CareerContext context,
+      YearAssessment previous) {
     Objects.requireNonNull(assessment, "assessment");
     Objects.requireNonNull(context, "context");
     if (assessment.topic() != ReportTopic.CAREER) {
@@ -20,11 +28,18 @@ public final class CareerNarrativePlanner {
     }
     LinkedHashSet<String> route = new LinkedHashSet<>();
     years.forEach(year -> route.addAll(year.actions()));
+    NarrativeTimeline timeline = previous == null ? null : new CareerTimelinePlanner().plan(
+        new NarrativeTimelinePlanner.Input<>(
+            ReportTopic.CAREER.code(),
+            previous,
+            assessment.years(),
+            Optional.of(context)));
     return new CareerNarrativePlan(
         thesis(context, assessment.years()),
         contextSummary(context),
         years,
-        route.stream().limit(3).toList());
+        route.stream().limit(3).toList(),
+        timeline);
   }
 
   private CareerNarrativePlan.YearNarrative year(

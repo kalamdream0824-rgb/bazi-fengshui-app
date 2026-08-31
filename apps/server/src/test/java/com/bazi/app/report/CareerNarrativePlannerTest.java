@@ -3,12 +3,16 @@ package com.bazi.app.report;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bazi.app.dto.PaipanRequest;
 import com.bazi.app.dto.PaipanResultDto;
 import com.bazi.app.report.rules.AnnualRuleCatalog;
 import com.bazi.app.service.BaziService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -53,6 +57,47 @@ class CareerNarrativePlannerTest {
       assertTrue(year.evidenceKeys().size() >= 2);
       assertTrue(year.verdict().length() <= 70, year.verdict());
     }
+  }
+
+  @Test
+  void keepsLegacyPlannerCallsWithoutATimeline() {
+    CareerContext context = CareerContext.fromCodes("job_seeking", "job_change", "stalled");
+
+    CareerNarrativePlan plan = planner.plan(
+        assessor.assess(request, chart, ReportTopic.CAREER, context), context);
+
+    assertNull(plan.timeline());
+  }
+
+  @Test
+  void attachesTimelineWhenPreviousYearAssessmentIsProvided() {
+    CareerContext context = CareerContext.fromCodes("job_seeking", "job_change", "stalled");
+    ThreeYearAssessment assessment = assessor.assess(request, chart, ReportTopic.CAREER, context);
+    AnnualContext previousContext = new AnnualContextFactory(CLOCK)
+        .createYear(request, chart, assessment.years().get(0).year() - 1);
+    YearAssessment previous = new AnnualPeriodAssessor(CLOCK, new AnnualRuleCatalog())
+        .assessYear(previousContext, ReportTopic.CAREER, context);
+
+    CareerNarrativePlan plan = planner.plan(assessment, context, previous);
+
+    assertNotNull(plan.timeline());
+    assertEquals(assessment.years().get(0).year(), plan.timeline().present().year());
+  }
+
+  @Test
+  void readsLegacyJsonThatDoesNotContainTimeline() throws Exception {
+    CareerContext context = CareerContext.fromCodes("job_seeking", "job_change", "stalled");
+    ObjectMapper mapper = new ObjectMapper();
+    CareerNarrativePlan current = planner.plan(
+        assessor.assess(request, chart, ReportTopic.CAREER, context), context);
+    JsonNode legacy = mapper.valueToTree(current);
+    ((com.fasterxml.jackson.databind.node.ObjectNode) legacy).remove("timeline");
+
+    CareerNarrativePlan restored = mapper.treeToValue(legacy, CareerNarrativePlan.class);
+
+    assertNull(restored.timeline());
+    assertEquals(current.thesis(), restored.thesis());
+    assertEquals(current.years(), restored.years());
   }
 
   @Test
