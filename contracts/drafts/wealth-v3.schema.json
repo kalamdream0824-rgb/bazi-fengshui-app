@@ -751,6 +751,74 @@
         "yearDecisionIds"
       ]
     },
+    "NarrativeTimeline": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "past": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "year": { "type": "integer" },
+            "headline": { "type": "string", "minLength": 1 },
+            "checkpoints": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "minItems": 2,
+              "maxItems": 2,
+              "uniqueItems": true
+            },
+            "bridge": { "type": "string", "minLength": 1 },
+            "evidenceKeys": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          "required": ["year", "headline", "checkpoints", "bridge", "evidenceKeys"]
+        },
+        "present": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "year": { "type": "integer" },
+            "headline": { "type": "string", "minLength": 1 },
+            "judgment": { "type": "string", "minLength": 1 },
+            "priority": { "type": "string", "minLength": 1 },
+            "evidenceKeys": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          "required": ["year", "headline", "judgment", "priority", "evidenceKeys"]
+        },
+        "future": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "year": { "type": "integer" },
+              "headline": { "type": "string", "minLength": 1 },
+              "action": { "type": "string", "minLength": 1 },
+              "evidenceKeys": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 },
+                "minItems": 1,
+                "uniqueItems": true
+              }
+            },
+            "required": ["year", "headline", "action", "evidenceKeys"]
+          },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      },
+      "required": ["past", "present", "future"]
+    },
     "Content": {
       "type": "object",
       "additionalProperties": false,
@@ -824,6 +892,9 @@
         },
         "readingNote": {
           "$ref": "#/definitions/Block"
+        },
+        "timeline": {
+          "$ref": "#/definitions/NarrativeTimeline"
         }
       },
       "required": [

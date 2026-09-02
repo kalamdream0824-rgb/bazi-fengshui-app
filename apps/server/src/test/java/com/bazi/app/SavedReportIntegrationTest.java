@@ -67,9 +67,12 @@ class SavedReportIntegrationTest {
         .andExpect(jsonPath("$.subject").value("林先生"))
         .andExpect(jsonPath("$.topic").value("career"))
         .andExpect(jsonPath("$.edition").value("plain"))
-        .andExpect(jsonPath("$.contentVersion").value("career-narrative-v3"))
+        .andExpect(jsonPath("$.contentVersion").value("career-narrative-v4"))
         .andExpect(jsonPath("$.content.thesis").isNotEmpty())
         .andExpect(jsonPath("$.content.years.length()").value(2))
+        .andExpect(jsonPath("$.content.timeline.past.year").value(2025))
+        .andExpect(jsonPath("$.content.timeline.present.year").value(2026))
+        .andExpect(jsonPath("$.content.timeline.future.length()").value(1))
         .andExpect(jsonPath("$.content.years[0].reasons.length()").value(2))
         .andExpect(jsonPath("$.content.years[0].actions.length()").value(2))
         .andReturn();
@@ -87,6 +90,8 @@ class SavedReportIntegrationTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(id))
         .andExpect(jsonPath("$.content.years[1].year").value(2027));
+
+    assertLegacyCloneReadable(token, id, "career-narrative-v3");
   }
 
   @Test
@@ -101,8 +106,11 @@ class SavedReportIntegrationTest {
         .andExpect(jsonPath("$.subject").value("林先生"))
         .andExpect(jsonPath("$.topic").value("overall"))
         .andExpect(jsonPath("$.edition").value("plain"))
-        .andExpect(jsonPath("$.contentVersion").value("overall-narrative-v1.1"))
+        .andExpect(jsonPath("$.contentVersion").value("overall-narrative-v2"))
         .andExpect(jsonPath("$.content.horizonYears").value(3))
+        .andExpect(jsonPath("$.content.timeline.past.year").value(2025))
+        .andExpect(jsonPath("$.content.timeline.present.year").value(2026))
+        .andExpect(jsonPath("$.content.timeline.future.length()").value(2))
         .andExpect(jsonPath("$.content.years.length()").value(3))
         .andExpect(jsonPath("$.content.years[0].dimensions.length()").value(4))
         .andExpect(jsonPath("$.content.years[0].actions.length()").value(2))
@@ -121,9 +129,11 @@ class SavedReportIntegrationTest {
     MvcResult read = mvc.perform(get("/api/v1/reports/{id}", id)
             .header("Authorization", "Bearer " + token))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.contentVersion").value("overall-narrative-v1.1"))
+        .andExpect(jsonPath("$.contentVersion").value("overall-narrative-v2"))
         .andReturn();
     assertEquals(snapshot, objectMapper.readTree(read.getResponse().getContentAsString()));
+
+    assertLegacyCloneReadable(token, id, "overall-narrative-v1.1");
   }
 
   @Test
@@ -214,8 +224,11 @@ class SavedReportIntegrationTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.subject").value("林先生"))
         .andExpect(jsonPath("$.topic").value("wealth"))
-        .andExpect(jsonPath("$.contentVersion").value("wealth-narrative-v3"))
+        .andExpect(jsonPath("$.contentVersion").value("wealth-narrative-v4"))
         .andExpect(jsonPath("$.content.zoneId").value("Asia/Shanghai"))
+        .andExpect(jsonPath("$.content.timeline.past.year").value(2025))
+        .andExpect(jsonPath("$.content.timeline.present.year").value(2026))
+        .andExpect(jsonPath("$.content.timeline.future.length()").value(2))
         .andExpect(jsonPath("$.content.calculationVersion").value("wealth-path-v2"))
         .andExpect(jsonPath("$.content.policyVersion").value("wealth-expression-v1"))
         .andExpect(jsonPath("$.content.copyVersion").value("wealth-plain-v3.3"))
@@ -256,10 +269,12 @@ class SavedReportIntegrationTest {
             .header("Authorization", "Bearer " + token))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.topic").value("wealth"))
-        .andExpect(jsonPath("$.contentVersion").value("wealth-narrative-v3"))
+        .andExpect(jsonPath("$.contentVersion").value("wealth-narrative-v4"))
         .andExpect(jsonPath("$.content.years[2].year").value(startYear + 2))
         .andReturn();
     assertEquals(createdSnapshot, objectMapper.readTree(read.getResponse().getContentAsString()));
+
+    assertLegacyCloneReadable(token, id, "wealth-narrative-v3");
   }
 
   @Test
@@ -376,8 +391,11 @@ class SavedReportIntegrationTest {
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.topic").value("relationship"))
           .andExpect(jsonPath("$.edition").value("plain"))
-          .andExpect(jsonPath("$.contentVersion").value("relationship-narrative-v1"))
+          .andExpect(jsonPath("$.contentVersion").value("relationship-narrative-v2"))
           .andExpect(jsonPath("$.content.relationshipStatus").value(statusCode))
+          .andExpect(jsonPath("$.content.timeline.past.year").value(2025))
+          .andExpect(jsonPath("$.content.timeline.present.year").value(2026))
+          .andExpect(jsonPath("$.content.timeline.future.length()").value(2))
           .andExpect(jsonPath("$.content.dimensions.length()").value(5))
           .andExpect(jsonPath("$.content.years.length()").value(3))
           .andExpect(jsonPath("$.content.years[0].realitySignals.length()").value(2))
@@ -394,6 +412,11 @@ class SavedReportIntegrationTest {
               .header("Authorization", "Bearer " + token))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.content.relationshipStatus").value(statusCode));
+
+      if ("dating".equals(statusCode)) {
+        assertLegacyCloneReadable(
+            token, report.get("id").asLong(), "relationship-narrative-v1");
+      }
     }
 
     JsonNode baseline = relationshipCalculation(reports.get(0).get("content"));
@@ -411,8 +434,11 @@ class SavedReportIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(relationshipPayload("plain", "single")))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.contentVersion").value("relationship-single-v1"))
+        .andExpect(jsonPath("$.contentVersion").value("relationship-single-v2"))
         .andExpect(jsonPath("$.content.relationshipStatus").value("single"))
+        .andExpect(jsonPath("$.content.timeline.past.year").value(2025))
+        .andExpect(jsonPath("$.content.timeline.present.year").value(2026))
+        .andExpect(jsonPath("$.content.timeline.future.length()").value(1))
         .andExpect(jsonPath("$.content.horizonYears").value(2))
         .andExpect(jsonPath("$.content.currentYear").value(2026))
         .andExpect(jsonPath("$.content.outlookYear").value(2027))
@@ -428,7 +454,10 @@ class SavedReportIntegrationTest {
     assertEquals(snapshot, objectMapper.readTree(read.getResponse().getContentAsString()));
     mvc.perform(get("/api/v1/reports").header("Authorization", "Bearer " + token))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].contentVersion").value("relationship-single-v1"));
+        .andExpect(jsonPath("$[0].contentVersion").value("relationship-single-v2"));
+
+    assertLegacyCloneReadable(
+        token, snapshot.get("id").asLong(), "relationship-single-v1");
   }
 
   @Test
@@ -460,7 +489,7 @@ class SavedReportIntegrationTest {
     mvc.perform(post("/api/v1/reports").header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON).content(relationshipPayload("plain", "single")))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.contentVersion").value("relationship-single-v1"));
+        .andExpect(jsonPath("$.contentVersion").value("relationship-single-v2"));
     MvcResult stored = mvc.perform(get("/api/v1/reports/{id}", old.getId())
             .header("Authorization", "Bearer " + token))
         .andExpect(status().isOk())
@@ -730,5 +759,27 @@ class SavedReportIntegrationTest {
     report.setCreatedAt(now);
     report.setGeneratedAt(now);
     return report;
+  }
+
+  private void assertLegacyCloneReadable(
+      String token,
+      long sourceId,
+      String legacyVersion) throws Exception {
+    BaziReport source = reportMapper.selectById(sourceId);
+    ObjectNode legacyContent = (ObjectNode) objectMapper.readTree(source.getContentJson());
+    legacyContent.remove("timeline");
+    BaziReport legacy = storedReport(
+        source.getUserId(),
+        source.getSubject(),
+        source.getTopic(),
+        legacyVersion,
+        objectMapper.writeValueAsString(legacyContent));
+    reportMapper.insert(legacy);
+
+    mvc.perform(get("/api/v1/reports/{id}", legacy.getId())
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.contentVersion").value(legacyVersion))
+        .andExpect(jsonPath("$.content.timeline").doesNotExist());
   }
 }

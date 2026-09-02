@@ -38,7 +38,19 @@ public final class AnnualPeriodAssessor {
       ReportTopic topic,
       ReportHorizon horizon,
       CareerContext careerContext) {
-    List<YearAssessment> years = new AnnualContextFactory(clock).create(request, chart, horizon).stream()
+    return assess(
+        new AnnualContextFactory(clock).create(request, chart, horizon),
+        topic,
+        careerContext);
+  }
+
+  public AnnualPeriodAssessment assess(
+      List<AnnualContext> contexts,
+      ReportTopic topic,
+      CareerContext careerContext) {
+    Objects.requireNonNull(contexts, "contexts");
+    ReportHorizon horizon = ReportHorizon.of(contexts.size());
+    List<YearAssessment> years = contexts.stream()
         .map(context -> assessYear(context, topic, careerContext))
         .toList();
     List<AnnualTransition> transitions = new ArrayList<>();

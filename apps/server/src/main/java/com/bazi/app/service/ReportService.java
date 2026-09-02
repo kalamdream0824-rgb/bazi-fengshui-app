@@ -8,15 +8,16 @@ import com.bazi.app.dto.ReportDto;
 import com.bazi.app.dto.ReportPreviewRequest;
 import com.bazi.app.mapper.BaziReportMapper;
 import com.bazi.app.report.AnnualContextFactory;
+import com.bazi.app.report.AnnualPeriodAssessor;
 import com.bazi.app.report.CareerContext;
 import com.bazi.app.report.CareerNarrativePlan;
 import com.bazi.app.report.CareerNarrativePlanner;
+import com.bazi.app.report.ReportAnalysisWindow;
 import com.bazi.app.report.ReportContent;
 import com.bazi.app.report.ReportEdition;
 import com.bazi.app.report.ReportHorizon;
 import com.bazi.app.report.ReportTopic;
 import com.bazi.app.report.ThreeYearAssessment;
-import com.bazi.app.report.ThreeYearAssessor;
 import com.bazi.app.report.rules.AnnualRuleCatalog;
 import com.bazi.app.report.overall.OverallNarrativePlan;
 import com.bazi.app.report.overall.OverallNarrativePlanner;
@@ -49,19 +50,24 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReportService {
 
   private static final ZoneId WEALTH_ZONE = ZoneId.of("Asia/Shanghai");
-  public static final String CAREER_CONTENT_VERSION = "career-narrative-v3";
-  public static final String OVERALL_CONTENT_VERSION = "overall-narrative-v1.1";
+  public static final String CAREER_CONTENT_VERSION = "career-narrative-v4";
+  public static final String CAREER_V3_CONTENT_VERSION = "career-narrative-v3";
+  public static final String OVERALL_CONTENT_VERSION = "overall-narrative-v2";
+  public static final String OVERALL_V11_CONTENT_VERSION = "overall-narrative-v1.1";
   public static final String OVERALL_V1_CONTENT_VERSION = "overall-narrative-v1";
-  public static final String WEALTH_CONTENT_VERSION = "wealth-narrative-v3";
+  public static final String WEALTH_CONTENT_VERSION = "wealth-narrative-v4";
+  public static final String WEALTH_V3_CONTENT_VERSION = "wealth-narrative-v3";
   public static final String WEALTH_V2_CONTENT_VERSION = "wealth-narrative-v2";
-  public static final String RELATIONSHIP_CONTENT_VERSION = "relationship-narrative-v1";
-  public static final String RELATIONSHIP_SINGLE_CONTENT_VERSION = "relationship-single-v1";
+  public static final String RELATIONSHIP_CONTENT_VERSION = "relationship-narrative-v2";
+  public static final String RELATIONSHIP_V1_CONTENT_VERSION = "relationship-narrative-v1";
+  public static final String RELATIONSHIP_SINGLE_CONTENT_VERSION = "relationship-single-v2";
+  public static final String RELATIONSHIP_SINGLE_V1_CONTENT_VERSION = "relationship-single-v1";
 
   private final BaziService baziService;
   private final BaziReportMapper mapper;
   private final ObjectMapper objectMapper;
   private final Clock clock;
-  private final ThreeYearAssessor assessor;
+  private final AnnualPeriodAssessor assessor;
   private final WealthReportGenerator wealthReportGenerator;
   private final ReportEntitlementService reportEntitlementService;
   private final CareerNarrativePlanner careerPlanner = new CareerNarrativePlanner();
@@ -79,7 +85,7 @@ public class ReportService {
     this.mapper = mapper;
     this.objectMapper = objectMapper;
     this.clock = Clock.systemDefaultZone();
-    this.assessor = new ThreeYearAssessor(clock, new AnnualRuleCatalog());
+    this.assessor = new AnnualPeriodAssessor(clock, new AnnualRuleCatalog());
     this.wealthReportGenerator = wealthReportGenerator;
     this.reportEntitlementService = reportEntitlementService;
   }
@@ -133,29 +139,35 @@ public class ReportService {
       reportEntitlementService.requireDirectGenerationAccess(userId);
     }
     PaipanResultDto chart = baziService.paipan(request.request());
+    ReportAnalysisWindow analysisWindow = analysisWindow(
+        request, chart, topic, productHorizon(topic, relationshipStatus));
     ReportContent content;
     String contentVersion;
     Object contextRequest;
     if (topic == ReportTopic.OVERALL) {
-      var contexts = new AnnualContextFactory(clock.withZone(WEALTH_ZONE))
-          .create(request.request(), chart, ReportHorizon.of(3));
-      content = new OverallNarrativePlanner().plan(new OverallPeriodArbitrator().arbitrate(contexts));
+      OverallPeriodArbitrator arbitrator = new OverallPeriodArbitrator();
+      var product = arbitrator.arbitrate(analysisWindow.productYears());
+      var analysis = new ArrayList<>(analysisWindow.productYears());
+      analysis.add(0, analysisWindow.previous());
+      var previous = arbitrator.arbitrate(analysis).years().get(0);
+      content = new OverallNarrativePlanner().plan(product, previous);
       contentVersion = OVERALL_CONTENT_VERSION;
       contextRequest = Map.of("source", "system", "horizonYears", 3);
     } else if (topic == ReportTopic.CAREER) {
       CareerContext context = request.careerContext().toDomain();
-      ThreeYearAssessment assessment = assessor.assess(request.request(), chart, topic, context);
-      content = careerPlanner.plan(assessment, context);
+      ThreeYearAssessment assessment = ThreeYearAssessment.from(
+          assessor.assess(analysisWindow.productYears(), topic, context));
+      var previous = assessor.assessYear(analysisWindow.previous(), topic, context);
+      content = careerPlanner.plan(assessment, context, previous);
       contentVersion = CAREER_CONTENT_VERSION;
       contextRequest = request.careerContext();
     } else if (topic == ReportTopic.WEALTH) {
       Clock wealthClock = clock.withZone(WEALTH_ZONE);
-      var contexts = new AnnualContextFactory(wealthClock)
-          .create(request.request(), chart, ReportHorizon.WEALTH_PRODUCT);
       LocalDate asOf = LocalDate.now(wealthClock);
       WealthNarrativeV3 wealthContent;
       try {
-        wealthContent = wealthReportGenerator.generate(chart, contexts, asOf);
+        wealthContent = wealthReportGenerator.generate(
+            chart, analysisWindow.previous(), analysisWindow.productYears(), asOf);
       } catch (IllegalArgumentException error) {
         throw new BusinessException("REPORT_GENERATION_UNAVAILABLE",
             "本次命书暂未生成成功，未扣除费用或使用次数，请稍后再试");
@@ -171,19 +183,20 @@ public class ReportService {
           "copyVersion", wealthContent.copyVersion());
     } else {
       boolean single = relationshipStatus == RelationshipStatus.SINGLE;
+      var analysis = new ArrayList<>(analysisWindow.productYears());
+      analysis.add(0, analysisWindow.previous());
+      var evaluations = relationshipDimensionEvaluator.evaluate(
+          relationshipFactExtractor.extract(request.request(), chart, analysis));
       var period = relationshipPeriodArbitrator.arbitrate(
-              relationshipDimensionEvaluator.evaluate(
-                  relationshipFactExtractor.extract(
-                      request.request(),
-                      chart,
-                      new AnnualContextFactory(clock).create(
-                          request.request(), chart, single
-                              ? ReportHorizon.RELATIONSHIP_SINGLE_PRODUCT : ReportHorizon.RELATIONSHIP_PRODUCT))));
+          evaluations.subList(1, evaluations.size()));
+      var previous = relationshipPeriodArbitrator.arbitrate(
+          evaluations.subList(0, ReportHorizon.MIN_YEARS)).years().get(0);
       if (single) {
-        content = new RelationshipSingleNarrativePlanner().plan(period);
+        content = new RelationshipSingleNarrativePlanner().plan(period, previous);
         contentVersion = RELATIONSHIP_SINGLE_CONTENT_VERSION;
       } else {
-        RelationshipNarrativePlan relationshipContent = relationshipPlanner.plan(period, relationshipStatus);
+        RelationshipNarrativePlan relationshipContent = relationshipPlanner.plan(
+            period, relationshipStatus, previous);
         validateRelationshipContent(relationshipContent);
         content = relationshipContent;
         contentVersion = RELATIONSHIP_CONTENT_VERSION;
@@ -233,18 +246,22 @@ public class ReportService {
 
   private ReportDto toDto(BaziReport report) throws Exception {
     ReportContent content;
-    if (Set.of(OVERALL_CONTENT_VERSION, OVERALL_V1_CONTENT_VERSION)
+    if (Set.of(OVERALL_CONTENT_VERSION, OVERALL_V11_CONTENT_VERSION, OVERALL_V1_CONTENT_VERSION)
         .contains(report.getContentVersion())) {
       content = objectMapper.readValue(report.getContentJson(), OverallNarrativePlan.class);
-    } else if (WEALTH_CONTENT_VERSION.equals(report.getContentVersion())) {
+    } else if (Set.of(WEALTH_CONTENT_VERSION, WEALTH_V3_CONTENT_VERSION)
+        .contains(report.getContentVersion())) {
       content = objectMapper.readValue(report.getContentJson(), WealthNarrativeV3.class);
     } else if (WEALTH_V2_CONTENT_VERSION.equals(report.getContentVersion())) {
       content = objectMapper.readValue(report.getContentJson(), WealthNarrativePlan.class);
-    } else if (RELATIONSHIP_SINGLE_CONTENT_VERSION.equals(report.getContentVersion())) {
+    } else if (Set.of(RELATIONSHIP_SINGLE_CONTENT_VERSION, RELATIONSHIP_SINGLE_V1_CONTENT_VERSION)
+        .contains(report.getContentVersion())) {
       content = objectMapper.readValue(report.getContentJson(), RelationshipSingleNarrativePlan.class);
-    } else if (RELATIONSHIP_CONTENT_VERSION.equals(report.getContentVersion())) {
+    } else if (Set.of(RELATIONSHIP_CONTENT_VERSION, RELATIONSHIP_V1_CONTENT_VERSION)
+        .contains(report.getContentVersion())) {
       content = objectMapper.readValue(report.getContentJson(), RelationshipNarrativePlan.class);
-    } else if (Set.of("career-narrative-v1", "career-narrative-v2", CAREER_CONTENT_VERSION,
+    } else if (Set.of("career-narrative-v1", "career-narrative-v2", CAREER_V3_CONTENT_VERSION,
+        CAREER_CONTENT_VERSION,
         "wealth-narrative-v1").contains(report.getContentVersion())) {
       content = objectMapper.readValue(report.getContentJson(), CareerNarrativePlan.class);
     } else {
@@ -264,6 +281,34 @@ public class ReportService {
 
   private String subject(String name) {
     return name == null || name.isBlank() ? "命主" : name.trim();
+  }
+
+  private ReportAnalysisWindow analysisWindow(
+      ReportPreviewRequest request,
+      PaipanResultDto chart,
+      ReportTopic topic,
+      ReportHorizon horizon) {
+    Clock analysisClock = topic == ReportTopic.WEALTH || topic == ReportTopic.OVERALL
+        ? clock.withZone(WEALTH_ZONE)
+        : clock;
+    AnnualContextFactory factory = new AnnualContextFactory(analysisClock);
+    var productYears = factory.create(request.request(), chart, horizon);
+    var previous = factory.createYear(
+        request.request(), chart, productYears.get(0).year() - 1);
+    return new ReportAnalysisWindow(previous, productYears);
+  }
+
+  private ReportHorizon productHorizon(
+      ReportTopic topic,
+      RelationshipStatus relationshipStatus) {
+    return switch (topic) {
+      case CAREER -> ReportHorizon.of(2);
+      case WEALTH -> ReportHorizon.WEALTH_PRODUCT;
+      case RELATIONSHIP -> relationshipStatus == RelationshipStatus.SINGLE
+          ? ReportHorizon.RELATIONSHIP_SINGLE_PRODUCT
+          : ReportHorizon.RELATIONSHIP_PRODUCT;
+      case OVERALL -> ReportHorizon.of(3);
+    };
   }
 
   private void validateRelationshipContent(RelationshipNarrativePlan content) {

@@ -1,6 +1,7 @@
 package com.bazi.app.report;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.bazi.app.report.relationship.RelationshipDimension;
@@ -25,6 +26,7 @@ class ReportContentCompatibilityTest {
     assertEquals("dating", restored.relationshipStatus());
     assertEquals(5, restored.dimensions().size());
     assertEquals(3, restored.years().size());
+    assertNull(restored.timeline());
     // Legacy snapshots intentionally contain repeated judgments: reads must never rewrite them.
     assertEquals(original, restored);
   }

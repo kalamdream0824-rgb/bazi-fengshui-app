@@ -35,7 +35,7 @@ class ReportCheckoutFailureIntegrationTest {
 
   @Test
   void generationFailureCreatesNeitherReportNorOrder() throws Exception {
-    when(wealthReportGenerator.generate(any(), any(), any()))
+    when(wealthReportGenerator.generate(any(), any(), any(), any()))
         .thenThrow(new IllegalArgumentException("internal planning failure"));
     String token = register("report-checkout-failure");
 

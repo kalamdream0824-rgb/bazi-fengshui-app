@@ -34,7 +34,7 @@ class WealthContentFailureIntegrationTest {
 
   @Test
   void invalidWealthContentReturnsStableErrorAndDoesNotSaveAReport() throws Exception {
-    when(wealthReportGenerator.generate(any(), any(), any()))
+    when(wealthReportGenerator.generate(any(), any(), any(), any()))
         .thenThrow(new IllegalArgumentException("unresolved wealth content"));
     String username = "member-wealth-content-invalid";
     String token = register(username);

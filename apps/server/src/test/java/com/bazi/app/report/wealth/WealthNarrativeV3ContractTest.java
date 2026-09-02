@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import com.bazi.app.report.wealth.v3.WealthNarrativeV3;
 import com.bazi.app.report.wealth.v3.WealthNarrativeV3.Year;
 import com.bazi.app.report.wealth.v3.WealthNarrativeWriter;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -60,5 +61,17 @@ class WealthNarrativeV3ContractTest {
 
     assertNull(restored.timeline());
     assertEquals(current.years(), restored.years());
+  }
+
+  @Test
+  void sharedWealthSchemaAllowsTheOptionalV4TimelineField() throws Exception {
+    Path schemaPath = Path.of(
+        System.getProperty("user.dir"), "..", "..", "contracts", "drafts",
+        "wealth-v3.schema.json").normalize();
+    var schema = JSON.readTree(schemaPath.toFile());
+
+    assertEquals(
+        "#/definitions/NarrativeTimeline",
+        schema.at("/definitions/Content/properties/timeline/$ref").asText());
   }
 }

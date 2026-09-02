@@ -32,7 +32,7 @@ public record ThreeYearAssessment(
     return years.size() == 2 ? "两年" : "三年";
   }
 
-  static ThreeYearAssessment from(AnnualPeriodAssessment assessment) {
+  public static ThreeYearAssessment from(AnnualPeriodAssessment assessment) {
     return new ThreeYearAssessment(
         assessment.topic(),
         assessment.generatedOn(),

@@ -474,16 +474,92 @@ components:
         status: { type: string, enum: [ready] }
         contentVersion:
           type: string
-          description: career-narrative-v1/v2/v3、wealth-narrative-v1 使用旧内容结构；wealth-narrative-v2/v3 与 relationship-narrative-v1 使用各自独立结构。新生成的财富通俗版为 wealth-narrative-v3。
+          enum:
+            - career-narrative-v1
+            - career-narrative-v2
+            - career-narrative-v3
+            - career-narrative-v4
+            - wealth-narrative-v1
+            - wealth-narrative-v2
+            - wealth-narrative-v3
+            - wealth-narrative-v4
+            - relationship-narrative-v1
+            - relationship-narrative-v2
+            - relationship-single-v1
+            - relationship-single-v2
+            - overall-narrative-v1
+            - overall-narrative-v1.1
+            - overall-narrative-v2
+          description: v4/v2 为带统一过去—当下—未来时间线的新快照；旧版本继续按原结构读取，timeline 缺失时不得补写或报错。
         content:
           oneOf:
             - $ref: '#/components/schemas/CareerNarrativePlan'
             - $ref: '#/components/schemas/WealthNarrativePlan'
             - $ref: '#/components/schemas/RelationshipNarrativePlan'
+            - $ref: '#/components/schemas/RelationshipSingleNarrativePlan'
+            - $ref: '#/components/schemas/OverallNarrativePlan'
             - $ref: './drafts/wealth-v3.schema.json#/definitions/Content'
-          description: 由 contentVersion 判别；旧事业及财富 v1 使用 CareerNarrativePlan，财富 v2 使用 WealthNarrativePlan，财富 v3 使用独立 Content，感情 v1 使用 RelationshipNarrativePlan。
+          description: 由 contentVersion 判别；新版本包含 timeline，历史版本允许缺少 timeline。
         createdAt: { type: string, format: date-time }
         generatedAt: { type: string, format: date-time }
+    NarrativeTimeline:
+      type: object
+      required: [past, present, future]
+      properties:
+        past:
+          $ref: '#/components/schemas/NarrativePastReview'
+        present:
+          $ref: '#/components/schemas/NarrativePresentReading'
+        future:
+          type: array
+          minItems: 1
+          maxItems: 2
+          items:
+            $ref: '#/components/schemas/NarrativeFutureStep'
+      description: 去年只作核对式回看；当下给出判断和优先事项；未来按产品年份给出行动。
+    NarrativePastReview:
+      type: object
+      required: [year, headline, checkpoints, bridge, evidenceKeys]
+      properties:
+        year: { type: integer }
+        headline: { type: string, minLength: 1 }
+        checkpoints:
+          type: array
+          minItems: 2
+          maxItems: 2
+          uniqueItems: true
+          items: { type: string, minLength: 1 }
+        bridge: { type: string, minLength: 1 }
+        evidenceKeys:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: { type: string }
+    NarrativePresentReading:
+      type: object
+      required: [year, headline, judgment, priority, evidenceKeys]
+      properties:
+        year: { type: integer }
+        headline: { type: string, minLength: 1 }
+        judgment: { type: string, minLength: 1 }
+        priority: { type: string, minLength: 1 }
+        evidenceKeys:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: { type: string }
+    NarrativeFutureStep:
+      type: object
+      required: [year, headline, action, evidenceKeys]
+      properties:
+        year: { type: integer }
+        headline: { type: string, minLength: 1 }
+        action: { type: string, minLength: 1 }
+        evidenceKeys:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: { type: string }
     CareerNarrativePlan:
       type: object
       required: [thesis, contextSummary, years, route]
@@ -496,6 +572,8 @@ components:
         route:
           type: array
           items: { type: string }
+        timeline:
+          $ref: '#/components/schemas/NarrativeTimeline'
     CareerYearNarrative:
       type: object
       properties:
@@ -686,6 +764,8 @@ components:
           minItems: 1
           uniqueItems: true
           items: { type: string }
+        timeline:
+          $ref: '#/components/schemas/NarrativeTimeline'
     RelationshipDimensionSummary:
       type: object
       required: [code, label, status, tone, judgment, supportingEvidenceKeys, limitingEvidenceKeys]
@@ -762,6 +842,67 @@ components:
           minItems: 1
           uniqueItems: true
           items: { type: string }
+    RelationshipSingleNarrativePlan:
+      type: object
+      description: 单身感情两年快照；v2 新增 timeline，v1 缺少该字段时仍可读取。
+      required:
+        - relationshipStatus
+        - horizonYears
+        - thesis
+        - summary
+        - currentYear
+        - outlookYear
+        - sections
+        - outlook
+        - readingNote
+        - evidenceKeys
+      properties:
+        relationshipStatus: { type: string, enum: [single] }
+        horizonYears: { type: integer, enum: [2], readOnly: true }
+        thesis: { type: string }
+        summary: { type: string }
+        currentYear: { type: integer }
+        outlookYear: { type: integer }
+        sections:
+          type: array
+          minItems: 1
+          items: { type: object }
+        outlook:
+          type: array
+          items: { type: string }
+        readingNote: { type: string }
+        evidenceKeys:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: { type: string }
+        timeline:
+          $ref: '#/components/schemas/NarrativeTimeline'
+    OverallNarrativePlan:
+      type: object
+      description: 综合主题三年快照；v2 新增 timeline，v1/v1.1 缺少该字段时仍可读取。
+      required: [horizonYears, thesis, summary, years, route, readingNote, evidenceKeys]
+      properties:
+        horizonYears: { type: integer, enum: [3], readOnly: true }
+        thesis: { type: string }
+        summary: { type: string }
+        years:
+          type: array
+          minItems: 3
+          maxItems: 3
+          items: { type: object }
+        route:
+          type: array
+          minItems: 1
+          items: { type: string }
+        readingNote: { type: string }
+        evidenceKeys:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: { type: string }
+        timeline:
+          $ref: '#/components/schemas/NarrativeTimeline'
     ReportEvidence:
       type: object
       properties:
