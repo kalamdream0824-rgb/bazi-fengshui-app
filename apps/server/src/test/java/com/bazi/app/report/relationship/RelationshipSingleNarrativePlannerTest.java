@@ -28,6 +28,7 @@ class RelationshipSingleNarrativePlannerTest {
       var three = evaluator.evaluate(extractor.extract(request, chart, factory.create(request, chart, ReportHorizon.of(3))));
       var plan = planner.plan(period(two));
       assertNotNull(plan);
+      assertNull(plan.timeline());
       assertEquals(2, plan.horizonYears());
       assertEquals(2026, plan.currentYear());
       assertEquals(2027, plan.outlookYear());
@@ -40,6 +41,122 @@ class RelationshipSingleNarrativePlannerTest {
       var mapper = new ObjectMapper();
       assertEquals(plan, mapper.readValue(mapper.writeValueAsString(plan), RelationshipSingleNarrativePlan.class));
     }
+  }
+
+  @Test
+  void previousYearEntryBuildsTimelineWithoutExpandingTheTwoYearProduct() {
+    var previous = previousYear();
+    var product = period(List.of(
+        year(2026, RelationshipDimension.CONNECTION, 8, 2),
+        year(2027, RelationshipDimension.RESPONSE, 9, 1)));
+
+    var plan = planner.plan(product, previous);
+
+    assertNotNull(plan.timeline());
+    assertEquals(2025, plan.timeline().past().year());
+    assertEquals(2026, plan.timeline().present().year());
+    assertEquals(List.of(2027), plan.timeline().future().stream()
+        .map(com.bazi.app.report.NarrativeTimeline.FutureStep::year)
+        .toList());
+    assertEquals(2, plan.evaluations().size());
+    assertEquals(List.of(2026, 2027), plan.evaluations().stream()
+        .map(RelationshipYearEvaluation::year)
+        .toList());
+  }
+
+  @Test
+  void pastReviewChecksOpportunitiesResponsesAndBoundariesWithoutInventingAPartner() {
+    var plan = planner.plan(
+        period(List.of(
+            year(2026, RelationshipDimension.CONNECTION, 8, 2),
+            year(2027, RelationshipDimension.STABILITY, 9, 1))),
+        previousYear());
+
+    String review = plan.timeline().past().headline()
+        + String.join("", plan.timeline().past().checkpoints())
+        + plan.timeline().past().bridge();
+    assertTrue(review.contains("认识机会"), review);
+    assertTrue(review.contains("回应"), review);
+    assertTrue(review.contains("边界"), review);
+    for (String forbidden : List.of(
+        "你去年有对象", "你去年认识了", "去年出现了对象", "当时的对方",
+        "事实证明", "准确命中", "一定脱单")) {
+      assertFalse(review.contains(forbidden), forbidden + ": " + review);
+    }
+  }
+
+  @Test
+  void timelineKeepsCurrentDetailAndAddsOnlyOneNextYearAction() {
+    var product = period(List.of(
+        year(2026, RelationshipDimension.CONNECTION, 8, 2),
+        year(2027, RelationshipDimension.RESPONSE, 9, 1)));
+    var legacy = planner.plan(product);
+
+    var plan = planner.plan(product, previousYear());
+
+    assertEquals(legacy.sections(), plan.sections());
+    assertEquals(legacy.outlook(), plan.outlook());
+    assertEquals(legacy.evaluations(), plan.evaluations());
+    assertEquals(1, plan.timeline().future().size());
+    assertTrue(plan.timeline().present().headline().contains("认识"));
+    assertTrue(plan.timeline().present().headline().contains("机会"));
+    assertTrue(plan.timeline().future().get(0).action().contains("回应"));
+    Set<String> detailedCopy = new HashSet<>();
+    plan.sections().forEach(section -> {
+      detailedCopy.addAll(section.paragraphs());
+      detailedCopy.addAll(section.signals());
+    });
+    detailedCopy.addAll(plan.outlook());
+    assertFalse(detailedCopy.contains(plan.timeline().present().headline()));
+    assertFalse(detailedCopy.contains(plan.timeline().present().judgment()));
+    assertFalse(detailedCopy.contains(plan.timeline().present().priority()));
+    assertFalse(detailedCopy.contains(plan.timeline().future().get(0).headline()));
+    assertFalse(detailedCopy.contains(plan.timeline().future().get(0).action()));
+  }
+
+  @Test
+  void timelineEvidenceBelongsToTheCorrespondingCalculationYear() {
+    var previous = previousYear();
+    var product = period(List.of(
+        year(2026, RelationshipDimension.CONNECTION, 8, 2),
+        year(2027, RelationshipDimension.RESPONSE, 9, 1)));
+
+    var timeline = planner.plan(product, previous).timeline();
+
+    assertEvidenceBelongsTo(previous, timeline.past().evidenceKeys());
+    assertEvidenceBelongsTo(product.years().get(0), timeline.present().evidenceKeys());
+    assertEvidenceBelongsTo(product.years().get(1), timeline.future().get(0).evidenceKeys());
+  }
+
+  @Test
+  void historicalSingleJsonWithoutTimelineStillDeserializes() throws Exception {
+    var legacy = planner.plan(period(List.of(
+        year(2026, RelationshipDimension.CONNECTION, 8, 0),
+        year(2027, RelationshipDimension.RESPONSE, 8, 0))));
+    var mapper = new ObjectMapper();
+    var json = mapper.valueToTree(legacy);
+    ((com.fasterxml.jackson.databind.node.ObjectNode) json).remove("timeline");
+
+    var restored = mapper.treeToValue(json, RelationshipSingleNarrativePlan.class);
+
+    assertNull(restored.timeline());
+    assertEquals(legacy.evaluations(), restored.evaluations());
+  }
+
+  @Test
+  void rejectsTimelineThatDoesNotMatchTheSingleProductYears() throws Exception {
+    var plan = planner.plan(
+        period(List.of(
+            year(2026, RelationshipDimension.CONNECTION, 8, 0),
+            year(2027, RelationshipDimension.RESPONSE, 8, 0))),
+        previousYear());
+    var mapper = new ObjectMapper();
+    var changed = (com.fasterxml.jackson.databind.node.ObjectNode) mapper.valueToTree(plan);
+    ((com.fasterxml.jackson.databind.node.ObjectNode) changed.at("/timeline/present"))
+        .put("year", 2028);
+
+    assertThrows(Exception.class,
+        () -> mapper.treeToValue(changed, RelationshipSingleNarrativePlan.class));
   }
 
   @Test
@@ -179,6 +296,24 @@ class RelationshipSingleNarrativePlannerTest {
 
   private RelationshipPeriodEvaluation period(List<RelationshipYearEvaluation> years) {
     return new RelationshipPeriodArbitrator().arbitrate(years);
+  }
+
+  private RelationshipPeriodEvaluation.Year previousYear() {
+    return period(List.of(
+        year(2025, RelationshipDimension.RESPONSE, 9, 2),
+        year(2026, RelationshipDimension.CONNECTION, 8, 1)))
+        .years().get(0);
+  }
+
+  private void assertEvidenceBelongsTo(
+      RelationshipPeriodEvaluation.Year year,
+      List<String> evidenceKeys) {
+    Set<String> available = year.dimensions().values().stream()
+        .flatMap(dimension -> dimension.evidence().stream())
+        .map(RelationshipEvidence::key)
+        .collect(java.util.stream.Collectors.toSet());
+    assertFalse(evidenceKeys.isEmpty());
+    assertTrue(available.containsAll(evidenceKeys), evidenceKeys + " not in " + available);
   }
 
   private RelationshipYearEvaluation year(int year, RelationshipDimension focus, int support, int limit) {

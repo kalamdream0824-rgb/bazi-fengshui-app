@@ -1,6 +1,8 @@
 package com.bazi.app.report.relationship;
 
+import com.bazi.app.report.NarrativeTimeline;
 import com.bazi.app.report.ReportContent;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,7 +19,35 @@ public record RelationshipSingleNarrativePlan(
     List<String> outlook,
     String readingNote,
     List<RelationshipYearEvaluation> evaluations,
-    List<String> evidenceKeys) implements ReportContent {
+    List<String> evidenceKeys,
+    @JsonInclude(JsonInclude.Include.NON_NULL) NarrativeTimeline timeline) implements ReportContent {
+
+  public RelationshipSingleNarrativePlan(
+      String relationshipStatus,
+      int horizonYears,
+      String thesis,
+      String summary,
+      int currentYear,
+      int outlookYear,
+      List<Section> sections,
+      List<String> outlook,
+      String readingNote,
+      List<RelationshipYearEvaluation> evaluations,
+      List<String> evidenceKeys) {
+    this(
+        relationshipStatus,
+        horizonYears,
+        thesis,
+        summary,
+        currentYear,
+        outlookYear,
+        sections,
+        outlook,
+        readingNote,
+        evaluations,
+        evidenceKeys,
+        null);
+  }
 
   public RelationshipSingleNarrativePlan {
     if (!"single".equals(relationshipStatus) || horizonYears != 2 || outlookYear != currentYear + 1) {
@@ -49,6 +79,12 @@ public record RelationshipSingleNarrativePlan(
     if (!Set.copyOf(evidenceKeys).equals(keys(evaluations))
         || evidenceKeys.stream().distinct().count() != evidenceKeys.size()) {
       throw new IllegalArgumentException("single reading requires all calculation evidence");
+    }
+    if (timeline != null
+        && (timeline.present().year() != currentYear
+            || timeline.future().size() != 1
+            || timeline.future().get(0).year() != outlookYear)) {
+      throw new IllegalArgumentException("single timeline does not match its calculation horizon");
     }
   }
 
