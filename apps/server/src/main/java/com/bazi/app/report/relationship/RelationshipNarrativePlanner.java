@@ -1,11 +1,15 @@
 package com.bazi.app.report.relationship;
 
+import com.bazi.app.report.NarrativeTimeline;
+import com.bazi.app.report.NarrativeTimelinePlanner;
+import com.bazi.app.report.ReportTopic;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 public final class RelationshipNarrativePlanner {
 
@@ -14,6 +18,13 @@ public final class RelationshipNarrativePlanner {
   public RelationshipNarrativePlan plan(
       RelationshipPeriodEvaluation period,
       RelationshipStatus relationshipStatus) {
+    return plan(period, relationshipStatus, null);
+  }
+
+  public RelationshipNarrativePlan plan(
+      RelationshipPeriodEvaluation period,
+      RelationshipStatus relationshipStatus,
+      RelationshipPeriodEvaluation.Year previous) {
     Objects.requireNonNull(period, "period");
     Objects.requireNonNull(relationshipStatus, "relationshipStatus");
     String prefix = relationshipStatus.code();
@@ -46,6 +57,12 @@ public final class RelationshipNarrativePlanner {
         "risk", period.mainRisk() == null ? "" : period.mainRisk().dimension().label());
     String summaryKey = prefix + ".summary."
         + (period.mainRisk() == null ? "without_risk" : "with_risk");
+    NarrativeTimeline timeline = previous == null ? null : new RelationshipTimelinePlanner().plan(
+        new NarrativeTimelinePlanner.Input<>(
+            ReportTopic.RELATIONSHIP.code(),
+            previous,
+            period.years(),
+            Optional.of(relationshipStatus)));
 
     return new RelationshipNarrativePlan(
         relationshipStatus.code(),
@@ -60,7 +77,8 @@ public final class RelationshipNarrativePlanner {
         period.focus().tied(),
         mainRisk,
         years,
-        allEvidenceKeys(period));
+        allEvidenceKeys(period),
+        timeline);
   }
 
   private RelationshipNarrativePlan.YearNarrative year(

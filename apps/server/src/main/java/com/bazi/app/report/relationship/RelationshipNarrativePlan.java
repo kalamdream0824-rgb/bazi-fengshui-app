@@ -1,7 +1,9 @@
 package com.bazi.app.report.relationship;
 
+import com.bazi.app.report.NarrativeTimeline;
 import com.bazi.app.report.ReportContent;
 import com.bazi.app.report.ReportHorizon;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -19,7 +21,37 @@ public record RelationshipNarrativePlan(
     boolean focusTied,
     RiskSummary mainRisk,
     List<YearNarrative> years,
-    List<String> evidenceKeys) implements ReportContent {
+    List<String> evidenceKeys,
+    @JsonInclude(JsonInclude.Include.NON_NULL) NarrativeTimeline timeline) implements ReportContent {
+
+  public RelationshipNarrativePlan(
+      String relationshipStatus,
+      String relationshipStatusLabel,
+      int horizonYears,
+      String thesis,
+      String summary,
+      List<DimensionSummary> dimensions,
+      String primaryDimensionCode,
+      String secondaryDimensionCode,
+      boolean focusTied,
+      RiskSummary mainRisk,
+      List<YearNarrative> years,
+      List<String> evidenceKeys) {
+    this(
+        relationshipStatus,
+        relationshipStatusLabel,
+        horizonYears,
+        thesis,
+        summary,
+        dimensions,
+        primaryDimensionCode,
+        secondaryDimensionCode,
+        focusTied,
+        mainRisk,
+        years,
+        evidenceKeys,
+        null);
+  }
 
   public RelationshipNarrativePlan {
     RelationshipStatus status = RelationshipStatus.fromCode(relationshipStatus);

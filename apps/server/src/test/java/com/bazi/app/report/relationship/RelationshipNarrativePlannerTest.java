@@ -3,6 +3,7 @@ package com.bazi.app.report.relationship;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -11,6 +12,7 @@ import com.bazi.app.dto.PaipanResultDto;
 import com.bazi.app.report.AnnualContextFactory;
 import com.bazi.app.report.ReportHorizon;
 import com.bazi.app.service.BaziService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -70,6 +72,36 @@ class RelationshipNarrativePlannerTest {
         assertFalse(year.evidenceKeys().isEmpty());
       }
     }
+  }
+
+  @Test
+  void oldPlannerEntryKeepsTimelineAbsentWhilePreviousYearEntryAddsIt() {
+    RelationshipPeriodEvaluation.Year previous = new RelationshipPeriodArbitrator()
+        .arbitrate(List.of(year(2025, 4, 3, 1), year(2026, 4, 3, 1)))
+        .years().get(0);
+
+    RelationshipNarrativePlan current = new RelationshipNarrativePlanner().plan(
+        evaluation, RelationshipStatus.DATING, previous);
+
+    assertNull(dating.timeline());
+    assertNotNull(current.timeline());
+    assertEquals(2025, current.timeline().past().year());
+    assertEquals(List.of(2027, 2028), current.timeline().future().stream()
+        .map(com.bazi.app.report.NarrativeTimeline.FutureStep::year)
+        .toList());
+  }
+
+  @Test
+  void historicalJsonWithoutTimelineStillDeserializes() throws Exception {
+    ObjectMapper json = new ObjectMapper().findAndRegisterModules();
+    var legacyJson = json.valueToTree(dating);
+    ((com.fasterxml.jackson.databind.node.ObjectNode) legacyJson).remove("timeline");
+
+    RelationshipNarrativePlan restored = json.treeToValue(
+        legacyJson, RelationshipNarrativePlan.class);
+
+    assertNull(restored.timeline());
+    assertEquals(dating.years(), restored.years());
   }
 
   @Test
