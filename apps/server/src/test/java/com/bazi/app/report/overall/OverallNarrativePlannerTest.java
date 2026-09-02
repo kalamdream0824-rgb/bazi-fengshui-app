@@ -2,6 +2,8 @@ package com.bazi.app.report.overall;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bazi.app.dto.PaipanRequest;
@@ -31,6 +33,7 @@ class OverallNarrativePlannerTest {
   void writesThreeDifferentAnnualHeadlinesAndAllFourDimensions() {
     OverallNarrativePlan content = content();
 
+    assertNull(content.timeline());
     assertEquals(3, content.horizonYears());
     assertEquals(3, content.years().size());
     assertEquals(3, content.years().stream().map(OverallNarrativePlan.YearNarrative::headline)
@@ -45,6 +48,35 @@ class OverallNarrativePlannerTest {
       assertFalse(year.priorityIssue().isBlank());
       assertFalse(year.changeCondition().isBlank());
     }
+  }
+
+  @Test
+  void previousYearEntryAddsTimelineWithoutChangingTheThreeYearNarrative() {
+    OverallPeriodEvaluation product = period();
+    OverallNarrativePlanner planner = new OverallNarrativePlanner();
+    OverallNarrativePlan legacy = planner.plan(product);
+
+    OverallNarrativePlan current = planner.plan(product, previousYear(product));
+
+    assertNotNull(current.timeline());
+    assertEquals(legacy.years(), current.years());
+    assertEquals(legacy.route(), current.route());
+    assertEquals(3, current.horizonYears());
+    assertEquals(List.of(2027, 2028), current.timeline().future().stream()
+        .map(com.bazi.app.report.NarrativeTimeline.FutureStep::year)
+        .toList());
+  }
+
+  @Test
+  void legacyOverallJsonWithoutTimelineRemainsReadable() throws Exception {
+    ObjectMapper json = new ObjectMapper().findAndRegisterModules();
+    ObjectNode legacy = json.valueToTree(content());
+    legacy.remove("timeline");
+
+    OverallNarrativePlan restored = json.treeToValue(legacy, OverallNarrativePlan.class);
+
+    assertNull(restored.timeline());
+    assertEquals(content().years(), restored.years());
   }
 
   @Test
@@ -176,6 +208,29 @@ class OverallNarrativePlannerTest {
     List<AnnualContext> contexts = new AnnualContextFactory(CLOCK)
         .create(request, chart, ReportHorizon.of(3));
     return new OverallPeriodArbitrator().arbitrate(contexts);
+  }
+
+  private OverallYearEvaluation previousYear(OverallPeriodEvaluation product) {
+    OverallYearEvaluation first = product.years().get(0);
+    List<OverallDimensionEvaluation> dimensions = first.dimensions().stream()
+        .map(dimension -> new OverallDimensionEvaluation(
+            dimension.dimension(),
+            dimension.stance(),
+            dimension.supportWeight(),
+            dimension.limitationWeight(),
+            dimension.supportingEvidenceKeys().stream()
+                .map(key -> "previous." + key).toList(),
+            dimension.limitingEvidenceKeys().stream()
+                .map(key -> "previous." + key).toList(),
+            dimension.directAnnualEvidenceKeys().stream()
+                .map(key -> "previous." + key).toList()))
+        .toList();
+    return new OverallYearEvaluation(
+        first.year() - 1,
+        "乙巳",
+        first.primaryDimension(),
+        first.secondaryDimension(),
+        dimensions);
   }
 
   private String reading(OverallNarrativePlan.YearNarrative year, String code) {

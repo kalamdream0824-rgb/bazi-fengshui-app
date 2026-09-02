@@ -1,6 +1,8 @@
 package com.bazi.app.report.overall;
 
+import com.bazi.app.report.NarrativeTimeline;
 import com.bazi.app.report.ReportContent;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -13,7 +15,19 @@ public record OverallNarrativePlan(
     List<YearNarrative> years,
     List<String> route,
     String readingNote,
-    List<String> evidenceKeys) implements ReportContent {
+    List<String> evidenceKeys,
+    @JsonInclude(JsonInclude.Include.NON_NULL) NarrativeTimeline timeline) implements ReportContent {
+
+  public OverallNarrativePlan(
+      int horizonYears,
+      String thesis,
+      String summary,
+      List<YearNarrative> years,
+      List<String> route,
+      String readingNote,
+      List<String> evidenceKeys) {
+    this(horizonYears, thesis, summary, years, route, readingNote, evidenceKeys, null);
+  }
 
   public OverallNarrativePlan {
     if (horizonYears < 2 || horizonYears > 5) {
@@ -27,6 +41,13 @@ public record OverallNarrativePlan(
     evidenceKeys = distinct(evidenceKeys);
     if (years.size() != horizonYears) {
       throw new IllegalArgumentException("overall narrative requires every configured year");
+    }
+    if (timeline != null
+        && (timeline.present().year() != years.get(0).year()
+            || timeline.future().size() != years.size() - 1
+            || !timeline.future().stream().map(NarrativeTimeline.FutureStep::year).toList()
+                .equals(years.subList(1, years.size()).stream().map(YearNarrative::year).toList()))) {
+      throw new IllegalArgumentException("overall timeline does not match narrative years");
     }
   }
 

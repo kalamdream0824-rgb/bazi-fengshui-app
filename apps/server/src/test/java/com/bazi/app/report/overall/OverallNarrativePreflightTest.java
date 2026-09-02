@@ -58,6 +58,9 @@ class OverallNarrativePreflightTest {
     assertTrue(failures.isEmpty(), String.join("\n", failures));
 
     ObjectNode summary = summary(results);
+    assertEquals(0, summary.get("timelineDuplicateCaseCount").asInt());
+    assertEquals(0, summary.get("timelineEmptyCopyCaseCount").asInt());
+    assertEquals(0, summary.get("timelineMissingEvidenceCaseCount").asInt());
     Files.writeString(OUTPUT, JSON.writerWithDefaultPrettyPrinter().writeValueAsString(summary) + "\n");
     results.forEach(result -> System.out.printf(
         "OVERALL_PREFLIGHT case=%s focuses=%s headlines=%s failures=%s%n",
@@ -73,10 +76,16 @@ class OverallNarrativePreflightTest {
       Clock clock = Clock.fixed(
           LocalDate.parse(fixture.get("asOf").asText()).atStartOfDay(zone).toInstant(), zone);
       var chart = new BaziService().paipan(request);
-      var contexts = new AnnualContextFactory(clock)
-          .create(request, chart, ReportHorizon.of(fixture.get("horizonYears").asInt()));
-      OverallPeriodEvaluation period = new OverallPeriodArbitrator().arbitrate(contexts);
-      OverallNarrativePlan content = new OverallNarrativePlanner().plan(period);
+      var factory = new AnnualContextFactory(clock);
+      var contexts = factory.create(
+          request, chart, ReportHorizon.of(fixture.get("horizonYears").asInt()));
+      var analysisContexts = new ArrayList<com.bazi.app.report.AnnualContext>();
+      analysisContexts.add(factory.createYear(request, chart, contexts.get(0).year() - 1));
+      analysisContexts.addAll(contexts);
+      OverallPeriodArbitrator arbitrator = new OverallPeriodArbitrator();
+      OverallYearEvaluation previous = arbitrator.arbitrate(analysisContexts).years().get(0);
+      OverallPeriodEvaluation period = arbitrator.arbitrate(contexts);
+      OverallNarrativePlan content = new OverallNarrativePlanner().plan(period, previous);
 
       inspect(content, failures);
       return new CaseResult(
@@ -99,6 +108,33 @@ class OverallNarrativePreflightTest {
   private void inspect(OverallNarrativePlan content, List<String> failures) {
     if (content.horizonYears() != 3 || content.years().size() != 3) {
       failures.add("不是完整三年输出");
+    }
+    if (content.timeline() == null) {
+      failures.add("缺少过去、当下、未来时间线");
+    } else {
+      List<String> timelineCopy = timelineCopy(content);
+      if (timelineCopy.stream().anyMatch(value -> value == null || value.isBlank())) {
+        failures.add("时间线存在空内容");
+      }
+      if (new LinkedHashSet<>(timelineCopy).size() != timelineCopy.size()) {
+        failures.add("时间线跨区段出现完全重复文案");
+      }
+      if (content.timeline().past().evidenceKeys().isEmpty()
+          || content.timeline().present().evidenceKeys().isEmpty()
+          || content.timeline().future().stream().anyMatch(step -> step.evidenceKeys().isEmpty())) {
+        failures.add("时间线存在无依据区段");
+      }
+      if (content.timeline().future().size() != 2
+          || content.timeline().future().stream()
+              .map(com.bazi.app.report.NarrativeTimeline.FutureStep::headline)
+              .distinct().count() != 2) {
+        failures.add("未来两年没有使用不同重点");
+      }
+      for (String emptyPhrase : List.of("整体情况", "综合层面")) {
+        if (String.join("", timelineCopy).contains(emptyPhrase)) {
+          failures.add("时间线出现空泛表达：" + emptyPhrase);
+        }
+      }
     }
     required("三年总论", content.thesis(), failures);
     required("三年摘要", content.summary(), failures);
@@ -207,6 +243,32 @@ class OverallNarrativePreflightTest {
         .count());
     output.put("emptyOrInvalidCaseCount", results.stream()
         .filter(result -> !result.failures().isEmpty()).count());
+    long timelineDuplicateCases = results.stream()
+        .filter(result -> result.content() != null && result.content().timeline() != null)
+        .filter(result -> {
+          List<String> copy = timelineCopy(result.content());
+          return new LinkedHashSet<>(copy).size() != copy.size();
+        })
+        .count();
+    long timelineEmptyCases = results.stream()
+        .filter(result -> result.content() == null
+            || result.content().timeline() == null
+            || timelineCopy(result.content()).stream().anyMatch(value -> value == null || value.isBlank()))
+        .count();
+    long timelineMissingEvidenceCases = results.stream()
+        .filter(result -> result.content() == null
+            || result.content().timeline() == null
+            || result.content().timeline().past().evidenceKeys().isEmpty()
+            || result.content().timeline().present().evidenceKeys().isEmpty()
+            || result.content().timeline().future().stream()
+                .anyMatch(step -> step.evidenceKeys().isEmpty()))
+        .count();
+    output.put("timelineDuplicateCaseCount", timelineDuplicateCases);
+    output.put("timelineEmptyCopyCaseCount", timelineEmptyCases);
+    output.put("timelineMissingEvidenceCaseCount", timelineMissingEvidenceCases);
+    output.put("timelineDuplicateRate", timelineDuplicateCases / (double) results.size());
+    output.put("timelineEmptyCopyRate", timelineEmptyCases / (double) results.size());
+    output.put("timelineMissingEvidenceRate", timelineMissingEvidenceCases / (double) results.size());
     ArrayNode cases = output.putArray("cases");
     results.forEach(result -> {
       ObjectNode item = cases.addObject();
@@ -219,6 +281,22 @@ class OverallNarrativePreflightTest {
       if (result.content() != null) item.set("content", JSON.valueToTree(result.content()));
     });
     return output;
+  }
+
+  private List<String> timelineCopy(OverallNarrativePlan content) {
+    var timeline = content.timeline();
+    List<String> copy = new ArrayList<>();
+    copy.add(timeline.past().headline());
+    copy.addAll(timeline.past().checkpoints());
+    copy.add(timeline.past().bridge());
+    copy.add(timeline.present().headline());
+    copy.add(timeline.present().judgment());
+    copy.add(timeline.present().priority());
+    timeline.future().forEach(step -> {
+      copy.add(step.headline());
+      copy.add(step.action());
+    });
+    return List.copyOf(copy);
   }
 
   private boolean hasDuplicateDimensionJudgment(CaseResult result) {

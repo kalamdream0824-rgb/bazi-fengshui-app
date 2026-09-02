@@ -1,10 +1,14 @@
 package com.bazi.app.report.overall;
 
+import com.bazi.app.report.NarrativeTimeline;
+import com.bazi.app.report.NarrativeTimelinePlanner;
+import com.bazi.app.report.ReportTopic;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Optional;
 
 public final class OverallNarrativePlanner {
 
@@ -12,6 +16,12 @@ public final class OverallNarrativePlanner {
   private final OverallEvidenceAngleResolver angleResolver = new OverallEvidenceAngleResolver();
 
   public OverallNarrativePlan plan(OverallPeriodEvaluation period) {
+    return plan(period, null);
+  }
+
+  public OverallNarrativePlan plan(
+      OverallPeriodEvaluation period,
+      OverallYearEvaluation previous) {
     List<OverallNarrativePlan.YearNarrative> years = new ArrayList<>();
     for (int index = 0; index < period.years().size(); index++) {
       OverallYearEvaluation year = period.years().get(index);
@@ -41,6 +51,12 @@ public final class OverallNarrativePlanner {
           evidenceKeys(year)));
     }
 
+    NarrativeTimeline timeline = previous == null ? null : new OverallTimelinePlanner().plan(
+        new NarrativeTimelinePlanner.Input<>(
+            ReportTopic.OVERALL.code(),
+            previous,
+            period.years(),
+            Optional.empty()));
     return new OverallNarrativePlan(
         period.horizonYears(),
         thesis(period),
@@ -48,7 +64,8 @@ public final class OverallNarrativePlanner {
         years,
         route(period),
         "这份综合命书用于比较三年的生活重点和处理顺序。它不代替具体的工作、财务、关系或健康决定。",
-        years.stream().flatMap(year -> year.evidenceKeys().stream()).distinct().toList());
+        years.stream().flatMap(year -> year.evidenceKeys().stream()).distinct().toList(),
+        timeline);
   }
 
   private OverallNarrativePlan.DimensionReading reading(OverallDimensionEvaluation evaluation) {
