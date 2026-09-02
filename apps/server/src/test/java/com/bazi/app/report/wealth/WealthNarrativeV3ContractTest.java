@@ -29,9 +29,11 @@ class WealthNarrativeV3ContractTest {
         historicalYears, current.route(), current.readingNote());
 
     assertNull(historical.headlinePlannerVersion());
+    assertNull(historical.timeline());
     assertNull(historical.years().get(0).headlineMeta());
     var json = JSON.readTree(JSON.writeValueAsString(historical));
     assertFalse(json.has("headlinePlannerVersion"));
+    assertFalse(json.has("timeline"));
     assertFalse(json.at("/years/0").has("headlineMeta"));
     assertEquals(historical, JSON.treeToValue(json, WealthNarrativeV3.class));
   }
@@ -45,5 +47,18 @@ class WealthNarrativeV3ContractTest {
     assertEquals("wealth-headline-v1", json.get("headlinePlannerVersion").asText());
     assertEquals("stable_receipt_support", json.at("/years/0/headlineMeta/themeKey").asText());
     assertEquals(current, JSON.treeToValue(json, WealthNarrativeV3.class));
+  }
+
+  @Test
+  void historicalV3JsonWithoutTimelineStillDeserializes() throws Exception {
+    var current = new WealthNarrativeWriter().plan(
+        WealthNarrativeV3Test.assessments(scoredCase("S07")), LocalDate.of(2026, 8, 29));
+    var legacyJson = JSON.valueToTree(current);
+    ((com.fasterxml.jackson.databind.node.ObjectNode) legacyJson).remove("timeline");
+
+    WealthNarrativeV3 restored = JSON.treeToValue(legacyJson, WealthNarrativeV3.class);
+
+    assertNull(restored.timeline());
+    assertEquals(current.years(), restored.years());
   }
 }

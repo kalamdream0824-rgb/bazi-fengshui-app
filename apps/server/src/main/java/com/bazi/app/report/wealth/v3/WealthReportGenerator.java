@@ -8,4 +8,10 @@ import java.util.List;
 /** Generates one validated wealth v3 content snapshot from server-owned calculations. */
 public interface WealthReportGenerator {
   WealthNarrativeV3 generate(PaipanResultDto chart, List<AnnualContext> contexts, LocalDate asOf);
+
+  WealthNarrativeV3 generate(
+      PaipanResultDto chart,
+      AnnualContext previous,
+      List<AnnualContext> productYears,
+      LocalDate asOf);
 }

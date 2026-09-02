@@ -113,7 +113,8 @@ public final class WealthNarrativeWriter {
             yearNumbers, years.stream().map(y -> decision(y, "retention")).toList()),
         paths, riskSummary, result, route,
         block("wealth.reading_note", "method_note", "reading_note",
-            "本报告按传统命理规则整理收入倾向，不保证现实收入或投资结果。观察事项只是核对现实情况的例子，不是预测成立的证明。", yearNumbers, List.of()));
+            "本报告按传统命理规则整理收入倾向，不保证现实收入或投资结果。观察事项只是核对现实情况的例子，不是预测成立的证明。", yearNumbers, List.of()),
+        null);
   }
 
   /** Current-copy validation only: never re-render or overwrite saved historical reports with this method. */
@@ -122,7 +123,7 @@ public final class WealthNarrativeWriter {
     var years = draft.years().stream().map(y -> new WealthAssessment(y.year(), y.ganZhi(), y.facts(), y.evidence(),
         y.decisions(), y.focus(), y.risk() == null ? null : new WealthAssessment.Risk(y.risk().path(), y.risk().limitingEvidenceIds()))).toList();
     // The closed generator is the executable license: template, kind, wording, scope and references must all match.
-    if (!plan(years, LocalDate.parse(draft.asOf())).equals(draft)) {
+    if (!plan(years, LocalDate.parse(draft.asOf())).equals(draft.withTimeline(null))) {
       throw new IllegalArgumentException("wealth draft violates the current copy license or reference scope");
     }
   }

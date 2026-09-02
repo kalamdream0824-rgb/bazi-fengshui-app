@@ -1,6 +1,7 @@
 package com.bazi.app.report.wealth.v3;
 
 import com.bazi.app.report.ReportContent;
+import com.bazi.app.report.NarrativeTimeline;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,8 @@ public record WealthNarrativeV3(String asOf, String zoneId, int horizonYears, St
     String policyVersion, String copyVersion,
     @JsonInclude(JsonInclude.Include.NON_NULL) String headlinePlannerVersion,
     Block thesis, Block summary, List<PathSummary> pathSummaries,
-    Block riskSummary, List<Year> years, List<Block> route, Block readingNote) implements ReportContent {
+    Block riskSummary, List<Year> years, List<Block> route, Block readingNote,
+    @JsonInclude(JsonInclude.Include.NON_NULL) NarrativeTimeline timeline) implements ReportContent {
   public WealthNarrativeV3 {
     pathSummaries = List.copyOf(pathSummaries); years = List.copyOf(years); route = List.copyOf(route);
   }
@@ -20,7 +22,24 @@ public record WealthNarrativeV3(String asOf, String zoneId, int horizonYears, St
       String policyVersion, String copyVersion, Block thesis, Block summary, List<PathSummary> pathSummaries,
       Block riskSummary, List<Year> years, List<Block> route, Block readingNote) {
     this(asOf, zoneId, horizonYears, calculationVersion, policyVersion, copyVersion, null,
-        thesis, summary, pathSummaries, riskSummary, years, route, readingNote);
+        thesis, summary, pathSummaries, riskSummary, years, route, readingNote, null);
+  }
+
+  /** Source-compatible constructor for v3.3 snapshots created before timeline support. */
+  public WealthNarrativeV3(String asOf, String zoneId, int horizonYears, String calculationVersion,
+      String policyVersion, String copyVersion, String headlinePlannerVersion,
+      Block thesis, Block summary, List<PathSummary> pathSummaries,
+      Block riskSummary, List<Year> years, List<Block> route, Block readingNote) {
+    this(asOf, zoneId, horizonYears, calculationVersion, policyVersion, copyVersion,
+        headlinePlannerVersion, thesis, summary, pathSummaries, riskSummary, years, route,
+        readingNote, null);
+  }
+
+  public WealthNarrativeV3 withTimeline(NarrativeTimeline value) {
+    return new WealthNarrativeV3(
+        asOf, zoneId, horizonYears, calculationVersion, policyVersion, copyVersion,
+        headlinePlannerVersion, thesis, summary, pathSummaries, riskSummary, years, route,
+        readingNote, value);
   }
 
   public record Block(String id, String kind, String text, String templateId, List<Integer> years, List<String> decisionIds) {

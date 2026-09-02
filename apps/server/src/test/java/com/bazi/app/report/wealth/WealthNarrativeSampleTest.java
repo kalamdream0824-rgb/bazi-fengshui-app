@@ -6,6 +6,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.bazi.app.report.wealth.v3.WealthAssessment;
 import com.bazi.app.report.wealth.v3.WealthNarrativeV3;
 import com.bazi.app.report.wealth.v3.WealthNarrativeWriter;
+import com.bazi.app.report.wealth.v3.DefaultWealthReportGenerator;
+import com.bazi.app.dto.PaipanRequest;
+import com.bazi.app.report.AnnualContextFactory;
+import com.bazi.app.report.ReportHorizon;
+import com.bazi.app.service.BaziService;
+import java.time.Clock;
+import java.time.ZoneId;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -165,6 +172,53 @@ class WealthNarrativeSampleTest {
       var content = draft("R%02d".formatted(caseNumber));
       assertTrue(content.years().stream().filter(year ->
           year.overview().text().contains("项目和额外收入")).count() <= 1, content.toString());
+    }
+  }
+
+  @Test
+  void fixedBirthSamplesHaveAuditableNonRepeatingTimelines() throws Exception {
+    for (int caseNumber = 1; caseNumber <= 12; caseNumber++) {
+      String id = "R%02d".formatted(caseNumber);
+      var source = find(read("wealth-v2-baseline-20260829.json").get("cases"), id);
+      var request = JSON.treeToValue(source.get("request"), PaipanRequest.class);
+      var chart = new BaziService().paipan(request);
+      LocalDate asOf = LocalDate.parse(source.get("asOf").asText());
+      ZoneId zone = ZoneId.of("Asia/Shanghai");
+      Clock clock = Clock.fixed(asOf.atStartOfDay(zone).toInstant(), zone);
+      var factory = new AnnualContextFactory(clock);
+      var content = new DefaultWealthReportGenerator().generate(
+          chart,
+          factory.createYear(request, chart, asOf.getYear() - 1),
+          factory.create(request, chart, ReportHorizon.WEALTH_PRODUCT),
+          asOf);
+
+      assertNotNull(content.timeline(), id);
+      assertEquals(asOf.getYear() - 1, content.timeline().past().year(), id);
+      assertEquals(List.of(asOf.getYear() + 1, asOf.getYear() + 2), content.timeline().future().stream()
+          .map(com.bazi.app.report.NarrativeTimeline.FutureStep::year)
+          .toList(), id);
+      List<String> copy = new ArrayList<>();
+      copy.add(content.timeline().past().headline());
+      copy.addAll(content.timeline().past().checkpoints());
+      copy.add(content.timeline().past().bridge());
+      copy.add(content.timeline().present().headline());
+      copy.add(content.timeline().present().judgment());
+      copy.add(content.timeline().present().priority());
+      content.timeline().future().forEach(step -> {
+        copy.add(step.headline());
+        copy.add(step.action());
+      });
+      assertEquals(copy.size(), new java.util.LinkedHashSet<>(copy).size(), id + copy);
+      for (String text : copy) {
+        for (String forbidden : List.of(
+            "你去年已经", "你去年一定", "去年必然", "事实证明", "准确命中",
+            "职责", "成果", "岗位", "升职", "具体金额")) {
+          assertFalse(text.contains(forbidden), id + ": " + text);
+        }
+      }
+      assertFalse(content.timeline().past().evidenceKeys().isEmpty(), id);
+      assertFalse(content.timeline().present().evidenceKeys().isEmpty(), id);
+      assertTrue(content.timeline().future().stream().allMatch(step -> !step.evidenceKeys().isEmpty()), id);
     }
   }
 
