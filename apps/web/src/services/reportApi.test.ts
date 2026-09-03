@@ -7,9 +7,9 @@ import type { WealthContentV3, WealthHeadlineMetaV3 } from './reportApi'
 const request: PaipanRequest = {
   name: '林先生',
   gender: 'male',
-  solarDateTime: '1995-10-08T14:30:00',
-  birthPlace: '上海',
-  trueSolarTime: false,
+  solarDateTime: '1995-10-08T13:05:00',
+  birthPlace: '广东省 深圳市',
+  trueSolarTime: true,
 }
 
 describe('reportApi', () => {

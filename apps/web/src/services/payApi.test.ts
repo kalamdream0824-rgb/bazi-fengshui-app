@@ -5,9 +5,9 @@ import { mockPayReportCheckout, prepareReportCheckout } from './payApi'
 const request = {
   name: '林先生',
   gender: 'male' as const,
-  solarDateTime: '1995-10-08T14:30:00',
-  birthPlace: '上海',
-  trueSolarTime: false,
+  solarDateTime: '1995-10-08T13:05:00',
+  birthPlace: '广东省 深圳市',
+  trueSolarTime: true,
 }
 
 function ok(body: unknown): Response {
