@@ -192,7 +192,7 @@ describe('baziMapper.paipan 结构完整性', () => {
     expect(without.pillars.time.gan + without.pillars.time.zhi).toBe('丁未')
     expect(withTrueSolar.pillars.time.gan + withTrueSolar.pillars.time.zhi).toBe('丙午')
     expect(withTrueSolar.trueSolar?.longitude).toBe(114.05)
-    expect(withTrueSolar.trueSolar?.adjusted).toContain('12:54')
+    expect(withTrueSolar.trueSolar?.adjusted).toContain('12:53')
     expect(withTrueSolar.trueSolar?.boundaryChanged).toBe(true)
     expect(withTrueSolar.trueSolar?.originalShichen).toBe('未')
     expect(withTrueSolar.trueSolar?.adjustedShichen).toBe('午')

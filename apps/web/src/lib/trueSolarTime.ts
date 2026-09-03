@@ -63,10 +63,23 @@ export function longitudeOf(birthPlace: string): number | null {
 
 /** 均时差（分钟），NOAA 近似公式 */
 export function equationOfTimeMinutes(date: Date): number {
-  const start = new Date(date.getFullYear(), 0, 0)
-  const dayOfYear = Math.floor((date.getTime() - start.getTime()) / 86400000)
-  const b = (2 * Math.PI * (dayOfYear - 81)) / 364
-  return 9.87 * Math.sin(2 * b) - 7.53 * Math.cos(b) - 1.5 * Math.sin(b)
+  const year = date.getFullYear()
+  const daysInYear = isLeapYear(year) ? 366 : 365
+  const dayOfYear = Math.floor(
+    (Date.UTC(year, date.getMonth(), date.getDate()) - Date.UTC(year, 0, 0)) / 86_400_000,
+  )
+  const hour = date.getHours()
+    + date.getMinutes() / 60
+    + date.getSeconds() / 3600
+    + date.getMilliseconds() / 3_600_000
+  const gamma = (2 * Math.PI / daysInYear) * (dayOfYear - 1 + (hour - 12) / 24)
+  return 229.18 * (
+    0.000075
+    + 0.001868 * Math.cos(gamma)
+    - 0.032077 * Math.sin(gamma)
+    - 0.014615 * Math.cos(2 * gamma)
+    - 0.040849 * Math.sin(2 * gamma)
+  )
 }
 
 export interface TrueSolarResult {
@@ -80,7 +93,12 @@ export function trueSolarTime(date: Date, longitude: number): TrueSolarResult {
   const offsetMinutes = (longitude - 120) * 4
   const eotMinutes = equationOfTimeMinutes(date)
   const total = offsetMinutes + eotMinutes
-  return { adjusted: new Date(date.getTime() + total * 60000), offsetMinutes, eotMinutes }
+  const totalOffsetMilliseconds = Math.round(total * 60) * 1000
+  return { adjusted: new Date(date.getTime() + totalOffsetMilliseconds), offsetMinutes, eotMinutes }
+}
+
+function isLeapYear(year: number): boolean {
+  return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)
 }
 
 export function formatAdjusted(date: Date): string {

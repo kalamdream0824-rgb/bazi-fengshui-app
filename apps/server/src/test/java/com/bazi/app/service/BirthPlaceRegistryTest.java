@@ -34,6 +34,15 @@ class BirthPlaceRegistryTest {
   }
 
   @Test
+  void rejectsUnknownNameEvenWhenItStartsWithAKnownCity() {
+    BusinessException error = assertThrows(
+        BusinessException.class,
+        () -> registry.longitudeOf("广东省 深圳火星市"));
+
+    assertEquals("BIRTH_PLACE_UNRESOLVED", error.getCode());
+  }
+
+  @Test
   void rejectsProvinceOnlyInsteadOfFallingBackToCapital() {
     BusinessException error = assertThrows(
         BusinessException.class,

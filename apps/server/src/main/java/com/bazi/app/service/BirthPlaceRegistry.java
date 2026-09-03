@@ -39,6 +39,9 @@ public final class BirthPlaceRegistry {
     if (exact != null) {
       return exact;
     }
+    if (!parts[1].matches(".*(自治州|地区|自治盟|盟)$")) {
+      throw unresolved();
+    }
     return longitudeByCity.entrySet().stream()
         .filter(entry -> normalizedCity.startsWith(entry.getKey()))
         .max(Map.Entry.comparingByKey((left, right) -> Integer.compare(left.length(), right.length())))

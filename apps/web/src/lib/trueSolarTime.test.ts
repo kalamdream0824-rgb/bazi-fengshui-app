@@ -24,10 +24,23 @@ describe('trueSolarTime', () => {
     expect(oct).toBeLessThan(16)
   })
 
-  it('深圳 13:05 校正后进入午时（12:54 左右）', () => {
+  it('深圳 13:05 与后端黄金向量一致到秒', () => {
     const base = new Date(1995, 9, 8, 13, 5, 0)
     const r = trueSolarTime(base, 114.05)
-    expect(formatAdjusted(r.adjusted).slice(11)).toBe('12:54')
+    expect(formatAdjusted(r.adjusted)).toBe('1995-10-08T12:53')
+    expect(r.adjusted.getSeconds()).toBe(51)
     expect(r.offsetMinutes).toBeCloseTo(-23.8, 1)
+  })
+
+  it('闰年跨日向量与后端一致到秒', () => {
+    const base = new Date(2024, 1, 29, 0, 5, 0)
+    const r = trueSolarTime(base, 87.6)
+
+    expect(r.adjusted.getFullYear()).toBe(2024)
+    expect(r.adjusted.getMonth()).toBe(1)
+    expect(r.adjusted.getDate()).toBe(28)
+    expect(r.adjusted.getHours()).toBe(21)
+    expect(r.adjusted.getMinutes()).toBe(42)
+    expect(r.adjusted.getSeconds()).toBe(23)
   })
 })

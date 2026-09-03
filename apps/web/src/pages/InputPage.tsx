@@ -7,7 +7,7 @@ import { DateTimePicker } from '@/components/DateTimePicker'
 import { LunarDatePicker } from '@/components/LunarDatePicker'
 import { FooterNote } from '@/components/FooterNote'
 import { SegControl } from '@/components/SegControl'
-import { isCompleteRegionSelection, RegionSelect } from '@/components/RegionSelect'
+import { RegionSelect } from '@/components/RegionSelect'
 import { Switch } from '@/components/Switch'
 import { TopBar } from '@/components/TopBar'
 import { getBaziApi } from '@/services/baziApi'
@@ -145,4 +145,8 @@ export function InputPage() {
       <FooterNote>排盘数据仅供传统文化研究参考</FooterNote>
     </>
   )
+}
+
+function isCompleteRegionSelection(value: string): boolean {
+  return value.trim().split(/\s+/).filter(Boolean).length === 2
 }

@@ -5,10 +5,6 @@ interface RegionSelectProps {
   onChange: (value: string) => void
 }
 
-export function isCompleteRegionSelection(value: string): boolean {
-  return value.trim().split(/\s+/).filter(Boolean).length === 2
-}
-
 export function RegionSelect({ value, onChange }: RegionSelectProps) {
   const parts = value ? value.split(' ') : ['', '']
   const province = parts[0] ?? ''
