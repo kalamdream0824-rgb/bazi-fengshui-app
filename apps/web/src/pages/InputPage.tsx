@@ -7,7 +7,7 @@ import { DateTimePicker } from '@/components/DateTimePicker'
 import { LunarDatePicker } from '@/components/LunarDatePicker'
 import { FooterNote } from '@/components/FooterNote'
 import { SegControl } from '@/components/SegControl'
-import { RegionSelect } from '@/components/RegionSelect'
+import { isCompleteRegionSelection, RegionSelect } from '@/components/RegionSelect'
 import { Switch } from '@/components/Switch'
 import { TopBar } from '@/components/TopBar'
 import { getBaziApi } from '@/services/baziApi'
@@ -48,8 +48,8 @@ export function InputPage() {
       toast('请选择出生时间')
       return
     }
-    if (trueSolar && !birthPlace) {
-      toast('开启真太阳时请先选择出生地（省/市）')
+    if (trueSolar && !isCompleteRegionSelection(birthPlace)) {
+      toast('开启真太阳时请完整选择出生省份和城市')
       return
     }
     mutation.mutate({
@@ -132,6 +132,9 @@ export function InputPage() {
           title="真太阳时"
           desc="按出生地经度校正，结果可能与本地时间不同"
         />
+        <div className="true-solar-support-note">
+          目前支持中国大陆省、市两级地点；县区、乡镇、台湾及境外地点暂不支持校正。
+        </div>
       </Card>
 
       <div style={{ padding: '0 14px 12px' }}>

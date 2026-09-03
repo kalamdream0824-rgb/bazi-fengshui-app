@@ -2083,6 +2083,42 @@ select.input-box {
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
+.true-solar-support-note {
+  margin: -2px 14px 14px;
+  color: var(--ink-3);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.true-solar-audit {
+  margin-top: 9px;
+  padding: 9px 11px;
+  border: 1px solid rgba(184, 144, 74, 0.28);
+  border-radius: 8px;
+  background: rgba(201, 163, 92, 0.08);
+  font-size: 11px;
+  line-height: 1.65;
+}
+.true-solar-audit.is-boundary {
+  border-color: rgba(181, 61, 49, 0.35);
+  background: rgba(181, 61, 49, 0.06);
+}
+.true-solar-audit__title {
+  color: var(--ink);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.true-solar-audit__time {
+  color: var(--ink-2);
+}
+.true-solar-audit__detail {
+  color: var(--ink-3);
+}
+.true-solar-audit__warning {
+  margin-top: 3px;
+  color: var(--red);
+  font-weight: 600;
+}
 
 /* 时间滚轮选择器 */
 .picker-field {

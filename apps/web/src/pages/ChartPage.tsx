@@ -26,6 +26,13 @@ export function ChartPage() {
 
   const genderLabel = request.gender === 'male' ? '乾造' : '坤造'
   const explanation = explain(result)
+  const trueSolar = result.trueSolar
+  const trueSolarTotalOffset = trueSolar
+    ? Math.round((trueSolar.offsetMinutes + trueSolar.eotMinutes) * 10) / 10
+    : null
+  const trueSolarDateChanged = trueSolar
+    ? trueSolar.original.slice(0, 10) !== trueSolar.adjusted.slice(0, 10)
+    : false
 
   return (
     <>
@@ -68,16 +75,25 @@ export function ChartPage() {
             <div className="meta-line" style={{ marginTop: 3 }}>
               农历 {result.lunarText} · {result.timeZhi}时
             </div>
-            {result.trueSolar ? (
-              <div className="meta-line" style={{ marginTop: 3 }}>
-                真太阳时 {result.trueSolar.original} → {result.trueSolar.adjusted}
-                （经度 {result.trueSolar.longitude}°E）
-              </div>
-            ) : null}
-            {result.trueSolar?.boundaryChanged ? (
-              <div className="meta-line" style={{ marginTop: 3, color: 'var(--red)' }}>
-                校正后时辰由 {result.trueSolar.originalShichen} 时变为 {result.trueSolar.adjustedShichen}{' '}
-                时，排盘已按校正后时辰计算
+            {trueSolar ? (
+              <div className={`true-solar-audit ${trueSolar.boundaryChanged || trueSolarDateChanged ? 'is-boundary' : ''}`}>
+                <div className="true-solar-audit__title">真太阳时校正</div>
+                <div className="true-solar-audit__time">
+                  原时间 {trueSolar.original.replace('T', ' ')} → 校正后 {trueSolar.adjusted.replace('T', ' ')}
+                </div>
+                <div className="true-solar-audit__detail">
+                  经度 {trueSolar.longitude}°E · 经度修正 {formatMinutes(trueSolar.offsetMinutes)} ·
+                  均时差 {formatMinutes(trueSolar.eotMinutes)} · 合计约 {formatMinutes(trueSolarTotalOffset ?? 0)}
+                </div>
+                {trueSolar.boundaryChanged || trueSolarDateChanged ? (
+                  <div className="true-solar-audit__warning">
+                    {trueSolarDateChanged ? '校正后跨越日期；' : ''}
+                    {trueSolar.boundaryChanged
+                      ? `时辰由${trueSolar.originalShichen}时变为${trueSolar.adjustedShichen}时；`
+                      : ''}
+                    本命盘及命书已按校正后时间计算。
+                  </div>
+                ) : null}
               </div>
             ) : null}
           </div>
@@ -147,4 +163,8 @@ export function ChartPage() {
       <FooterNote>排盘数据仅供传统文化研究参考</FooterNote>
     </>
   )
+}
+
+function formatMinutes(value: number): string {
+  return `${value > 0 ? '+' : ''}${value} 分钟`
 }
