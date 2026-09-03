@@ -158,6 +158,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaipanResult'
+        '400':
+          description: 出生时间无效（BIRTH_TIME_INVALID），或开启真太阳时但城市不完整/不受支持（BIRTH_PLACE_UNRESOLVED）。
     get:
       summary: 我的排盘历史
       responses:
@@ -208,7 +210,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ReportInfo'
         '400':
-          description: 非会员需购买（REPORT_PAYMENT_REQUIRED）、会员当日额度已用完（MEMBER_DAILY_REPORT_LIMIT）或内容生成失败。
+          description: 非会员需购买（REPORT_PAYMENT_REQUIRED）、会员当日额度已用完（MEMBER_DAILY_REPORT_LIMIT）、出生城市无法解析（BIRTH_PLACE_UNRESOLVED）或内容生成失败；失败不消耗会员次数。
     get:
       summary: 我的命书列表（需 Bearer token；只返回 ready 报告）
       description: locked 报告在支付完成前不会出现在列表中。
@@ -239,7 +241,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ReportCheckoutInfo'
         '400':
-          description: 商品未开放（REPORT_PRODUCT_UNAVAILABLE）或命书生成失败；失败时不创建可收费订单。
+          description: 商品未开放（REPORT_PRODUCT_UNAVAILABLE）、出生城市无法解析（BIRTH_PLACE_UNRESOLVED）或命书生成失败；失败时不创建报告、订单或扣费记录。
   /reports/checkout/{orderId}/mock-pay:
     post:
       summary: 模拟支付并解锁单份命书（仅非生产环境，需 Bearer token）
@@ -920,12 +922,13 @@ components:
           enum: [male, female]
         solarDateTime:
           type: string
-          description: ISO 格式公历时间，如 1995-10-08T14:30:00
+          description: 用户输入的原始民用钟表时间，ISO 本地时间格式，如 1995-10-08T14:30:00。客户端不得预先换算；开启真太阳时后由后端按 UTC+8、中国城市经度和 NOAA 均时差公式恰好校正一次。
         birthPlace:
           type: string
-          description: 出生地，用于真太阳时
+          description: 出生地，格式为“省级行政区 城市”，如“广东省 深圳市”。trueSolarTime=true 时必须提供后端支持的中国大陆市级地点；四个直辖市按市中心经度处理，不支持县区、乡镇、台湾及境外地点。
         trueSolarTime:
           type: boolean
+          description: 是否由后端进行真太阳时校正。false 时按 solarDateTime 原值排盘，true 时 birthPlace 为必填。
     PaipanResult:
       type: object
       properties:
@@ -995,6 +998,8 @@ components:
           $ref: '#/components/schemas/LiuNianInfo'
         trueSolar:
           $ref: '#/components/schemas/TrueSolarInfo'
+          nullable: true
+          description: 仅 trueSolarTime=true 且校正成功时返回，记录后端实际采用的校正结果。
     Pillar:
       type: object
       properties:
@@ -1156,20 +1161,29 @@ components:
             type: string
     TrueSolarInfo:
       type: object
+      required: [original, adjusted, offsetMinutes, eotMinutes, longitude, originalShichen, adjustedShichen, boundaryChanged]
       properties:
         original:
           type: string
+          description: 用户输入的原始民用时间，精确到分钟。
         adjusted:
           type: string
+          description: 后端实际用于排盘和命书生成的真太阳时，精确到分钟。
         offsetMinutes:
           type: number
+          description: 相对东经 120 度标准经线的经度修正分钟数（显示值四舍五入为整数）。
         eotMinutes:
           type: number
+          description: NOAA 均时差分钟数（显示值保留一位小数）。
         longitude:
           type: number
+          description: 后端城市经度表中实际采用的东经度数。
         originalShichen:
           type: string
+          description: 原始民用时间所属时辰。
         adjustedShichen:
           type: string
+          description: 校正后时间所属时辰。
         boundaryChanged:
           type: boolean
+          description: 校正是否跨越时辰边界；日期变化可通过 original 与 adjusted 的日期部分判断。

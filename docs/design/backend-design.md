@@ -2,8 +2,8 @@
 
 | 项目 | 内容 |
 |---|---|
-| 版本 | v0.7（模拟支付全流程已交付） |
-| 日期 | 2026-08-09 |
+| 版本 | v0.15（真太阳时后端权威链路） |
+| 日期 | 2026-09-04 |
 | 关联 | 契约 `contracts/openapi.yaml`；前端 `frontend-design.md`；文档索引 `README.md` |
 
 ## 1. 定位与范围（第一版）
@@ -22,7 +22,8 @@
 - ✅ **v0.11 星运/旬空已交付**——`DaYun.starFortune`（大运地支对日主十二长生，复用 ZiZuoConstants）、`LiuNianItem.starFortune/xunKong`（流年旬空 lunar-java `LiuNian.getXunKong`），fixtures 6 组用例全断言，后端测试 21/21。
 - ✅ **v0.12 流月/小运已交付**——`LiuNianItem.liuYue`（流年内节气月）、`xiaoYunList`（起运后小运）、`currentYearLiuYue`（今年逐月）——lunar-java `LiuNian.getLiuYue` / `DaYun.getXiaoYun` 直接支持；fixtures 6 组用例全断言，后端测试 21/21。
 - ✅ **v0.14 批量清空已交付**——`DELETE /records` 清空当前用户全部记录（按 user_id 批量删除，用户隔离）；集成测试覆盖清空本人 + 不影响他人，后端测试 22/22。
-- ⚠️ 神煞 / 真太阳时：**后端第一版不实现**——前端 `HttpBaziApi` 用与 Mock 同一套规则补充（`enrichResult` / `adjustRequestForTrueSolar`），保持结果一致；后续需要可下沉。
+- ✅ **真太阳时后端权威链路已交付**：HTTP 客户端始终提交用户输入的原始民用时间、完整省市和开关；后端统一解析城市经度，以 UTC+8 标准经线和 NOAA 均时差公式校正一次，排盘、命书、预览与单份购买共用同一结果。无法解析城市时返回 `BIRTH_PLACE_UNRESOLVED`，并在创建报告、消耗额度和创建订单前失败。
+- ⚠️ 神煞：后端第一版不实现，由前端 `enrichResult` 用与 Mock 同一套规则补充。
 - ⏸️ 合婚 / 运势文案：前端保留，不在本端实现。
 - ✅ 账号 / 云同步：已交付（v0.3）。
 - ⏸️ **真实支付通道：待办**——需企业主体 + 商户号 + 备案域名才能接微信/支付宝；当前用模拟支付打通全流程，资质就绪后接 `POST /api/v1/pay/callback`（订单表已含 `provider/trade_no/paid_at`，无表结构变更）。
@@ -104,7 +105,7 @@ CREATE TABLE bazi_user (
 
 - 读取 `contracts/fixtures/bazi-cases.json`（6 组：普通男/女、立春前后、闰二月、晚子时）。
 - Java 侧断言关键字段：`lunarText / shengXiao / pillars.*.ganZhi / shiShen / naYin / wuXing / daYun[*].ganZhi`。
-- 真太阳时：与前端同一公式（经度差 + NOAA 均时差），出生地经度表口径需对齐（前端内置 356 城，后端可复用同一数据集或等价来源）。
+- 真太阳时：后端 `BirthTimeResolver` 是 HTTP 生产链路唯一计算源；`BirthPlaceRegistry` 与前端 Mock 共用一致的城市经度数据。`solarDateTime` 永远保存原始民用时间，后端计算出的有效时间只用于本次排盘并通过 `trueSolar` 元数据审计。前端 Mock 保留同公式实现，黄金向量要求两端误差不超过 1 秒。
 - 任一侧跑挂即阻断合并（CI 两侧各跑 fixtures 测试）。
 
 ## 7. 合规
@@ -122,6 +123,7 @@ CREATE TABLE bazi_user (
 
 ## 8. 变更日志
 
+- v0.15（2026-09-04）：真太阳时计算下沉后端——新增城市经度注册表与 `BirthTimeResolver`；排盘、命书和结算统一使用校正时间，原始请求不改写；未知/省级地点失败关闭且不创建订单或消耗权益；前端 HTTP 链路移除预校正并展示后端审计信息。
 - v0.14（2026-08-16）：DELETE /records 批量清空交付——RecordService.clear（按 user_id）+ Controller @DeleteMapping；集成测试 clearAllRemovesOnlyCurrentUserRecords；后端测试 22/22。
 - v0.13（2026-08-16）：MySQL 持久化实测通过——docker compose 拉起 mysql:8.4、schema.sql 自动建表、mysql profile 连接验证；注册/排盘写入 MySQL，重启后端数据保留；后端测试 21/21 不受影响。
 - v0.12（2026-08-15）：流月/小运交付——新增 LiuYueItemDto/XiaoYunItemDto；LiuNianItemDto.liuYue、PaipanResultDto.xiaoYunList/currentYearLiuYue；BaziService 用 lunar-java LiuYue/XiaoYun 填充；fixtures 断言；后端测试 21/21。
