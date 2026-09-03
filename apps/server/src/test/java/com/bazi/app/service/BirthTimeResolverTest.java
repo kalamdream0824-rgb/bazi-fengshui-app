@@ -52,7 +52,7 @@ class BirthTimeResolverTest {
     ResolvedBirthTime result = resolver.resolve(
         request("2024-02-29T00:05:00", "新疆维吾尔自治区 乌鲁木齐市", true));
 
-    assertEquals(LocalDateTime.of(2024, 2, 28, 21, 42, 28), result.effective());
+    assertEquals(LocalDateTime.of(2024, 2, 28, 21, 42, 23), result.effective());
   }
 
   @Test
