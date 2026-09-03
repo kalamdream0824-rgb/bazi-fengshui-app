@@ -319,6 +319,80 @@ const relationshipReport: RelationshipV1SavedReport = {
   },
 }
 
+function timelineFor(futureYears: number[]) {
+  return {
+    past: {
+      year: 2025,
+      headline: '先回看去年的真实情况',
+      checkpoints: ['回看去年是否出现过明显变化。', '如果事情有变化，是否留下了实际结果。'],
+      bridge: '去年的实际经历，可以帮助你理解今年的重点。',
+      evidenceKeys: ['timeline.2025'],
+    },
+    present: {
+      year: 2026,
+      headline: '今年先处理最影响眼下的一件事',
+      judgment: '今年的重点已经比去年更清楚。',
+      priority: '先把最重要的一件事做出实际结果。',
+      evidenceKeys: ['timeline.2026'],
+    },
+    future: futureYears.map((year) => ({
+      year,
+      headline: `${year}年把已经验证的方向继续做稳`,
+      action: `${year}年留下一个可以核对的实际结果。`,
+      evidenceKeys: [`timeline.${year}`],
+    })),
+  }
+}
+
+const careerV4Report: SavedReport = {
+  ...report,
+  topic: 'career',
+  contentVersion: 'career-narrative-v4',
+  content: { ...report.content, timeline: timelineFor([2027]) },
+}
+
+const wealthV4Report: SavedReport = {
+  ...wealthV3Report,
+  contentVersion: 'wealth-narrative-v4',
+  content: { ...wealthV3Report.content, timeline: timelineFor([2027, 2028]) },
+}
+
+const relationshipV2Report: SavedReport = {
+  ...relationshipReport,
+  contentVersion: 'relationship-narrative-v2',
+  content: { ...relationshipReport.content, timeline: timelineFor([2027, 2028]) },
+}
+
+const relationshipSingleV2Report: SavedReport = {
+  ...relationshipReport,
+  contentVersion: 'relationship-single-v2',
+  content: {
+    relationshipStatus: 'single',
+    horizonYears: 2,
+    thesis: '今年可以主动认识人。',
+    summary: '刚有好感，不必急着确定关系。',
+    currentYear: 2026,
+    outlookYear: 2027,
+    sections: [{
+      id: 'opportunities',
+      title: '今年有没有认识人的机会？',
+      paragraphs: ['如果目前没有正在了解的人，可以多给新的认识一些时间。'],
+      signals: [],
+      evidenceKeys: ['annual.connection'],
+    }],
+    outlook: ['明年的重点是说清彼此的想法。'],
+    readingNote: '按年度解读，不预测具体月份。',
+    evidenceKeys: ['annual.connection'],
+    timeline: timelineFor([2027]),
+  },
+}
+
+const overallV2Report: SavedReport = {
+  ...overallV11Report,
+  contentVersion: 'overall-narrative-v2',
+  content: { ...overallV11Report.content, timeline: timelineFor([2027, 2028]) },
+}
+
 function renderReader() {
   return render(
     <MemoryRouter initialEntries={['/reports/18']}>
@@ -327,7 +401,68 @@ function renderReader() {
   )
 }
 
+function expectTimelineBeforeDetails(detailsSelector: string, futureSteps: number) {
+  const summary = document.querySelector('.report-reader__thesis')
+  const timeline = screen.getByRole('region', { name: '命书时间线' })
+  const details = document.querySelector(detailsSelector)
+
+  expect(summary).not.toBeNull()
+  expect(details).not.toBeNull()
+  expect(summary!.compareDocumentPosition(timeline) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  expect(timeline.compareDocumentPosition(details!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  expect(timeline.querySelectorAll('.narrative-timeline__future-list > li')).toHaveLength(futureSteps)
+}
+
 describe('ReportReaderPage', () => {
+  it('事业v4在总览与两年正文之间展示一条未来行动', async () => {
+    vi.mocked(getReport).mockResolvedValue(careerV4Report)
+    renderReader()
+
+    await screen.findByRole('region', { name: '命书时间线' })
+    expectTimelineBeforeDetails('.report-reader__years', 1)
+  })
+
+  it('财富v4在总览与三年正文之间展示两条未来行动', async () => {
+    vi.mocked(getReport).mockResolvedValue(wealthV4Report)
+    renderReader()
+
+    await screen.findByRole('region', { name: '命书时间线' })
+    expectTimelineBeforeDetails('.report-reader__years', 2)
+  })
+
+  it('感情v2在总览与三年正文之间展示两条未来行动', async () => {
+    vi.mocked(getReport).mockResolvedValue(relationshipV2Report)
+    renderReader()
+
+    await screen.findByRole('region', { name: '命书时间线' })
+    expectTimelineBeforeDetails('.report-reader__years', 2)
+  })
+
+  it('单身感情v2在总览与当年正文之间展示一条未来行动', async () => {
+    vi.mocked(getReport).mockResolvedValue(relationshipSingleV2Report)
+    renderReader()
+
+    await screen.findByRole('region', { name: '命书时间线' })
+    expectTimelineBeforeDetails('.relationship-single-reader__current', 1)
+  })
+
+  it('综合v2在总览与三年正文之间展示两条未来行动', async () => {
+    vi.mocked(getReport).mockResolvedValue(overallV2Report)
+    renderReader()
+
+    await screen.findByRole('region', { name: '命书时间线' })
+    expectTimelineBeforeDetails('.report-reader__years', 2)
+  })
+
+  it('历史命书没有时间线时不显示空标题或占位区', async () => {
+    vi.mocked(getReport).mockResolvedValue(report)
+    renderReader()
+
+    await screen.findByText('两年总断')
+    expect(screen.queryByRole('region', { name: '命书时间线' })).not.toBeInTheDocument()
+    expect(screen.queryByText('命书脉络')).not.toBeInTheDocument()
+  })
+
   it('新版单身报告只展开今年问题，明年为摘要，使用保存时的年份', async () => {
     vi.mocked(getReport).mockResolvedValue({
       ...relationshipReport,

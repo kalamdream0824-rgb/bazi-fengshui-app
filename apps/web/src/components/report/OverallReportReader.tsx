@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { OverallSavedReport } from '@/services/reportApi'
+import { NarrativeTimeline } from './NarrativeTimeline'
 
 const ORDINALS = ['第一年', '第二年', '第三年', '第四年', '第五年']
 
@@ -19,6 +20,8 @@ export function OverallReportReader({ report }: { report: OverallSavedReport }) 
         <h1 id="overall-thesis">{report.content.thesis}</h1>
         <p className="overall-reader__summary">{report.content.summary}</p>
       </section>
+
+      <NarrativeTimeline timeline={report.content.timeline} />
 
       <div className="report-reader__years">
         {report.content.years.map((year, index) => (

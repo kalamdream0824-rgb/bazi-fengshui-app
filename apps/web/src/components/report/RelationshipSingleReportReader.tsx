@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { RelationshipSingleSavedReport } from '@/services/reportApi'
+import { NarrativeTimeline } from './NarrativeTimeline'
 import './RelationshipReportReader.css'
 import './RelationshipSingleReportReader.css'
 
@@ -21,6 +22,8 @@ export function RelationshipSingleReportReader({ report }: { report: Relationshi
         <h1 id="single-thesis">{content.thesis}</h1>
         <p>{content.summary}</p>
       </section>
+
+      <NarrativeTimeline timeline={content.timeline} />
 
       <div className="relationship-single-reader__current" aria-label={`${content.currentYear}年详细解读`}>
         {content.sections.map((section) => (

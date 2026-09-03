@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
-import type { LegacySavedReport } from '@/services/reportApi'
+import type { CareerV4SavedReport, LegacySavedReport } from '@/services/reportApi'
+import { NarrativeTimeline } from './NarrativeTimeline'
 
 const TOPIC_META = {
   career: { title: '事业命书', seal: '业' },
@@ -14,7 +15,7 @@ function ordinal(index: number) {
   return ORDINALS[index] ?? `第${index + 1}年`
 }
 
-export function CareerReportReader({ report }: { report: LegacySavedReport }) {
+export function CareerReportReader({ report }: { report: LegacySavedReport | CareerV4SavedReport }) {
   return (
     <main className="report-reader__paper">
       <header className="report-reader__masthead">
@@ -29,6 +30,8 @@ export function CareerReportReader({ report }: { report: LegacySavedReport }) {
         <span>两年总断</span>
         <h1 id="report-thesis">{report.content.thesis}</h1>
       </section>
+
+      <NarrativeTimeline timeline={report.content.timeline} />
 
       <div className="report-reader__years">
         {report.content.years.map((year, index) => (

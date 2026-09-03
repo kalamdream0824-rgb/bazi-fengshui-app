@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { WealthPathV3, WealthV3SavedReport } from '@/services/reportApi'
+import { NarrativeTimeline } from './NarrativeTimeline'
 
 const PATH_LABELS: Record<WealthPathV3, string> = {
   stable_income: '稳定收入',
@@ -25,6 +26,8 @@ export function WealthV3ReportReader({ report }: { report: WealthV3SavedReport }
         <h1 id="wealth-v3-thesis">{report.content.thesis.text}</h1>
         <p className="wealth-reader__summary">{report.content.summary.text}</p>
       </section>
+
+      <NarrativeTimeline timeline={report.content.timeline} />
 
       <section className="wealth-reader__paths" aria-labelledby="wealth-v3-paths">
         <header>

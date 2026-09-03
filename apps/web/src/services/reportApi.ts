@@ -367,6 +367,12 @@ export interface LegacySavedReport extends SavedReportBase {
   content: CareerNarrativePlan
 }
 
+export interface CareerV4SavedReport extends SavedReportBase {
+  topic: 'career'
+  contentVersion: 'career-narrative-v4'
+  content: CareerNarrativePlan
+}
+
 export interface WealthV2SavedReport extends SavedReportBase {
   topic: 'wealth'
   edition: 'plain'
@@ -377,7 +383,7 @@ export interface WealthV2SavedReport extends SavedReportBase {
 export interface OverallSavedReport extends SavedReportBase {
   topic: 'overall'
   edition: 'plain'
-  contentVersion: 'overall-narrative-v1' | 'overall-narrative-v1.1'
+  contentVersion: 'overall-narrative-v1' | 'overall-narrative-v1.1' | 'overall-narrative-v2'
   content: OverallNarrativePlan
 }
 
@@ -385,14 +391,14 @@ export interface WealthV3SavedReport extends SavedReportBase {
   topic: 'wealth'
   edition: 'plain'
   status: 'ready'
-  contentVersion: 'wealth-narrative-v3'
+  contentVersion: 'wealth-narrative-v3' | 'wealth-narrative-v4'
   content: WealthContentV3
 }
 
 export interface RelationshipV1SavedReport extends SavedReportBase {
   topic: 'relationship'
   edition: 'plain'
-  contentVersion: 'relationship-narrative-v1'
+  contentVersion: 'relationship-narrative-v1' | 'relationship-narrative-v2'
   content: RelationshipNarrativePlan
 }
 
@@ -419,13 +425,14 @@ export interface RelationshipSingleNarrativePlan {
 export interface RelationshipSingleSavedReport extends SavedReportBase {
   topic: 'relationship'
   edition: 'plain'
-  contentVersion: 'relationship-single-v1'
+  contentVersion: 'relationship-single-v1' | 'relationship-single-v2'
   content: RelationshipSingleNarrativePlan
 }
 
 export type SavedReport =
   | OverallSavedReport
   | LegacySavedReport
+  | CareerV4SavedReport
   | WealthV2SavedReport
   | WealthV3SavedReport
   | RelationshipV1SavedReport
@@ -433,23 +440,31 @@ export type SavedReport =
 
 export function isRelationshipSingleReport(report: SavedReport): report is RelationshipSingleSavedReport {
   return report.contentVersion === 'relationship-single-v1'
+    || report.contentVersion === 'relationship-single-v2'
 }
 
 export function isOverallReport(report: SavedReport): report is OverallSavedReport {
   return report.contentVersion === 'overall-narrative-v1'
     || report.contentVersion === 'overall-narrative-v1.1'
+    || report.contentVersion === 'overall-narrative-v2'
 }
 
 export function isWealthV2Report(report: SavedReport): report is WealthV2SavedReport {
   return report.contentVersion === 'wealth-narrative-v2'
 }
 
-export function isWealthV3Report(report: SavedReport): report is WealthV3SavedReport {
+export function isWealthDetailedReport(report: SavedReport): report is WealthV3SavedReport {
   return report.contentVersion === 'wealth-narrative-v3'
+    || report.contentVersion === 'wealth-narrative-v4'
 }
 
-export function isRelationshipV1Report(report: SavedReport): report is RelationshipV1SavedReport {
+export function isRelationshipReport(report: SavedReport): report is RelationshipV1SavedReport {
   return report.contentVersion === 'relationship-narrative-v1'
+    || report.contentVersion === 'relationship-narrative-v2'
+}
+
+export function isCareerV4Report(report: SavedReport): report is CareerV4SavedReport {
+  return report.contentVersion === 'career-narrative-v4'
 }
 
 export function isLegacyReport(report: SavedReport): report is LegacySavedReport {

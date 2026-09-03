@@ -3,6 +3,7 @@ import type {
   RelationshipDimensionSummary,
   RelationshipV1SavedReport,
 } from '@/services/reportApi'
+import { NarrativeTimeline } from './NarrativeTimeline'
 import './RelationshipReportReader.css'
 
 const ORDINALS = ['第一年', '第二年', '第三年', '第四年', '第五年']
@@ -48,6 +49,8 @@ export function RelationshipReportReader({ report }: { report: RelationshipV1Sav
         <h1 id="relationship-report-thesis">{report.content.thesis}</h1>
         <p>{report.content.summary}</p>
       </section>
+
+      <NarrativeTimeline timeline={report.content.timeline} />
 
       <section className="relationship-reader__focus" aria-label={`${horizon}关系重点`}>
         <FocusCard kind="primary" dimension={primary} />

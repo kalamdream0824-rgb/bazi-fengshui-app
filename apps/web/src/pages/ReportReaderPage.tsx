@@ -9,12 +9,13 @@ import { OverallReportReader } from '@/components/report/OverallReportReader'
 import { TopBar } from '@/components/TopBar'
 import {
   getReport,
+  isCareerV4Report,
   isOverallReport,
   isLegacyReport,
-  isRelationshipV1Report,
+  isRelationshipReport,
   isRelationshipSingleReport,
   isWealthV2Report,
-  isWealthV3Report,
+  isWealthDetailedReport,
   type SavedReport,
 } from '@/services/reportApi'
 
@@ -46,12 +47,14 @@ export function ReportReaderPage() {
         <OverallReportReader report={report} />
       ) : isRelationshipSingleReport(report) ? (
         <RelationshipSingleReportReader report={report} />
-      ) : isRelationshipV1Report(report) ? (
+      ) : isRelationshipReport(report) ? (
         <RelationshipReportReader report={report} />
       ) : isWealthV2Report(report) ? (
         <WealthReportReader report={report} />
-      ) : isWealthV3Report(report) ? (
+      ) : isWealthDetailedReport(report) ? (
         <WealthV3ReportReader report={report} />
+      ) : isCareerV4Report(report) ? (
+        <CareerReportReader report={report} />
       ) : isLegacyReport(report) ? (
         <CareerReportReader report={report} />
       ) : (
