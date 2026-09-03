@@ -3075,6 +3075,267 @@ select.input-box {
   background: #fffaf0;
 }
 
+/* 过去—当下—未来：以一条朱砂线串起三段，不叠加厚重卡片 */
+.narrative-timeline {
+  margin: 0 0 32px 42px;
+  padding: 20px 0 22px;
+  overflow: hidden;
+  border-top: 1px solid rgba(177, 143, 88, 0.5);
+  border-bottom: 1px solid rgba(177, 143, 88, 0.5);
+}
+
+.narrative-timeline__intro {
+  display: grid;
+  gap: 5px;
+  margin-bottom: 19px;
+}
+
+.narrative-timeline__intro > span {
+  color: #a43b31;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+}
+
+.narrative-timeline__intro h2 {
+  font-family: var(--font-display);
+  font-size: 19px;
+  line-height: 1.45;
+  letter-spacing: 0.06em;
+}
+
+.narrative-timeline__intro p {
+  color: #796a5a;
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.narrative-timeline__phases,
+.narrative-timeline__checkpoints,
+.narrative-timeline__future-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.narrative-timeline__phases {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.narrative-timeline__phase {
+  position: relative;
+  min-width: 0;
+  padding: 14px 0 20px 35px;
+  overflow-wrap: anywhere;
+}
+
+.narrative-timeline__phase:not(:last-child) {
+  border-bottom: 1px dashed rgba(177, 143, 88, 0.38);
+}
+
+.narrative-timeline__phase::before {
+  position: absolute;
+  top: 21px;
+  bottom: -8px;
+  left: 8px;
+  width: 1px;
+  content: '';
+  background: rgba(169, 58, 44, 0.45);
+}
+
+.narrative-timeline__phase::after {
+  position: absolute;
+  top: 20px;
+  left: 4px;
+  width: 9px;
+  height: 9px;
+  content: '';
+  border: 1px solid #a93a2c;
+  background: #fffaf0;
+  transform: rotate(45deg);
+}
+
+.narrative-timeline__phase:last-child::before {
+  bottom: auto;
+  height: 14px;
+}
+
+.narrative-timeline__phase.is-present::after {
+  background: #a93a2c;
+  box-shadow: 0 0 0 3px rgba(169, 58, 44, 0.1);
+}
+
+.narrative-timeline__phase-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 9px;
+}
+
+.narrative-timeline__phase-heading > span {
+  color: #9d352c;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.narrative-timeline__phase-heading time,
+.narrative-timeline__phase-heading small {
+  color: #9b7a42;
+  font-family: var(--font-glyph);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.narrative-timeline__review-label {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 2px 7px;
+  border: 1px solid rgba(116, 105, 91, 0.42);
+  color: #75695d;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.narrative-timeline__phase h3 {
+  color: #352c24;
+  font-family: var(--font-display);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.narrative-timeline__checkpoints {
+  display: grid;
+  gap: 7px;
+  margin-top: 11px;
+}
+
+.narrative-timeline__checkpoints li {
+  position: relative;
+  padding-left: 13px;
+  color: #67594b;
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.narrative-timeline__checkpoints li::before {
+  position: absolute;
+  top: 0.68em;
+  left: 0;
+  width: 4px;
+  height: 4px;
+  content: '';
+  border: 1px solid #948575;
+  border-radius: 50%;
+}
+
+.narrative-timeline__bridge {
+  margin-top: 10px;
+  color: #8a7966;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.narrative-timeline__judgment {
+  margin-top: 9px;
+  color: #5f5144;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.narrative-timeline__priority {
+  margin-top: 13px;
+  padding: 11px 12px;
+  border-left: 3px solid #ad3c31;
+  background: rgba(169, 58, 44, 0.075);
+}
+
+.narrative-timeline__priority span {
+  display: block;
+  margin-bottom: 5px;
+  color: #a43b31;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.narrative-timeline__priority strong {
+  color: #3d3026;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.65;
+}
+
+.narrative-timeline__future-list {
+  display: grid;
+  gap: 12px;
+}
+
+.narrative-timeline__future-list > li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 9px;
+}
+
+.narrative-timeline__future-list > li + li {
+  padding-top: 12px;
+  border-top: 1px dashed rgba(177, 143, 88, 0.38);
+}
+
+.narrative-timeline__future-list time {
+  align-self: start;
+  padding-top: 2px;
+  color: #9b7136;
+  font-family: var(--font-glyph);
+  font-size: 10px;
+}
+
+.narrative-timeline__future-list p {
+  margin-top: 6px;
+  color: #67594b;
+  font-size: 11px;
+  line-height: 1.68;
+}
+
+@media (min-width: 700px) {
+  .narrative-timeline__phases {
+    position: relative;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .narrative-timeline__phases::before {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    left: 18px;
+    height: 1px;
+    content: '';
+    background: rgba(169, 58, 44, 0.42);
+  }
+
+  .narrative-timeline__phase {
+    padding: 43px 14px 4px;
+  }
+
+  .narrative-timeline__phase:not(:last-child) {
+    border-right: 1px dashed rgba(177, 143, 88, 0.38);
+    border-bottom: 0;
+  }
+
+  .narrative-timeline__phase::before {
+    display: none;
+  }
+
+  .narrative-timeline__phase::after {
+    top: 14px;
+    left: 14px;
+  }
+}
+
 /* 命书两级页面共用全宽纸张，避免纸面与底层背景左右错位 */
 .report-reader__paper,
 .report-library > main {

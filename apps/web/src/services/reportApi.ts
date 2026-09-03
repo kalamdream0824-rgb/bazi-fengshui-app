@@ -45,6 +45,35 @@ export interface ReportEvidence {
   value: string
 }
 
+export interface NarrativeTimelinePastReview {
+  year: number
+  headline: string
+  checkpoints: string[]
+  bridge: string
+  evidenceKeys: string[]
+}
+
+export interface NarrativeTimelinePresentReading {
+  year: number
+  headline: string
+  judgment: string
+  priority: string
+  evidenceKeys: string[]
+}
+
+export interface NarrativeTimelineFutureStep {
+  year: number
+  headline: string
+  action: string
+  evidenceKeys: string[]
+}
+
+export interface NarrativeTimeline {
+  past: NarrativeTimelinePastReview
+  present: NarrativeTimelinePresentReading
+  future: NarrativeTimelineFutureStep[]
+}
+
 export interface CareerYearNarrative {
   year: number
   ganZhi: string
@@ -66,6 +95,7 @@ export interface CareerNarrativePlan {
   contextSummary: string
   years: CareerYearNarrative[]
   route: string[]
+  timeline?: NarrativeTimeline
 }
 
 export interface WealthPathSummary {
@@ -234,6 +264,7 @@ export interface WealthContentV3 {
   years: WealthYearV3[]
   route: WealthBlockV3[]
   readingNote: WealthBlockV3
+  timeline?: NarrativeTimeline
 }
 
 export interface RelationshipDimensionSummary {
@@ -281,6 +312,7 @@ export interface RelationshipNarrativePlan {
   mainRisk: RelationshipRiskSummary | null
   years: RelationshipYearNarrative[]
   evidenceKeys: string[]
+  timeline?: NarrativeTimeline
 }
 
 export interface OverallNarrativePlan {
@@ -313,6 +345,7 @@ export interface OverallNarrativePlan {
   route: string[]
   readingNote: string
   evidenceKeys: string[]
+  timeline?: NarrativeTimeline
 }
 
 interface SavedReportBase {
@@ -380,6 +413,7 @@ export interface RelationshipSingleNarrativePlan {
   outlook: string[]
   readingNote: string
   evidenceKeys: string[]
+  timeline?: NarrativeTimeline
 }
 
 export interface RelationshipSingleSavedReport extends SavedReportBase {
