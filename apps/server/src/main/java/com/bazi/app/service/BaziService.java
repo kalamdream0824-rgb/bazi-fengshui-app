@@ -22,6 +22,7 @@ import com.bazi.app.dto.YunStartDto;
 import com.bazi.app.domain.constants.WuXingConstants;
 import com.bazi.app.domain.constants.ZiZuoConstants;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -32,17 +33,26 @@ import org.springframework.stereotype.Service;
 @Service
 public class BaziService {
 
-  public PaipanResultDto paipan(PaipanRequest req) {
-    String[] parts = req.solarDateTime().split("T");
-    String[] date = parts[0].split("-");
-    String[] time = (parts.length > 1 ? parts[1] : "00:00").split(":");
-    int y = Integer.parseInt(date[0]);
-    int m = Integer.parseInt(date[1]);
-    int d = Integer.parseInt(date[2]);
-    int h = Integer.parseInt(time[0]);
-    int min = Integer.parseInt(time[1]);
+  private final BirthTimeResolver birthTimeResolver;
 
-    Solar solar = Solar.fromYmdHms(y, m, d, h, min, 0);
+  public BaziService() {
+    this(new BirthTimeResolver(new BirthPlaceRegistry()));
+  }
+
+  BaziService(BirthTimeResolver birthTimeResolver) {
+    this.birthTimeResolver = birthTimeResolver;
+  }
+
+  public PaipanResultDto paipan(PaipanRequest req) {
+    ResolvedBirthTime resolved = birthTimeResolver.resolve(req);
+    LocalDateTime effective = resolved.effective();
+    int y = effective.getYear();
+    int m = effective.getMonthValue();
+    int d = effective.getDayOfMonth();
+    int h = effective.getHour();
+    int min = effective.getMinute();
+
+    Solar solar = Solar.fromYmdHms(y, m, d, h, min, effective.getSecond());
     Lunar lunar = solar.getLunar();
     EightChar ec = lunar.getEightChar();
 
@@ -198,7 +208,7 @@ public class BaziService {
         currentYearLiuYue,
         currentYearGanZhi,
         new LiuNianDto(yearGanZhi, List.of()),
-        null);
+        resolved.metadata());
   }
 
   private PillarDto pillar(String label, String gan, String zhi, String shiShen, List<String> hideGan, List<String> hideGanShiShen, String naYin, String diShi, String xunKong) {

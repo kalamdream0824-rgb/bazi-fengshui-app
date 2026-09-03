@@ -2,6 +2,7 @@ package com.bazi.app;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bazi.app.dto.PaipanRequest;
@@ -18,6 +19,35 @@ class BaziServiceTest {
 
   private final BaziService service = new BaziService();
   private final ObjectMapper om = new ObjectMapper();
+
+  @Test
+  void trueSolarTimeChangesBoundaryHourAndReturnsAuditMetadata() {
+    PaipanRequest request = new PaipanRequest(
+        "测试", "male", "1995-10-08T13:05:00", "广东省 深圳市", true);
+
+    PaipanResultDto result = service.paipan(request);
+
+    assertEquals("丙午", result.pillars().get("time").gan() + result.pillars().get("time").zhi());
+    assertEquals("1995-10-08 12:53", result.solarText());
+    assertNotNull(result.trueSolar());
+    assertEquals("1995-10-08T13:05", result.trueSolar().original());
+    assertEquals("1995-10-08T12:53", result.trueSolar().adjusted());
+    assertTrue(result.trueSolar().boundaryChanged());
+    assertEquals("1995-10-08T13:05:00", request.solarDateTime());
+    assertTrue(request.trueSolarTime());
+  }
+
+  @Test
+  void disabledTrueSolarTimeKeepsOriginalTimeAndNoMetadata() {
+    PaipanRequest request = new PaipanRequest(
+        "测试", "male", "1995-10-08T13:05:00", "广东省 深圳市", false);
+
+    PaipanResultDto result = service.paipan(request);
+
+    assertEquals("丁未", result.pillars().get("time").gan() + result.pillars().get("time").zhi());
+    assertEquals("1995-10-08 13:05", result.solarText());
+    assertNull(result.trueSolar());
+  }
 
   @Test
   void fixturesConsistency() throws Exception {
