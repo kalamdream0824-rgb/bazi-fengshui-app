@@ -51,6 +51,34 @@ class ReportCheckoutFailureIntegrationTest {
     org.junit.jupiter.api.Assertions.assertEquals(0, linkMapper.selectCount(null));
   }
 
+  @Test
+  void unresolvedTrueSolarPlaceCreatesNeitherReportNorOrder() throws Exception {
+    String token = register("report-checkout-unresolved-place");
+
+    mvc.perform(post("/api/v1/reports/checkout")
+            .header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                  "request": {
+                    "name": "林先生",
+                    "gender": "male",
+                    "solarDateTime": "1995-10-08T13:05:00",
+                    "birthPlace": "广东省 火星市",
+                    "trueSolarTime": true
+                  },
+                  "topic": "wealth",
+                  "edition": "plain"
+                }
+                """))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("BIRTH_PLACE_UNRESOLVED"));
+
+    org.junit.jupiter.api.Assertions.assertEquals(0, reportMapper.selectCount(null));
+    org.junit.jupiter.api.Assertions.assertEquals(0, orderMapper.selectCount(null));
+    org.junit.jupiter.api.Assertions.assertEquals(0, linkMapper.selectCount(null));
+  }
+
   private String register(String username) throws Exception {
     MvcResult result = mvc.perform(post("/api/v1/auth/register")
             .contentType(MediaType.APPLICATION_JSON)

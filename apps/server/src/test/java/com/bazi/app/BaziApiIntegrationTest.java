@@ -120,4 +120,31 @@ class BaziApiIntegrationTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.length()").value(1));
   }
+
+  @Test
+  void recordUsesServerResolvedTrueSolarTimeAndReturnsAuditMetadata() throws Exception {
+    String token = register("true-solar-record");
+
+    mvc.perform(post("/api/v1/records")
+            .header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                  "gender": "male",
+                  "solarDateTime": "1995-10-08T13:05:00",
+                  "birthPlace": "广东省 深圳市",
+                  "trueSolarTime": true
+                }
+                """))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.solarText").value("1995-10-08 12:53"))
+        .andExpect(jsonPath("$.pillars.time.gan").value("丙"))
+        .andExpect(jsonPath("$.pillars.time.zhi").value("午"))
+        .andExpect(jsonPath("$.trueSolar.original").value("1995-10-08T13:05"))
+        .andExpect(jsonPath("$.trueSolar.adjusted").value("1995-10-08T12:53"))
+        .andExpect(jsonPath("$.trueSolar.longitude").value(114.05))
+        .andExpect(jsonPath("$.trueSolar.originalShichen").value("未"))
+        .andExpect(jsonPath("$.trueSolar.adjustedShichen").value("午"))
+        .andExpect(jsonPath("$.trueSolar.boundaryChanged").value(true));
+  }
 }

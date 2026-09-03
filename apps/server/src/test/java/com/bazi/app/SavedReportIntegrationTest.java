@@ -95,6 +95,35 @@ class SavedReportIntegrationTest {
   }
 
   @Test
+  void reportUsesTheSameServerResolvedTimeWhilePreservingOriginalRequest() throws Exception {
+    String token = register("saved-true-solar-report-owner");
+
+    MvcResult trueSolar = mvc.perform(post("/api/v1/reports")
+            .header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(trueSolarCareerPayload("1995-10-08T13:05:00", true)))
+        .andExpect(status().isOk())
+        .andReturn();
+    MvcResult explicitEffectiveTime = mvc.perform(post("/api/v1/reports")
+            .header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(trueSolarCareerPayload("1995-10-08T12:53:51", false)))
+        .andExpect(status().isOk())
+        .andReturn();
+
+    JsonNode trueSolarBody = objectMapper.readTree(trueSolar.getResponse().getContentAsString());
+    JsonNode effectiveBody = objectMapper.readTree(
+        explicitEffectiveTime.getResponse().getContentAsString());
+    assertEquals(effectiveBody.get("content"), trueSolarBody.get("content"));
+
+    BaziReport stored = reportMapper.selectById(trueSolarBody.get("id").asLong());
+    JsonNode storedRequest = objectMapper.readTree(stored.getRequestJson());
+    assertEquals("1995-10-08T13:05:00", storedRequest.get("solarDateTime").asText());
+    assertEquals("广东省 深圳市", storedRequest.get("birthPlace").asText());
+    assertEquals(true, storedRequest.get("trueSolarTime").asBoolean());
+  }
+
+  @Test
   void createsAndReadsAStoredOverallPlainReportSnapshot() throws Exception {
     String token = register("saved-overall-report-owner");
 
@@ -575,6 +604,27 @@ class SavedReportIntegrationTest {
           }
         }
         """.formatted(edition);
+  }
+
+  private String trueSolarCareerPayload(String solarDateTime, boolean trueSolarTime) {
+    return """
+        {
+          "request": {
+            "name": "林先生",
+            "gender": "male",
+            "solarDateTime": "%s",
+            "birthPlace": "广东省 深圳市",
+            "trueSolarTime": %s
+          },
+          "topic": "career",
+          "edition": "plain",
+          "careerContext": {
+            "status": "employed",
+            "goal": "promotion",
+            "pace": "smooth"
+          }
+        }
+        """.formatted(solarDateTime, trueSolarTime);
   }
 
   private String overallPayload(String edition) {
