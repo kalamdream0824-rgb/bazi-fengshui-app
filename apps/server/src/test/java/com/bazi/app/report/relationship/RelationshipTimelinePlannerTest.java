@@ -59,6 +59,20 @@ class RelationshipTimelinePlannerTest {
   }
 
   @Test
+  void relationshipTimelineDoesNotUseWorkplaceProgressJargon() {
+    Window window = window(false);
+
+    for (RelationshipStatus status : List.of(RelationshipStatus.DATING, RelationshipStatus.MARRIED)) {
+      NarrativeTimeline timeline = plan(window, status);
+      String text = timeline.present().headline()
+          + timeline.present().judgment()
+          + timeline.present().priority();
+
+      assertFalse(text.contains("推进"), status + ": " + text);
+    }
+  }
+
+  @Test
   void futureYearsUseDifferentVerbsAndObjectsEvenWhenFocusRepeats() {
     Window window = window(true);
 

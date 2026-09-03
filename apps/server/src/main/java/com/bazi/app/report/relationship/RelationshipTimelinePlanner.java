@@ -126,7 +126,7 @@ public final class RelationshipTimelinePlanner
     RelationshipTone tone = year.dimensions().get(dimension).tone();
     String subject = topic(status, dimension);
     return switch (tone) {
-      case SUPPORTIVE -> subject + "更容易顺利推进，但仍要看双方是否持续投入。";
+      case SUPPORTIVE -> subject + "更容易顺一些，但仍要看双方是否持续投入。";
       case MIXED -> subject + "有顺利的时候，也会遇到分歧，不能只看一时感受。";
       case PRESSURED -> subject + "容易遇到不一致，先把具体问题说清。";
       case QUIET -> subject + "没有明显变化，继续看双方实际怎么做。";
