@@ -7,6 +7,7 @@ import {
   type SavedReport,
 } from './reportApi'
 import { authFetch } from './http'
+import { apiUrl } from './apiConfig'
 
 function isHttpMode(): boolean {
   return import.meta.env.VITE_API_MODE === 'http'
@@ -31,7 +32,7 @@ export async function createOrder(plan: string): Promise<OrderInfo> {
   if (!isHttpMode()) {
     throw new Error('联调模式不支持购买')
   }
-  const res = await authFetch('/api/v1/orders', {
+  const res = await authFetch(apiUrl('/v1/orders'), {
     method: 'POST',
     body: JSON.stringify({ plan }),
   })
@@ -46,7 +47,7 @@ export async function mockPay(orderId: number): Promise<MembershipInfo> {
   if (!isHttpMode()) {
     throw new Error('联调模式不支持支付')
   }
-  const res = await authFetch(`/api/v1/pay/mock-success/${orderId}`, {
+  const res = await authFetch(apiUrl(`/v1/pay/mock-success/${orderId}`), {
     method: 'POST',
   })
   if (!res.ok) {
@@ -70,7 +71,7 @@ export async function prepareReportCheckout(
     : topic === 'relationship' && options.relationshipContext
       ? { request, topic, edition, relationshipContext: options.relationshipContext }
       : { request, topic, edition }
-  const res = await authFetch('/api/v1/reports/checkout', {
+  const res = await authFetch(apiUrl('/v1/reports/checkout'), {
     method: 'POST',
     body: JSON.stringify(payload),
   })
@@ -85,7 +86,7 @@ export async function mockPayReportCheckout(orderId: number): Promise<SavedRepor
   if (!isHttpMode()) {
     throw new Error('联调模式不支持单份支付')
   }
-  const res = await authFetch(`/api/v1/reports/checkout/${orderId}/mock-pay`, {
+  const res = await authFetch(apiUrl(`/v1/reports/checkout/${orderId}/mock-pay`), {
     method: 'POST',
   })
   if (!res.ok) {

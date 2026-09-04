@@ -1,4 +1,5 @@
 import type { AuthResponse } from '@/types/bazi'
+import { apiUrl } from './apiConfig'
 
 function isHttpMode(): boolean {
   return import.meta.env.VITE_API_MODE === 'http'
@@ -9,7 +10,7 @@ async function postAuth(path: string, username: string, password: string): Promi
     // 开发期（Mock）模拟登录，不接后端
     return { token: 'mock-token', username }
   }
-  const res = await fetch(`/api/v1/auth${path}`, {
+  const res = await fetch(apiUrl(`/v1/auth${path}`), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password }),

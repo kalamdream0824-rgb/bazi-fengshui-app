@@ -1,5 +1,6 @@
 import type { PaipanRequest } from '@/types/bazi'
 import { authFetch } from './http'
+import { apiUrl } from './apiConfig'
 
 export class ReportApiError extends Error {
   constructor(public readonly code: string, message: string) {
@@ -496,18 +497,18 @@ export async function createReport(
     : topic === 'relationship' && options.relationshipContext
       ? { request, topic, edition, relationshipContext: options.relationshipContext }
       : { request, topic, edition }
-  return reportJson('/api/v1/reports', {
+  return reportJson(apiUrl('/v1/reports'), {
     method: 'POST',
     body: JSON.stringify(payload),
   })
 }
 
 export async function listReports(): Promise<SavedReport[]> {
-  return reportJson('/api/v1/reports')
+  return reportJson(apiUrl('/v1/reports'))
 }
 
 export async function getReport(id: number): Promise<SavedReport> {
-  return reportJson(`/api/v1/reports/${id}`)
+  return reportJson(apiUrl(`/v1/reports/${id}`))
 }
 
 export interface ReportPreviewFile {
@@ -524,7 +525,7 @@ export async function fetchReportPreview(
   const payload = careerContext
     ? { request, topic, edition, careerContext }
     : { request, topic, edition }
-  const response = await authFetch('/api/v1/reports/preview', {
+  const response = await authFetch(apiUrl('/v1/reports/preview'), {
     method: 'POST',
     body: JSON.stringify(payload),
   })

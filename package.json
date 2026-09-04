@@ -1,0 +1,13 @@
+{
+  "name": "bazi-fengshui-workspace",
+  "private": true,
+  "scripts": {
+    "dev:web": "npm --prefix apps/web run dev",
+    "build:web": "npm --prefix apps/web run build",
+    "test:web": "npm --prefix apps/web run test",
+    "lint:web": "npm --prefix apps/web run lint",
+    "dev:server": "apps/server/mvnw -f apps/server/pom.xml spring-boot:run",
+    "test:server": "apps/server/mvnw -f apps/server/pom.xml test",
+    "build:server": "apps/server/mvnw -f apps/server/pom.xml package"
+  }
+}

@@ -1,6 +1,7 @@
 import { useAuthStore } from '@/store/useAuthStore'
 import type { HistoryRecord } from './historyStore'
 import { listHistory } from './historyStore'
+import { apiUrl } from './apiConfig'
 
 function isHttpMode(): boolean {
   return import.meta.env.VITE_API_MODE === 'http'
@@ -19,7 +20,7 @@ export async function syncLocalHistoryToCloud(): Promise<{ uploaded: number }> {
   const records = await listHistory()
   let uploaded = 0
   for (const record of records) {
-    const res = await fetch('/api/v1/records', {
+    const res = await fetch(apiUrl('/v1/records'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify(record.request),
@@ -42,7 +43,7 @@ export async function listCloudRecords(): Promise<HistoryRecord[]> {
   if (!isHttpMode()) {
     return []
   }
-  const res = await fetch('/api/v1/records', { headers: authHeaders() })
+  const res = await fetch(apiUrl('/v1/records'), { headers: authHeaders() })
   if (!res.ok) {
     throw new Error('获取云端记录失败')
   }
@@ -54,7 +55,7 @@ export async function deleteCloudRecord(id: number): Promise<void> {
   if (!isHttpMode()) {
     return
   }
-  await fetch(`/api/v1/records/${id}`, { method: 'DELETE', headers: authHeaders() })
+  await fetch(apiUrl(`/v1/records/${id}`), { method: 'DELETE', headers: authHeaders() })
 }
 
 /** 清空当前用户云端全部记录 */
@@ -62,5 +63,5 @@ export async function clearCloudRecords(): Promise<void> {
   if (!isHttpMode()) {
     return
   }
-  await fetch('/api/v1/records', { method: 'DELETE', headers: authHeaders() })
+  await fetch(apiUrl('/v1/records'), { method: 'DELETE', headers: authHeaders() })
 }

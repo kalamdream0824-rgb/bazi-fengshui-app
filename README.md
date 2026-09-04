@@ -16,7 +16,11 @@ bazi-fengshui-app/
 └─ README.md
 ```
 
-## 快速开始（前端）
+## 独立开发
+
+前端和后端是两个可以分别安装依赖、启动、测试和发布的应用；`contracts/` 是两者之间共享的接口契约。
+
+### 快速开始（前端）
 
 ```bash
 cd apps/web
@@ -25,6 +29,10 @@ npm run dev
 ```
 
 打开 http://localhost:5173 即可使用。默认 `VITE_API_MODE=mock`，排盘数据由 lunar-javascript 本地真算；后端就绪后切换为 `http` 模式（见前端技术设计文档）。
+
+也可以在仓库根目录执行 `npm run dev:web`、`npm run build:web` 和 `npm run test:web`。
+
+前端的独立配置示例见 `apps/web/.env.example`。开发联调时使用 `VITE_API_MODE=http`；独立部署时将 `VITE_API_BASE_URL` 指向后端 API 根地址。
 
 ## 常用命令（apps/web）
 
@@ -50,7 +58,7 @@ npm config set proxy http://127.0.0.1:7890
 npm config set https-proxy http://127.0.0.1:7890
 ```
 
-## 快速开始（后端）
+### 快速开始（后端）
 
 ```bash
 cd apps/server
@@ -58,6 +66,8 @@ mvn spring-boot:run    # http://localhost:8080
 ```
 
 前端联调：`apps/web` 下设置 `VITE_API_MODE=http` 后 `npm run dev`（`/api` 已代理到 8080）。
+
+后端的独立启动、测试和 CORS 配置见 `apps/server/README.md`。
 
 可选 MySQL（Docker）：
 
