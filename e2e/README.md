@@ -25,3 +25,22 @@ python3 e2e/run_e2e.py
 
 - 脚本为 headless Chromium，依赖真实前后端链路（非 mock），排盘/会员/历史均走 `http://localhost:8080` API 与 MySQL。
 - 曾在开发中借此发现「刷新后 /chart 立即跳回 /input」的 bug（历史兜底异步加载时页面过早导航），修复见 `useBaziWithFallback` 的 loading 状态。
+
+## 财富真人盲测离线统计
+
+真人评分不得写进仓库。先把示例复制到根目录已忽略的 `.private-evals/`，再填写随机编号与评分：
+
+```bash
+mkdir -p .private-evals
+cp e2e/wealth-blind-review.example.json .private-evals/wealth-pilot-001.json
+python3 e2e/wealth_blind_review.py .private-evals/wealth-pilot-001.json
+```
+
+统计器会校验版本、重复报告、评分范围和失败原因，并拒绝姓名、生日、出生时间、出生地点、手机号、邮箱等个人字段。输出只包含聚合指标，不回显报告正文或单份哈希。
+
+运行统计器单元测试：
+
+```bash
+cd e2e
+python3 -m unittest test_wealth_blind_review.py
+```
