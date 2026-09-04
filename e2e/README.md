@@ -36,7 +36,15 @@ cp e2e/wealth-blind-review.example.json .private-evals/wealth-pilot-001.json
 python3 e2e/wealth_blind_review.py .private-evals/wealth-pilot-001.json
 ```
 
-统计器会校验版本、重复报告、评分范围和失败原因，并拒绝姓名、生日、出生时间、出生地点、手机号、邮箱等个人字段。输出只包含聚合指标，不回显报告正文或单份哈希。
+如果已经取得 `/api/v1/reports` 返回的财富报告数组，先把完整响应保存在私有目录，例如 `.private-evals/private-reports.json`，再自动生成不含姓名和正文的评分骨架：
+
+```bash
+python3 e2e/wealth_blind_review.py .private-evals/private-reports.json --init-reports --batch-id wealth-pilot-001 --commit 994fa51 > .private-evals/wealth-pilot-001.json
+```
+
+初始化只接受 `wealth-narrative-v4` + `wealth-plain-v3.4` 的已完成财富通俗版报告。填写骨架里的 A/B/C/D、0–3 分和失败原因后，再运行不带 `--init-reports` 的统计命令。
+
+统计器会校验版本、重复报告、评分范围和失败原因，并拒绝姓名、生日、出生时间、出生地点、手机号、邮箱等个人字段。汇总输出只包含聚合指标，不回显报告正文或单份哈希。
 
 运行统计器单元测试：
 

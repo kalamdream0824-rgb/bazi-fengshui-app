@@ -1,11 +1,12 @@
 import contextlib
+import hashlib
 import io
 import json
 from pathlib import Path
 import tempfile
 import unittest
 
-from wealth_blind_review import ValidationError, evaluate_batch, main
+from wealth_blind_review import ValidationError, evaluate_batch, initialize_batch, main
 
 
 def review_case(index: int, overall: str = "A", similarity: int = 0) -> dict:
@@ -32,6 +33,50 @@ def review_case(index: int, overall: str = "A", similarity: int = 0) -> dict:
 
 
 class WealthBlindReviewTest(unittest.TestCase):
+    def test_report_snapshot_initialization_outputs_only_anonymous_score_fields(self):
+        content = {
+            "copyVersion": "wealth-plain-v3.4",
+            "timeline": {"past": {"year": 2025}},
+            "years": [{"year": 2026}],
+        }
+        report = {
+            "id": 27,
+            "subject": "不应出现在输出中的姓名",
+            "topic": "wealth",
+            "edition": "plain",
+            "status": "ready",
+            "contentVersion": "wealth-narrative-v4",
+            "content": content,
+            "createdAt": "2026-09-05T08:00:00",
+            "generatedAt": "2026-09-05T08:00:00",
+        }
+
+        batch = initialize_batch([report], "wealth-pilot-001", "994fa51")
+
+        expected_hash = hashlib.sha256(json.dumps(
+            content, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        ).encode("utf-8")).hexdigest()
+        self.assertEqual("W001", batch["cases"][0]["caseId"])
+        self.assertEqual(27, batch["cases"][0]["reportId"])
+        self.assertEqual(expected_hash, batch["cases"][0]["contentHash"])
+        self.assertEqual("", batch["cases"][0]["pastOverall"])
+        serialized = json.dumps(batch, ensure_ascii=False)
+        self.assertNotIn(report["subject"], serialized)
+        self.assertNotIn("content", batch["cases"][0])
+
+    def test_report_snapshot_initialization_rejects_old_wealth_copy(self):
+        report = {
+            "id": 1,
+            "topic": "wealth",
+            "edition": "plain",
+            "status": "ready",
+            "contentVersion": "wealth-narrative-v3",
+            "content": {"copyVersion": "wealth-plain-v3.3"},
+        }
+
+        with self.assertRaisesRegex(ValidationError, "只接受 wealth-narrative-v4.*wealth-plain-v3.4"):
+            initialize_batch([report], "wealth-pilot-001", "994fa51")
+
     def test_pilot_metrics_keep_unknown_separate_from_clear_mismatch(self):
         cases = [review_case(index) for index in range(1, 31)]
         cases[-2] = review_case(29, "C")
@@ -128,6 +173,37 @@ class WealthBlindReviewTest(unittest.TestCase):
         self.assertIn("样本数：5", output.getvalue())
         self.assertIn("至少需要30份", output.getvalue())
         self.assertNotIn("contentHash", output.getvalue())
+
+    def test_cli_can_initialize_an_anonymous_batch_from_report_snapshots(self):
+        report = {
+            "id": 27,
+            "subject": "不应输出的姓名",
+            "topic": "wealth",
+            "edition": "plain",
+            "status": "ready",
+            "contentVersion": "wealth-narrative-v4",
+            "content": {
+                "copyVersion": "wealth-plain-v3.4",
+                "timeline": {"past": {"year": 2025}},
+            },
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "private-reports.json"
+            path.write_text(json.dumps([report], ensure_ascii=False), encoding="utf-8")
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                exit_code = main([
+                    str(path),
+                    "--init-reports",
+                    "--batch-id", "wealth-pilot-001",
+                    "--commit", "994fa51",
+                ])
+
+        self.assertEqual(0, exit_code)
+        batch = json.loads(output.getvalue())
+        self.assertEqual("W001", batch["cases"][0]["caseId"])
+        self.assertEqual(27, batch["cases"][0]["reportId"])
+        self.assertNotIn(report["subject"], output.getvalue())
 
 
 if __name__ == "__main__":

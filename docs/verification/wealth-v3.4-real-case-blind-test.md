@@ -133,6 +133,14 @@ python3 e2e/wealth_blind_review.py .private-evals/wealth-pilot-001.json
 
 程序会自动拒绝个人信息字段、重复 `caseId`、重复 `reportId`、错误版本、无失败原因的 B/C/D 评分以及未完成复核的数据，并输出阶段门槛和 95% Wilson 区间。命令行汇总不会回显单份报告正文、事实说明或正文哈希。
 
+若已有 `/api/v1/reports` 返回的财富报告数组，可先初始化匿名评分骨架：
+
+```bash
+python3 e2e/wealth_blind_review.py .private-evals/private-reports.json --init-reports --batch-id wealth-pilot-001 --commit 994fa51 > .private-evals/wealth-pilot-001.json
+```
+
+输入快照仍可能包含姓名与完整报告，因此只能放在 `.private-evals/`。初始化输出只保留随机 `caseId`、`reportId`、版本、正文哈希和空评分项，不保留姓名与正文。空评分骨架不能通过统计校验，必须由受测者完成评分后再统计。
+
 ## 本轮交付判定
 
 拿到首批真人数据前，当前只能视为“结构与表达回归通过”。首批 30 份完成后，才决定下一轮应优先调整规则方向、证据阈值、对象具体度还是文案自然度。

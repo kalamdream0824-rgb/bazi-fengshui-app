@@ -2,6 +2,7 @@
 
 import argparse
 from collections import Counter
+import hashlib
 import json
 from math import sqrt
 from pathlib import Path
@@ -54,6 +55,52 @@ CASE_FIELDS = {
     "reviewStatus",
 }
 BATCH_FIELDS = {"batchId", "commit", "cases"}
+
+
+def initialize_batch(reports, batch_id, commit):
+    if not isinstance(reports, list) or not reports:
+        raise ValidationError("报告快照列表不能为空")
+    if not isinstance(batch_id, str) or not batch_id.strip():
+        raise ValidationError("batchId 不能为空")
+    if not isinstance(commit, str) or not re.fullmatch(r"[0-9a-f]{7,40}", commit):
+        raise ValidationError("commit 必须是 Git 提交哈希")
+
+    cases = []
+    for index, report in enumerate(reports, start=1):
+        content = report.get("content") if isinstance(report, dict) else None
+        if (
+            not isinstance(content, dict)
+            or report.get("topic") != "wealth"
+            or report.get("edition") != "plain"
+            or report.get("status") != "ready"
+            or report.get("contentVersion") != "wealth-narrative-v4"
+            or content.get("copyVersion") != "wealth-plain-v3.4"
+        ):
+            raise ValidationError(
+                "只接受 wealth-narrative-v4 与 wealth-plain-v3.4 的已完成财富通俗版报告"
+            )
+        report_id = report.get("id")
+        if isinstance(report_id, bool) or not isinstance(report_id, int) or report_id <= 0:
+            raise ValidationError("报告 id 必须是正整数")
+        canonical = json.dumps(
+            content, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        ).encode("utf-8")
+        cases.append({
+            "caseId": f"W{index:03d}",
+            "reportId": report_id,
+            "copyVersion": "wealth-plain-v3.4",
+            "contentHash": hashlib.sha256(canonical).hexdigest(),
+            "pastMain": "",
+            "pastSecondary": "",
+            "pastHidden": "",
+            "pastOverall": "",
+            "currentRelevance": "",
+            "readability": "",
+            "similarity": "",
+            "failureReasons": [],
+            "reviewStatus": "none",
+        })
+    return {"batchId": batch_id, "commit": commit, "cases": cases}
 
 
 def _rate(value, field, case_id):
@@ -271,15 +318,24 @@ def render_markdown(result):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="统计脱敏财富真人盲测评分")
-    parser.add_argument("input", help="私有评分 JSON 文件路径")
+    parser.add_argument("input", help="私有评分或报告快照 JSON 文件路径")
     parser.add_argument("--format", choices=("markdown",), default="markdown")
+    parser.add_argument("--init-reports", action="store_true", help="从财富报告快照初始化匿名评分骨架")
+    parser.add_argument("--batch-id", help="初始化批次编号")
+    parser.add_argument("--commit", help="初始化时锁定的 Git 提交")
     args = parser.parse_args(argv)
     try:
-        batch = json.loads(Path(args.input).read_text(encoding="utf-8"))
-        result = evaluate_batch(batch)
+        payload = json.loads(Path(args.input).read_text(encoding="utf-8"))
+        if args.init_reports:
+            batch = initialize_batch(payload, args.batch_id, args.commit)
+        else:
+            result = evaluate_batch(payload)
     except (OSError, json.JSONDecodeError, ValidationError) as error:
         print(f"评分数据无效：{error}", file=sys.stderr)
         return 2
+    if args.init_reports:
+        print(json.dumps(batch, ensure_ascii=False, indent=2))
+        return 0
     print(render_markdown(result), end="")
     return 0
 
