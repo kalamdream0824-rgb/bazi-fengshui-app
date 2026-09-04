@@ -1,8 +1,6 @@
 package com.bazi.app.report.wealth.v3;
 
-import com.bazi.app.report.wealth.WealthPath;
 import com.bazi.app.report.wealth.v3.WealthAssessment.Decision;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -10,26 +8,26 @@ import java.util.Set;
 
 /** Closed, versioned plain-language vocabulary. No user data, random wording or report-position branches. */
 final class WealthPlainCopyV3 {
-  static final String VERSION = "wealth-plain-v3.3";
+  static final String VERSION = "wealth-plain-v3.4";
 
   record Words(String object, String meaning, String limitation, String observation, String action) {}
   private static final Map<String, Words> WORDS = Map.of(
-      "stable_income", new Words("固定工资、长期客户这类持续收入", "它看重持续拿到钱，而不是偶尔多一笔进账。",
-          "固定收入也有需要留意的限制，不宜把新增支出全押在这一项上。",
-          "若有固定收入，可留意到账是否准时，以及是否过于依赖一个客户。",
-          "把收入金额、到账时间和可能中断的情况列清楚。"),
-      "skill_income", new Words("靠手艺或服务获得的收入", "它看重别人愿意为什么本事付钱，而不是单纯忙了多久。",
-          "靠本事赚钱也有限制，多接活之前要看增加的时间是否值得。",
-          "可以留意同一种服务是否有人再次付费，而不只是口头称赞。",
-          "选一项拿手服务，写清收费、所需时间和完成内容。"),
-      "project_income", new Words("按单、按次结算的额外收入", "它更偏向一笔笔结算的钱，不宜直接当作每年都有的固定收入。",
-          "额外收入需要连同成本和收款条件一起看，不能只看报价。",
-          "若有额外项目，可留意扣除成本和垫付款后，每笔最终留下多少。",
-          "接项目前先算成本，再写清付款时间和追加要求的价格。"),
-      "cooperation_income", new Words("与别人一起做事带来的收入", "一起接单、介绍客户是这类收入的例子，不代表已经有人找你合作。",
-          "合作收入要连同分账和共同开销一起看，不能只看大家赚了多少。",
-          "若有合作，可留意分账是否说得清，以及额外开销由谁承担。",
-          "合作前写清谁出钱、谁做事、钱怎么分。"),
+      "stable_income", new Words("进账的持续性", "它看的是钱能否持续进入，不判断这笔钱来自哪种工作。",
+          "进账持续性也可能发生变化，安排长期支出前要留出余地。",
+          "可以留意各次进账之间是否规律，以及是否出现明显中断。",
+          "记录每次进账的日期和金额，观察持续性。"),
+      "skill_income", new Words("投入与进账是否相称", "它看的是增加投入以后，实际进账是否同步变化。",
+          "投入增加未必带来相同幅度的进账，要把时间和花费一起算进去。",
+          "可以留意自己更忙以后，实际进账是否同步增加。",
+          "把投入的时间、花费和实际进账放在一起核对。"),
+      "project_income", new Words("到账的节奏", "它看的是钱何时到账以及是否延后，不判断收入形式。",
+          "预期中的钱不等于已经到账，提前支出时要留出余地。",
+          "可以留意原本预期的进账是否按时出现，以及延后多久。",
+          "把预计到账和实际到账分开记录，不提前花尚未收到的钱。"),
+      "cooperation_income", new Words("涉及他人时的资金责任", "它看的是钱与他人有关时，责任和支出边界是否清楚。",
+          "涉及他人的钱容易增加额外责任，要先分清各自承担什么。",
+          "如果有共同用钱的情况，可以留意责任和开销是否清楚。",
+          "涉及共同用钱时，先写清金额、用途和各自承担的部分。"),
       "retention", new Words("最后能留下的钱", "进账和结余是两件事，新增收入还要扣掉为此增加的花费。",
           "留钱方面存在限制，新增花费需要与收入一起衡量。",
           "可以留意收入增加时，支出是否也跟着增加。",
@@ -37,8 +35,14 @@ final class WealthPlainCopyV3 {
 
   static Words words(String path) { return WORDS.get(path); }
   static String label(String path) {
-    if (path.equals("retention")) return "结余";
-    return Arrays.stream(WealthPath.values()).filter(p -> p.code().equals(path)).findFirst().orElseThrow().label();
+    return switch (path) {
+      case "stable_income" -> "进账稳定";
+      case "skill_income" -> "投入回报";
+      case "project_income" -> "到账节奏";
+      case "cooperation_income" -> "资金责任";
+      case "retention" -> "收支结余";
+      default -> throw new IllegalArgumentException("unknown wealth path");
+    };
   }
 
   static List<String> causes(WealthAssessment year, Decision d) {
@@ -46,11 +50,11 @@ final class WealthPlainCopyV3 {
     for (var e : year.evidence()) {
       if (!d.limitingEvidenceIds().contains(e.id())) continue;
       String key = e.factKey();
-      if (key.equals("natal.combination.peer_wealth")) result.add("shared_money");
-      else if (key.equals("natal.balance")) result.add("extra_input");
-      else if (key.matches("annual\\.branch\\.(clash|harm|punishment)\\..+")) result.add("changed_arrangements");
-      else if (key.equals("dayun.stem.ten_god")) result.add("shared_expenses");
-      else if (key.equals("annual.stem.ten_god")) result.add("project_terms");
+      if (key.equals("natal.combination.peer_wealth")) result.add("shared_responsibility");
+      else if (key.equals("natal.balance")) result.add("extra_spending");
+      else if (key.matches("annual\\.branch\\.(clash|harm|punishment)\\..+")) result.add("timing_changes");
+      else if (key.equals("dayun.stem.ten_god")) result.add("money_responsibility");
+      else if (key.equals("annual.stem.ten_god")) result.add("receipt_expectation");
     }
     return result.stream().sorted().toList();
   }
@@ -59,11 +63,11 @@ final class WealthPlainCopyV3 {
     List<String> causes = causes(year, d);
     if (causes.isEmpty()) return words(d.path()).limitation();
     return String.join("", causes.stream().map(c -> switch (c) {
-      case "shared_money" -> "分账和共同开销，是需要先看清的部分。";
-      case "extra_input" -> "进账机会不等于结余增加，额外投入要留出余地。";
-      case "changed_arrangements" -> "约定反复或临时增加开销，是需要防备的情况。";
-      case "shared_expenses" -> "与人有关的支出要留出余地，别把进账全当作可用的钱。";
-      case "project_terms" -> "项目要求和付款条件更需要看清，不能只看报价。";
+      case "shared_responsibility" -> "涉及共同用钱时，责任和额外开销要先看清。";
+      case "extra_spending" -> "进账增加不等于结余增加，新增花费要留出余地。";
+      case "timing_changes" -> "到账时间变化或临时增加开销，是需要防备的情况。";
+      case "money_responsibility" -> "与他人有关的支出要留出余地，别把进账全当作可用的钱。";
+      case "receipt_expectation" -> "预计进账和实际到账需要分开，不能提前使用尚未收到的钱。";
       default -> throw new IllegalArgumentException("unknown wealth copy cause");
     }).toList());
   }
@@ -108,10 +112,10 @@ final class WealthPlainCopyV3 {
 
   static String caution(WealthAssessment year, Decision d) {
     String context = switch (d.path()) {
-      case "stable_income" -> "安排固定收入时";
-      case "skill_income" -> "靠本事赚钱时";
-      case "project_income" -> "接额外项目时";
-      case "cooperation_income" -> "与人合作赚钱时";
+      case "stable_income" -> "安排长期支出时";
+      case "skill_income" -> "增加投入时";
+      case "project_income" -> "按预计进账安排花费时";
+      case "cooperation_income" -> "钱与他人有关时";
       case "retention" -> "想把钱留下来";
       default -> throw new IllegalArgumentException("unknown wealth caution");
     };
@@ -120,18 +124,18 @@ final class WealthPlainCopyV3 {
 
   static String concerns(WealthAssessment year, Decision d) {
     String concerns = String.join("、", causes(year, d).stream().map(c -> switch (c) {
-      case "shared_money" -> "分账";
-      case "extra_input" -> "新增投入";
-      case "changed_arrangements" -> "约定变化";
-      case "shared_expenses" -> "共同开销";
-      case "project_terms" -> "付款条件";
+      case "shared_responsibility" -> "共同用钱的责任";
+      case "extra_spending" -> "新增花费";
+      case "timing_changes" -> "到账时间变化";
+      case "money_responsibility" -> "与他人有关的开销";
+      case "receipt_expectation" -> "预计与实际到账的差距";
       default -> throw new IllegalArgumentException("unknown wealth copy cause");
     }).toList());
     if (concerns.isEmpty()) concerns = switch (d.path()) {
-      case "stable_income" -> "收入中断的可能";
-      case "skill_income" -> "时间投入";
-      case "project_income" -> "成本和收款";
-      case "cooperation_income" -> "分账和开销";
+      case "stable_income" -> "进账中断的可能";
+      case "skill_income" -> "投入是否值得";
+      case "project_income" -> "到账延后";
+      case "cooperation_income" -> "资金责任和开销";
       default -> "收入与支出";
     };
     return concerns;
@@ -139,10 +143,10 @@ final class WealthPlainCopyV3 {
 
   static String route(String path) {
     return switch (path) {
-      case "stable_income" -> "先看固定收入能覆盖多少日常开支，再决定额外项目能投入多少。";
-      case "skill_income" -> "先比较哪项本事能带来重复付费，再决定要不要增加服务种类。";
-      case "project_income" -> "把报价、实际收款和最后结余分开记录，别只看接单金额。";
-      case "cooperation_income" -> "一起赚钱前，先把分账约定写下来，别只靠口头承诺。";
+      case "stable_income" -> "先核对进账是否持续，再决定能承担多少长期支出。";
+      case "skill_income" -> "比较投入增加前后的实际进账，避免只看到忙碌程度。";
+      case "project_income" -> "把预计到账和实际到账分开记录，别提前使用尚未收到的钱。";
+      case "cooperation_income" -> "涉及共同用钱时，先明确金额、用途和各自责任。";
       case "retention" -> "给临时开销留一笔余钱，收入增加后也不要马上提高固定花费。";
       default -> throw new IllegalArgumentException("unknown wealth route");
     };

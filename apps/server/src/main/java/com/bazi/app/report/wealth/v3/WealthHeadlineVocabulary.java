@@ -178,7 +178,81 @@ public final class WealthHeadlineVocabulary {
       String angleKey, String objectKey, String objectText, String corePhraseKey,
       String stance, String text) {
     return new Entry(order, themeKey, pathKey, subjectKey, angleKey, objectKey,
-        objectText, List.of(corePhraseKey), stance, text);
+        neutralObject(pathKey, order), List.of(corePhraseKey), stance,
+        neutralText(pathKey, stance, order));
+  }
+
+  private static String neutralObject(String pathKey, int order) {
+    int variant = order % 10;
+    return switch (pathKey) {
+      case "stable_income" -> List.of("进账是否持续", "进账中断的可能", "日常支出承受力").get(variant);
+      case "skill_income" -> List.of("投入增加后的进账", "时间投入", "实际回报").get(variant);
+      case "project_income" -> List.of("预计到账时间", "实际到账情况", "到账后的结余").get(variant);
+      case "cooperation_income" -> List.of("共同用钱的责任", "涉及他人的资金安排", "额外承担的开销").get(variant);
+      case "retention" -> List.of("存钱目标", "每次留下的钱", "实际可存比例").get(variant);
+      default -> throw new IllegalArgumentException("unknown wealth headline path: " + pathKey);
+    };
+  }
+
+  private static String neutralText(String pathKey, String stance, int order) {
+    String subject = neutralSubject(pathKey, order);
+    String object = neutralObject(pathKey, order);
+    return switch (stance) {
+      case "supportive" -> switch (order % 10) {
+        case 0 -> subject + "出现较多有利条件，先核对" + object + "。";
+        case 1 -> subject + "值得重点留意，同时记录" + object + "。";
+        case 2 -> subject + "有改善空间，可以观察" + object + "是否变化。";
+        default -> throw new IllegalArgumentException("unknown wealth headline variant");
+      };
+      case "mixed" -> switch (order % 10) {
+        case 0 -> subject + "有改善空间也有变数，先核对" + object + "。";
+        case 1 -> subject + "好坏条件同时出现，重点看" + object + "。";
+        case 2 -> subject + "不能只看进账增加，还要检查" + object + "。";
+        default -> throw new IllegalArgumentException("unknown wealth headline variant");
+      };
+      case "restricted" -> switch (order % 10) {
+        case 0 -> subject + "受到的限制较多，先控制" + object + "。";
+        case 1 -> subject + "存在较明显变数，暂缓增加" + object + "。";
+        case 2 -> subject + "需要多留余地，优先准备" + object + "。";
+        default -> throw new IllegalArgumentException("unknown wealth headline variant");
+      };
+      default -> throw new IllegalArgumentException("unknown wealth headline stance: " + stance);
+    };
+  }
+
+  private static String neutralSubject(String pathKey, int order) {
+    int firstGroup = switch (pathKey) {
+      case "stable_income" -> 1;
+      case "skill_income" -> 4;
+      case "project_income" -> 7;
+      case "cooperation_income" -> 10;
+      case "retention" -> 13;
+      default -> throw new IllegalArgumentException("unknown wealth headline path: " + pathKey);
+    };
+    int variant = (order / 10 - firstGroup) * 3 + order % 10;
+    return switch (pathKey) {
+      case "stable_income" -> List.of(
+          "进账持续性", "进账延续情况", "日常支出承受力",
+          "进账稳定程度", "到账间隔变化", "长期花费基础",
+          "进账中断风险", "可用资金缓冲", "长期支出余地").get(variant);
+      case "skill_income" -> List.of(
+          "投入与回报", "时间投入变化", "实际进账变化",
+          "忙碌与收益", "新增投入结果", "投入后的结余",
+          "投入负担", "时间占用", "低回报投入").get(variant);
+      case "project_income" -> List.of(
+          "到账节奏", "预计与实际到账", "到账后的结余",
+          "进账时间变化", "资金等待期", "花费安排",
+          "到账延后风险", "提前支出压力", "资金周转余地").get(variant);
+      case "cooperation_income" -> List.of(
+          "资金责任", "与他人有关的钱", "额外开销责任",
+          "共同用钱边界", "资金用途约定", "责任分配",
+          "共同支出风险", "额外承担部分", "资金安排余地").get(variant);
+      case "retention" -> List.of(
+          "收支结余", "最后留下的钱", "实际可存比例",
+          "进账与支出差距", "临时开销余地", "收支记录",
+          "固定支出压力", "必需开支保障", "应急余钱").get(variant);
+      default -> throw new IllegalStateException("unreachable wealth headline path");
+    };
   }
 
   public record Entry(int catalogOrder, String themeKey, String pathKey, String subjectKey,

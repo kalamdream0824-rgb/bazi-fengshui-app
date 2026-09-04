@@ -11,12 +11,11 @@ import java.util.Set;
 public final class WealthTimelinePlanner {
 
   private static final List<String> CORE_PHRASES = List.of(
-      "收入来源变化",
-      "固定进账安排",
-      "服务重复付费",
-      "项目付款条件",
-      "合作分账约定",
-      "日常开支上限",
+      "进账持续变化",
+      "投入回报变化",
+      "到账节奏变化",
+      "资金责任变化",
+      "日常支出压力",
       "每月实际结余");
 
   public NarrativeTimeline plan(WealthAssessment previous, WealthNarrativeV3 content) {
@@ -53,7 +52,7 @@ public final class WealthTimelinePlanner {
     NarrativeTimeline timeline = new NarrativeTimeline(
         new NarrativeTimeline.PastReview(
             previous.year(),
-            previous.year() + "年" + reviewLabel(pastDecision.path()) + "回看",
+            reviewHeadline(previous.year(), pastDecision.path()),
             pastCheckpoints(previous.year(), pastDecision.path()),
             pastBridge(pastDecision.path()),
             evidenceKeys(previous, List.of(pastDecision))),
@@ -93,31 +92,31 @@ public final class WealthTimelinePlanner {
   private List<String> pastCheckpoints(int year, String path) {
     return switch (path) {
       case "stable_income" -> List.of(
-          "回看" + year + "年收入来源是否更稳定，工资或长期客户有没有持续",
-          "如果" + year + "年固定进账有变化，到账是否仍然准时");
+          "次判断：回看" + year + "年进账是否比此前更稳定，有没有出现明显中断",
+          "隐性影响：如果" + year + "年进账金额变化不大，到账间隔是否变得不规律");
       case "skill_income" -> List.of(
-          "回看" + year + "年靠手艺或服务得到的进账是否更稳定",
-          "如果" + year + "年同一种服务有人付钱，是否出现再次购买");
+          "次判断：回看" + year + "年增加投入以后，实际进账是否同步变化",
+          "隐性影响：如果" + year + "年比以前更忙，最后留下的钱是否反而没有增加");
       case "project_income" -> List.of(
-          "回看" + year + "年按次结算的收入是否增加，回款有没有变慢",
-          "如果" + year + "年额外项目变多，扣掉成本后是否真的留下钱");
+          "次判断：回看" + year + "年预计进账是否按时到账，有没有明显延后",
+          "隐性影响：如果" + year + "年到账节奏改变，日常支出安排是否受到影响");
       case "cooperation_income" -> List.of(
-          "回看" + year + "年与别人共同做事的进账是否增加",
-          "如果" + year + "年有合作收入，分账和共同开销是否事先说清");
+          "次判断：回看" + year + "年与他人有关的钱是否增加，责任和用途是否清楚",
+          "隐性影响：如果" + year + "年有共同开销，最后承担的部分是否超出原先预期");
       case "retention" -> List.of(
-          "回看" + year + "年支出压力是否增加，固定开销有没有变多",
-          "如果" + year + "年进账提高，最后留下的钱是否也跟着增加");
+          "次判断：回看" + year + "年支出压力是否增加，固定开销有没有变多",
+          "隐性影响：如果" + year + "年进账提高，最后留下的钱是否也跟着增加");
       default -> throw new IllegalArgumentException("unknown wealth path: " + path);
     };
   }
 
-  private String reviewLabel(String path) {
+  private String reviewHeadline(int year, String path) {
     return switch (path) {
-      case "stable_income" -> "持续进账";
-      case "skill_income" -> "服务收入";
-      case "project_income" -> "项目收款";
-      case "cooperation_income" -> "合作分账";
-      case "retention" -> "收支结余";
+      case "stable_income" -> "主判断：" + year + "年最值得回看的是进账能否持续";
+      case "skill_income" -> "主判断：" + year + "年最值得回看的是投入与进账是否相称";
+      case "project_income" -> "主判断：" + year + "年最值得回看的是预计与实际到账是否错开";
+      case "cooperation_income" -> "主判断：" + year + "年最值得回看的是与他人有关的钱是否增加责任";
+      case "retention" -> "主判断：" + year + "年最值得回看的是进账最终能否留下";
       default -> throw new IllegalArgumentException("unknown wealth path: " + path);
     };
   }
@@ -125,9 +124,9 @@ public final class WealthTimelinePlanner {
   private String pastBridge(String path) {
     return switch (path) {
       case "stable_income" -> "去年只用来核对进账是否稳定，再看今年怎么安排。";
-      case "skill_income" -> "去年只用来核对别人是否愿意付钱，再看今年怎么扩大。";
-      case "project_income" -> "去年只用来核对收款和成本，再看今年要先管住什么。";
-      case "cooperation_income" -> "去年只用来核对分账和开销，再看今年怎么合作。";
+      case "skill_income" -> "去年只用来核对投入与进账是否相称，再看今年怎么调整。";
+      case "project_income" -> "去年只用来核对预计和实际到账的差距，再看今年怎么安排。";
+      case "cooperation_income" -> "去年只用来核对资金责任和开销，再看今年怎么分配。";
       case "retention" -> "去年只用来核对钱最后留下多少，再看今年怎么调整。";
       default -> throw new IllegalArgumentException("unknown wealth path: " + path);
     };
@@ -136,9 +135,9 @@ public final class WealthTimelinePlanner {
   private String presentHeadline(String path) {
     return switch (path) {
       case "stable_income" -> "今年先看持续进账能否稳定到账";
-      case "skill_income" -> "今年先看哪项服务有人愿意重复付钱";
-      case "project_income" -> "今年先看额外进账能否按约定收到";
-      case "cooperation_income" -> "今年先看合作带来的钱能否分清";
+      case "skill_income" -> "今年先看增加投入后进账是否同步变化";
+      case "project_income" -> "今年先看预计进账能否按时到账";
+      case "cooperation_income" -> "今年先看与他人有关的钱能否分清责任";
       case "retention" -> "今年先看每月结余有没有真正增加";
       default -> throw new IllegalArgumentException("unknown wealth path: " + path);
     };
@@ -147,9 +146,9 @@ public final class WealthTimelinePlanner {
   private String presentJudgment(WealthAssessment.Decision decision) {
     String object = switch (decision.path()) {
       case "stable_income" -> "持续进账";
-      case "skill_income" -> "靠服务赚钱";
-      case "project_income" -> "额外进账";
-      case "cooperation_income" -> "合作进账";
+      case "skill_income" -> "投入回报";
+      case "project_income" -> "到账节奏";
+      case "cooperation_income" -> "资金责任";
       case "retention" -> "把钱留下";
       default -> throw new IllegalArgumentException("unknown wealth path: " + decision.path());
     };
@@ -167,9 +166,9 @@ public final class WealthTimelinePlanner {
   private String presentPriority(String path, WealthAssessment.Decision retention) {
     String first = switch (path) {
       case "stable_income" -> "先核对每月到账日期和中断可能";
-      case "skill_income" -> "先核对哪项服务能带来再次付费";
-      case "project_income" -> "先核对报价、收款时间和项目成本";
-      case "cooperation_income" -> "先核对分账、共同开销和付款时间";
+      case "skill_income" -> "先比较投入增加前后的实际进账";
+      case "project_income" -> "先核对预计到账和实际到账的差距";
+      case "cooperation_income" -> "先核对共同用钱时的用途和各自责任";
       case "retention" -> "先把固定开销和新增投入分开记录";
       default -> throw new IllegalArgumentException("unknown wealth path: " + path);
     };
@@ -206,14 +205,14 @@ public final class WealthTimelinePlanner {
           ? year + "年先确认持续到账"
           : year + "年再准备进账中断时的安排";
       case "skill_income" -> index == 0
-          ? year + "年先验证服务是否能再次收费"
-          : year + "年再调整服务价格和所需时间";
+          ? year + "年先比较投入与实际进账"
+          : year + "年再减少回报偏低的投入";
       case "project_income" -> index == 0
-          ? year + "年先说清报价和付款时间"
-          : year + "年再核对每笔项目最后留下多少";
+          ? year + "年先核对预计到账时间"
+          : year + "年再检查到账延后的影响";
       case "cooperation_income" -> index == 0
-          ? year + "年先写清合作分账方式"
-          : year + "年再约定共同开销怎么承担";
+          ? year + "年先分清共同用钱的责任"
+          : year + "年再核对额外责任是否增加";
       case "retention" -> index == 0
           ? year + "年先给日常开支设上限"
           : year + "年再核对实际收支记录";
@@ -227,14 +226,14 @@ public final class WealthTimelinePlanner {
           ? "把每月到账日期和可能中断的情况列清楚。"
           : "提前留出进账暂停时能覆盖日常开销的余钱。";
       case "skill_income" -> index == 0
-          ? "挑一项有人愿意再次付费的服务，写清价格和内容。"
-          : "记录老客户是否再次购买，再决定要不要增加种类。";
+          ? "把增加投入前后的进账放在一起比较，看实际回报有没有提高。"
+          : "减少长期占用时间、实际进账却没有增加的投入。";
       case "project_income" -> index == 0
-          ? "接项目前写清成本、付款时间和追加要求的价格。"
-          : "项目结束后分开记录报价、实际收款和最后结余。";
+          ? "把预计到账日期单独记下，并与实际到账日期进行核对。"
+          : "到账延后时，先减少非必要支出，避免打乱原有安排。";
       case "cooperation_income" -> index == 0
-          ? "合作前写清谁出钱、谁做事和进账怎么分。"
-          : "共同开销发生时当天记录，不留到分账时再争论。";
+          ? "涉及共同用钱时，先写清金额、用途和各自承担的部分。"
+          : "共同开销发生后及时记录，避免责任一直说不清。";
       case "retention" -> index == 0
           ? "给日常必需开支和新增投入分别设一个上限。"
           : "每月结束后核对实际进账和支出，再决定下月花多少。";

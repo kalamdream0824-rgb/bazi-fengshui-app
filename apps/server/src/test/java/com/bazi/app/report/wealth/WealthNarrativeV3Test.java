@@ -65,8 +65,8 @@ class WealthNarrativeV3Test {
     var content = content(scoredCase("S03"));
     var year = content.years().get(0);
     assertEquals("tied", year.focus().state());
-    assertTrue(content.thesis().text().contains("稳定收入"));
-    assertTrue(content.thesis().text().contains("靠能力赚钱"));
+    assertTrue(content.thesis().text().contains("进账稳定"));
+    assertTrue(content.thesis().text().contains("投入回报"));
     assertFalse(content.thesis().text().contains("辅助"));
     assertEquals(Set.of("2026.decision.stable_income", "2026.decision.skill_income"),
         year.income().stream().flatMap(b -> b.decisionIds().stream()).collect(Collectors.toSet()));
@@ -90,7 +90,7 @@ class WealthNarrativeV3Test {
   @Test
   void identicalAnnualConditionsKeepTheSameJudgmentButUseDistinctPlannedHeadlines() throws Exception {
     var content = content(scoredCase("S07"));
-    assertEquals("wealth-plain-v3.3", content.copyVersion());
+    assertEquals("wealth-plain-v3.4", content.copyVersion());
     assertEquals("wealth-headline-v1", content.headlinePlannerVersion());
     assertEquals(3, content.years().stream().map(y -> y.overview().text()).distinct().count());
     assertEquals(3, content.years().stream().map(y -> y.headlineMeta().themeKey()).distinct().count());
@@ -119,8 +119,8 @@ class WealthNarrativeV3Test {
     var stable = content(withPathWeights(scoredCase("S02"), WealthPath.STABLE_INCOME, 8, 0));
     var skill = content(withPathWeights(scoredCase("S02"), WealthPath.SKILL_INCOME, 8, 0));
     assertNotEquals(stable.thesis().text(), skill.thesis().text());
-    assertTrue(stable.thesis().text().contains("稳定收入"));
-    assertTrue(skill.thesis().text().contains("靠能力赚钱"));
+    assertTrue(stable.thesis().text().contains("进账稳定"));
+    assertTrue(skill.thesis().text().contains("投入回报"));
   }
 
   @Test
@@ -206,6 +206,35 @@ class WealthNarrativeV3Test {
         assertFalse(block.text().contains(banned), block.text());
       }
       for (String sentence : block.text().split("[。！？；]")) assertTrue(sentence.codePoints().filter(c -> c >= 0x4e00 && c <= 0x9fff).count() <= 48, sentence);
+    }
+  }
+
+  @Test
+  void customerFacingCopyNeverInfersOccupationOrIncomeSource() throws Exception {
+    List<String> forbidden = List.of(
+        "工资", "加薪", "客户", "项目", "订单", "接单", "接活", "服务",
+        "报价", "回款", "生意", "手艺", "按单", "按次", "合作收入");
+
+    for (String fixture : List.of("S02", "S03", "S05", "S07", "S08")) {
+      WealthNarrativeV3 content = content(scoredCase(fixture));
+      String visibleCopy = content.blocks().stream()
+          .map(Block::text)
+          .collect(Collectors.joining("\n"));
+
+      for (String word : forbidden) {
+        assertFalse(visibleCopy.contains(word), fixture + " inferred " + word + ":\n" + visibleCopy);
+      }
+    }
+  }
+
+  @Test
+  void customerFacingCopyExplainsMoneyStateInsteadOfEarningMethod() throws Exception {
+    String visibleCopy = content(scoredCase("S07")).blocks().stream()
+        .map(Block::text)
+        .collect(Collectors.joining("\n"));
+
+    for (String dimension : List.of("进账", "到账", "支出", "结余", "责任", "风险")) {
+      assertTrue(visibleCopy.contains(dimension), dimension + " missing from:\n" + visibleCopy);
     }
   }
 

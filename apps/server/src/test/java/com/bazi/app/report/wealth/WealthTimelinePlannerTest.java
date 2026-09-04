@@ -63,11 +63,47 @@ class WealthTimelinePlannerTest {
 
     NarrativeTimeline timeline = planner.plan(generated.previous(), generated.content());
 
-    assertTrue(timeline.present().judgment().contains("额外进账"));
+    assertTrue(timeline.present().judgment().contains("到账节奏"));
     assertTrue(timeline.present().priority().contains("结余"));
     assertEquals(2, timeline.future().size());
     assertEquals(2, timeline.future().stream().map(NarrativeTimeline.FutureStep::headline).distinct().count());
     assertEquals(2, timeline.future().stream().map(NarrativeTimeline.FutureStep::action).distinct().count());
+  }
+
+  @Test
+  void pastReviewPresentsOnePrimaryOneSecondaryAndOneHiddenEffect() throws Exception {
+    Generated generated = generated(WealthPath.PROJECT_INCOME);
+
+    NarrativeTimeline.PastReview past = planner.plan(generated.previous(), generated.content()).past();
+
+    assertTrue(past.headline().startsWith("主判断："), past.headline());
+    assertTrue(past.checkpoints().get(0).startsWith("次判断："), past.checkpoints().toString());
+    assertTrue(past.checkpoints().get(1).startsWith("隐性影响："), past.checkpoints().toString());
+  }
+
+  @ParameterizedTest
+  @MethodSource("pathReviewCases")
+  void entireTimelineAvoidsUnprovenOccupationAndIncomeSource(
+      WealthPath path,
+      List<String> ignoredExpectedObjects) throws Exception {
+    Generated generated = generated(path);
+    NarrativeTimeline timeline = planner.plan(generated.previous(), generated.content());
+    String visibleCopy = String.join("\n",
+        timeline.past().headline(),
+        String.join("\n", timeline.past().checkpoints()),
+        timeline.past().bridge(),
+        timeline.present().headline(),
+        timeline.present().judgment(),
+        timeline.present().priority(),
+        timeline.future().stream()
+            .flatMap(step -> Stream.of(step.headline(), step.action()))
+            .reduce("", (left, right) -> left + "\n" + right));
+
+    for (String word : List.of(
+        "工资", "加薪", "客户", "项目", "订单", "接单", "接活", "服务",
+        "报价", "回款", "生意", "手艺", "按单", "按次", "合作收入")) {
+      assertFalse(visibleCopy.contains(word), path + " inferred " + word + ":\n" + visibleCopy);
+    }
   }
 
   @Test
@@ -161,10 +197,10 @@ class WealthTimelinePlannerTest {
 
   private static Stream<Arguments> pathReviewCases() {
     return Stream.of(
-        Arguments.of(WealthPath.STABLE_INCOME, List.of("收入来源", "到账")),
-        Arguments.of(WealthPath.SKILL_INCOME, List.of("服务", "付钱")),
-        Arguments.of(WealthPath.PROJECT_INCOME, List.of("回款", "成本")),
-        Arguments.of(WealthPath.COOPERATION_INCOME, List.of("分账", "共同开销")),
+        Arguments.of(WealthPath.STABLE_INCOME, List.of("进账", "到账")),
+        Arguments.of(WealthPath.SKILL_INCOME, List.of("投入", "进账")),
+        Arguments.of(WealthPath.PROJECT_INCOME, List.of("到账", "支出")),
+        Arguments.of(WealthPath.COOPERATION_INCOME, List.of("责任", "共同开销")),
         Arguments.of(WealthPath.RETENTION, List.of("支出", "留下")));
   }
 

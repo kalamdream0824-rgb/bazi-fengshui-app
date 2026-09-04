@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import type { WealthPathV3, WealthV3SavedReport } from '@/services/reportApi'
 import { NarrativeTimeline } from './NarrativeTimeline'
 
-const PATH_LABELS: Record<WealthPathV3, string> = {
+const LEGACY_PATH_LABELS: Record<WealthPathV3, string> = {
   stable_income: '稳定收入',
   skill_income: '靠能力赚钱',
   project_income: '项目和额外收入',
@@ -10,7 +10,18 @@ const PATH_LABELS: Record<WealthPathV3, string> = {
   retention: '把钱留下',
 }
 
+const MONEY_STATE_LABELS: Record<WealthPathV3, string> = {
+  stable_income: '进账稳定',
+  skill_income: '投入回报',
+  project_income: '到账节奏',
+  cooperation_income: '资金责任',
+  retention: '收支结余',
+}
+
 export function WealthV3ReportReader({ report }: { report: WealthV3SavedReport }) {
+  const usesMoneyStateCopy = report.content.copyVersion === 'wealth-plain-v3.4'
+  const pathLabels = usesMoneyStateCopy ? MONEY_STATE_LABELS : LEGACY_PATH_LABELS
+
   return (
     <main className="report-reader__paper wealth-reader wealth-v3-reader">
       <header className="report-reader__masthead">
@@ -31,15 +42,15 @@ export function WealthV3ReportReader({ report }: { report: WealthV3SavedReport }
 
       <section className="wealth-reader__paths" aria-labelledby="wealth-v3-paths">
         <header>
-          <span>五路账册</span>
-          <h2 id="wealth-v3-paths">五条钱路逐项看</h2>
+          <span>{usesMoneyStateCopy ? '资金状态账册' : '五路账册'}</span>
+          <h2 id="wealth-v3-paths">{usesMoneyStateCopy ? '五项资金状态逐项看' : '五条钱路逐项看'}</h2>
         </header>
         <div>
           {report.content.pathSummaries.map((path, index) => (
             <article className={`wealth-path is-${path.path}`} key={path.path}>
               <b aria-hidden="true">{index + 1}</b>
               <span>
-                <strong>{PATH_LABELS[path.path]}</strong>
+                <strong>{pathLabels[path.path]}</strong>
                 <p>{path.reading.text}</p>
               </span>
             </article>
@@ -66,16 +77,16 @@ export function WealthV3ReportReader({ report }: { report: WealthV3SavedReport }
               {year.focus.state === 'tied' ? (
                 <section className="wealth-v3-year__focus is-tied">
                   <h3>可以一起关注的方向</h3>
-                  <p>{year.focus.primaryCandidates.map((path) => PATH_LABELS[path]).join('、')}</p>
+                  <p>{year.focus.primaryCandidates.map((path) => pathLabels[path]).join('、')}</p>
                 </section>
               ) : year.focus.state === 'leading' ? (
                 <section className="wealth-v3-year__focus is-leading">
                   <h3>相对更值得关注的方向</h3>
-                  <p>{PATH_LABELS[year.focus.primaryCandidates[0]]}</p>
+                  <p>{pathLabels[year.focus.primaryCandidates[0]]}</p>
                 </section>
               ) : null}
               <section className="wealth-year__income">
-                <h3>这一年的收入方向</h3>
+                <h3>{usesMoneyStateCopy ? '这一年的资金变化' : '这一年的收入方向'}</h3>
                 {year.income.map((block) => <p key={block.id}>{block.text}</p>)}
               </section>
               <section className="wealth-v3-year__retention">

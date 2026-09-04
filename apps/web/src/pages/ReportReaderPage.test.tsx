@@ -652,6 +652,27 @@ describe('ReportReaderPage', () => {
     expect(screen.queryByText('辅助钱路')).not.toBeInTheDocument()
   })
 
+  it('财富v4新文案使用资金状态标签且不改写历史v3标签', async () => {
+    vi.mocked(getReport).mockResolvedValue({
+      ...wealthV4Report,
+      content: {
+        ...wealthV4Report.content,
+        copyVersion: 'wealth-plain-v3.4',
+      },
+    })
+    renderReader()
+
+    await screen.findByText('进账稳定', { selector: '.wealth-path strong' })
+    for (const label of ['进账稳定', '投入回报', '到账节奏', '资金责任', '收支结余']) {
+      expect(screen.getByText(label, { selector: '.wealth-path strong' })).toBeInTheDocument()
+    }
+    expect(screen.getByText('资金状态账册')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '五项资金状态逐项看' })).toBeInTheDocument()
+    expect(screen.getAllByRole('heading', { name: '这一年的资金变化' })).toHaveLength(3)
+    expect(screen.getByText('进账稳定、投入回报')).toBeInTheDocument()
+    expect(screen.getByText('到账节奏', { selector: '.wealth-v3-year__focus p' })).toBeInTheDocument()
+  })
+
   it('财富v3有真实限制时才显示三年提醒和年度提醒', async () => {
     const riskReading = wealthBlock('2026.risk', '共同开销增加时，要先说清各自承担多少。', [2026])
     vi.mocked(getReport).mockResolvedValue({

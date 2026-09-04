@@ -113,7 +113,7 @@ public final class WealthNarrativeWriter {
             yearNumbers, years.stream().map(y -> decision(y, "retention")).toList()),
         paths, riskSummary, result, route,
         block("wealth.reading_note", "method_note", "reading_note",
-            "本报告按传统命理规则整理收入倾向，不保证现实收入或投资结果。观察事项只是核对现实情况的例子，不是预测成立的证明。", yearNumbers, List.of()),
+            "本报告按传统命理规则整理资金变化，不判断职业或收入来源，也不能替代现实中的收益与风险判断。观察事项只用于核对现实情况，不是预测成立的证明。", yearNumbers, List.of()),
         null);
   }
 
@@ -137,8 +137,8 @@ public final class WealthNarrativeWriter {
       return names + (d.stance().equals("mixed") ? "可以关注，但限制也要一起看。"
           : d.strength().equals("pronounced") ? "在这份分析里更值得关注。" : "可以作为关注的一个方向。");
     }
-    return year.risk() == null ? "没有明显领先的收入方向，不宜只押一种赚钱方式。"
-        : "没有明显领先的收入方向。" + WealthPlainCopyV3.caution(year, decision(year, year.risk().path()));
+    return year.risk() == null ? "各项资金变化都不突出，先看进账、支出和结余是否稳定。"
+        : "没有哪项资金变化明显领先。" + WealthPlainCopyV3.caution(year, decision(year, year.risk().path()));
   }
 
   private List<Decision> focusDecisions(WealthAssessment year) {
@@ -180,13 +180,13 @@ public final class WealthNarrativeWriter {
   private String closingSummary(List<WealthAssessment> years) {
     var limited = years.stream().filter(y -> decision(y, "retention").limitationWeight() > 0).toList();
     if (!limited.isEmpty()) return limited.stream().map(y -> String.valueOf(y.year())).collect(Collectors.joining("、"))
-        + "年，不宜把全部进账都算成能留下的钱。选择收入方向时，也要把为此增加的花费算进去。";
-    if (years.stream().allMatch(y -> decision(y, "retention").stance().equals("quiet"))) return "本报告不对结余增减作具体判断，不能用收入方向代替实际收支记录。";
-    return "除了关注收入从哪里来，也可以把增加结余作为一个目标。是否多赚钱、是否多留下钱，要分开核对。";
+        + "年，不宜把全部进账都算成能留下的钱。判断资金状况时，也要把新增花费算进去。";
+    if (years.stream().allMatch(y -> decision(y, "retention").stance().equals("quiet"))) return "本报告不对结余增减作具体判断，实际情况仍要以收支记录为准。";
+    return "进账增加和结余增加是两件事。除了看有多少钱进入，也要核对最后留下多少。";
   }
 
   private String comparisonText(WealthAssessment current, WealthAssessment next, WealthComparison comparison) {
-    if (comparison.direction().equals("unchanged")) return "到" + next.year() + "年，收入方向和需要留意的限制延续，不必另起一套安排。";
+    if (comparison.direction().equals("unchanged")) return "到" + next.year() + "年，资金重点和需要留意的限制延续，不必另起一套安排。";
     List<String> phrases = new ArrayList<>();
     for (var change : comparison.changes()) {
       String name = WealthPlainCopyV3.label(change.path());
