@@ -16,6 +16,8 @@ class ValidationError(ValueError):
 
 RATINGS = {"A", "B", "C", "D"}
 REVIEW_STATUSES = {"none", "pending", "resolved"}
+CURRENT_COPY_VERSION = "wealth-plain-v3.5"
+SUPPORTED_SCORE_COPY_VERSIONS = {"wealth-plain-v3.4", CURRENT_COPY_VERSION}
 FAILURE_REASONS = {
     "RULE_DIRECTION_WRONG",
     "EVIDENCE_TOO_WEAK",
@@ -74,10 +76,10 @@ def initialize_batch(reports, batch_id, commit):
             or report.get("edition") != "plain"
             or report.get("status") != "ready"
             or report.get("contentVersion") != "wealth-narrative-v4"
-            or content.get("copyVersion") != "wealth-plain-v3.4"
+            or content.get("copyVersion") != CURRENT_COPY_VERSION
         ):
             raise ValidationError(
-                "只接受 wealth-narrative-v4 与 wealth-plain-v3.4 的已完成财富通俗版报告"
+                f"只接受 wealth-narrative-v4 与 {CURRENT_COPY_VERSION} 的已完成财富通俗版报告"
             )
         report_id = report.get("id")
         if isinstance(report_id, bool) or not isinstance(report_id, int) or report_id <= 0:
@@ -88,7 +90,7 @@ def initialize_batch(reports, batch_id, commit):
         cases.append({
             "caseId": f"W{index:03d}",
             "reportId": report_id,
-            "copyVersion": "wealth-plain-v3.4",
+            "copyVersion": CURRENT_COPY_VERSION,
             "contentHash": hashlib.sha256(canonical).hexdigest(),
             "pastMain": "",
             "pastSecondary": "",
@@ -151,8 +153,9 @@ def _validate_case(case, seen_case_ids, seen_report_ids):
         raise ValidationError("reportId 不得重复")
     seen_report_ids.add(report_id)
 
-    if case["copyVersion"] != "wealth-plain-v3.4":
-        raise ValidationError(f"{case_id}.copyVersion 必须是 wealth-plain-v3.4")
+    if case["copyVersion"] not in SUPPORTED_SCORE_COPY_VERSIONS:
+        supported = " / ".join(sorted(SUPPORTED_SCORE_COPY_VERSIONS))
+        raise ValidationError(f"{case_id}.copyVersion 必须是 {supported}")
     if not isinstance(case["contentHash"], str) or not re.fullmatch(r"[0-9a-f]{64}", case["contentHash"]):
         raise ValidationError(f"{case_id}.contentHash 必须是小写 SHA-256")
 
@@ -193,6 +196,10 @@ def evaluate_batch(batch):
     seen_report_ids = set()
     for case in cases:
         _validate_case(case, seen_case_ids, seen_report_ids)
+    copy_versions = {case["copyVersion"] for case in cases}
+    if len(copy_versions) != 1:
+        raise ValidationError("同一批次不得混用文案版本")
+    copy_version = next(iter(copy_versions))
 
     total = len(cases)
     ratings = Counter(case["pastOverall"] for case in cases)
@@ -254,6 +261,7 @@ def evaluate_batch(batch):
     return {
         "batchId": batch["batchId"],
         "commit": batch["commit"],
+        "copyVersion": copy_version,
         "counts": {
             "N": total,
             "ratings": {rating: ratings[rating] for rating in ("A", "B", "C", "D")},
@@ -286,6 +294,7 @@ def render_markdown(result):
         f"# 财富真人盲测汇总：{result['batchId']}",
         "",
         f"代码提交：`{result['commit']}`  ",
+        f"文案版本：`{result['copyVersion']}`  ",
         f"样本数：{result['counts']['N']}  ",
         f"阶段：`{gate['stage']}`  ",
         f"门槛结果：{'通过' if gate['passed'] else '未通过'}",

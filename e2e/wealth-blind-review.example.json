@@ -1,11 +1,11 @@
 {
   "batchId": "wealth-dry-run",
-  "commit": "009ede1",
+  "commit": "1dc9abf",
   "cases": [
     {
       "caseId": "W001",
       "reportId": 1,
-      "copyVersion": "wealth-plain-v3.4",
+      "copyVersion": "wealth-plain-v3.5",
       "contentHash": "0000000000000000000000000000000000000000000000000000000000000000",
       "pastMain": "A",
       "pastSecondary": "A",

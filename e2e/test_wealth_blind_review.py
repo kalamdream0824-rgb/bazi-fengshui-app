@@ -18,7 +18,7 @@ def review_case(index: int, overall: str = "A", similarity: int = 0) -> dict:
     return {
         "caseId": f"W{index:03d}",
         "reportId": index,
-        "copyVersion": "wealth-plain-v3.4",
+        "copyVersion": "wealth-plain-v3.5",
         "contentHash": f"{index:064x}",
         "pastMain": overall,
         "pastSecondary": overall,
@@ -35,7 +35,7 @@ def review_case(index: int, overall: str = "A", similarity: int = 0) -> dict:
 class WealthBlindReviewTest(unittest.TestCase):
     def test_report_snapshot_initialization_outputs_only_anonymous_score_fields(self):
         content = {
-            "copyVersion": "wealth-plain-v3.4",
+            "copyVersion": "wealth-plain-v3.5",
             "timeline": {"past": {"year": 2025}},
             "years": [{"year": 2026}],
         }
@@ -58,6 +58,7 @@ class WealthBlindReviewTest(unittest.TestCase):
         ).encode("utf-8")).hexdigest()
         self.assertEqual("W001", batch["cases"][0]["caseId"])
         self.assertEqual(27, batch["cases"][0]["reportId"])
+        self.assertEqual("wealth-plain-v3.5", batch["cases"][0]["copyVersion"])
         self.assertEqual(expected_hash, batch["cases"][0]["contentHash"])
         self.assertEqual("", batch["cases"][0]["pastOverall"])
         serialized = json.dumps(batch, ensure_ascii=False)
@@ -74,8 +75,32 @@ class WealthBlindReviewTest(unittest.TestCase):
             "content": {"copyVersion": "wealth-plain-v3.3"},
         }
 
-        with self.assertRaisesRegex(ValidationError, "只接受 wealth-narrative-v4.*wealth-plain-v3.4"):
+        with self.assertRaisesRegex(ValidationError, "只接受 wealth-narrative-v4.*wealth-plain-v3.5"):
             initialize_batch([report], "wealth-pilot-001", "994fa51")
+
+    def test_legacy_v34_batch_remains_evaluable(self):
+        case = review_case(1)
+        case["copyVersion"] = "wealth-plain-v3.4"
+
+        result = evaluate_batch({
+            "batchId": "wealth-v34-archive",
+            "commit": "009ede1",
+            "cases": [case],
+        })
+
+        self.assertEqual(1, result["counts"]["N"])
+        self.assertEqual("wealth-plain-v3.4", result["copyVersion"])
+
+    def test_mixed_copy_versions_are_rejected(self):
+        legacy = review_case(1)
+        legacy["copyVersion"] = "wealth-plain-v3.4"
+
+        with self.assertRaisesRegex(ValidationError, "同一批次不得混用文案版本"):
+            evaluate_batch({
+                "batchId": "wealth-mixed-copy",
+                "commit": "1dc9abf",
+                "cases": [legacy, review_case(2)],
+            })
 
     def test_pilot_metrics_keep_unknown_separate_from_clear_mismatch(self):
         cases = [review_case(index) for index in range(1, 31)]
@@ -91,6 +116,7 @@ class WealthBlindReviewTest(unittest.TestCase):
         })
 
         self.assertEqual(30, result["counts"]["N"])
+        self.assertEqual("wealth-plain-v3.5", result["copyVersion"])
         self.assertEqual({"A": 28, "B": 0, "C": 1, "D": 1}, result["counts"]["ratings"])
         self.assertAlmostEqual(1 / 30, result["metrics"]["rawMismatchRate"])
         self.assertAlmostEqual(1 / 29, result["metrics"]["decidableMismatchRate"])
@@ -170,6 +196,7 @@ class WealthBlindReviewTest(unittest.TestCase):
 
         self.assertEqual(0, exit_code)
         self.assertIn("# 财富真人盲测汇总：wealth-dry-run", output.getvalue())
+        self.assertIn("文案版本：`wealth-plain-v3.5`", output.getvalue())
         self.assertIn("样本数：5", output.getvalue())
         self.assertIn("至少需要30份", output.getvalue())
         self.assertNotIn("contentHash", output.getvalue())
@@ -183,7 +210,7 @@ class WealthBlindReviewTest(unittest.TestCase):
             "status": "ready",
             "contentVersion": "wealth-narrative-v4",
             "content": {
-                "copyVersion": "wealth-plain-v3.4",
+                "copyVersion": "wealth-plain-v3.5",
                 "timeline": {"past": {"year": 2025}},
             },
         }
