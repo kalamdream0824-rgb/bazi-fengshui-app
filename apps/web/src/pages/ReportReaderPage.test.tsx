@@ -652,12 +652,13 @@ describe('ReportReaderPage', () => {
     expect(screen.queryByText('辅助钱路')).not.toBeInTheDocument()
   })
 
-  it('财富v4新文案使用资金状态标签且不改写历史v3标签', async () => {
+  it.each(['wealth-plain-v3.4', 'wealth-plain-v3.5'] as const)(
+    '财富v4的%s文案使用资金状态标签且不改写历史v3标签', async (copyVersion) => {
     vi.mocked(getReport).mockResolvedValue({
       ...wealthV4Report,
       content: {
         ...wealthV4Report.content,
-        copyVersion: 'wealth-plain-v3.4',
+        copyVersion,
       },
     })
     renderReader()

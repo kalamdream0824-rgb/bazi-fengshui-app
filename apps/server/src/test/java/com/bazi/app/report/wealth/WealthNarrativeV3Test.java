@@ -90,7 +90,7 @@ class WealthNarrativeV3Test {
   @Test
   void identicalAnnualConditionsKeepTheSameJudgmentButUseDistinctPlannedHeadlines() throws Exception {
     var content = content(scoredCase("S07"));
-    assertEquals("wealth-plain-v3.4", content.copyVersion());
+    assertEquals("wealth-plain-v3.5", content.copyVersion());
     assertEquals("wealth-headline-v1", content.headlinePlannerVersion());
     assertEquals(3, content.years().stream().map(y -> y.overview().text()).distinct().count());
     assertEquals(3, content.years().stream().map(y -> y.headlineMeta().themeKey()).distinct().count());

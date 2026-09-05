@@ -181,7 +181,7 @@ class WealthNarrativeSampleTest {
 
   @Test
   void revisedAnnualOverviewHasANewCopyVersion() throws Exception {
-    assertEquals("wealth-plain-v3.4", draft("R12").copyVersion());
+    assertEquals("wealth-plain-v3.5", draft("R12").copyVersion());
     assertEquals("wealth-headline-v1", draft("R12").headlinePlannerVersion());
   }
 

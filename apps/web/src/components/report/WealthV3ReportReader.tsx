@@ -19,7 +19,7 @@ const MONEY_STATE_LABELS: Record<WealthPathV3, string> = {
 }
 
 export function WealthV3ReportReader({ report }: { report: WealthV3SavedReport }) {
-  const usesMoneyStateCopy = report.content.copyVersion === 'wealth-plain-v3.4'
+  const usesMoneyStateCopy = ['wealth-plain-v3.4', 'wealth-plain-v3.5'].includes(report.content.copyVersion)
   const pathLabels = usesMoneyStateCopy ? MONEY_STATE_LABELS : LEGACY_PATH_LABELS
 
   return (

@@ -252,7 +252,7 @@ export interface WealthContentV3 {
   horizonYears: 3
   calculationVersion: 'wealth-path-v2'
   policyVersion: 'wealth-expression-v1'
-  copyVersion: 'wealth-plain-v3' | 'wealth-plain-v3.1' | 'wealth-plain-v3.2' | 'wealth-plain-v3.3' | 'wealth-plain-v3.4'
+  copyVersion: 'wealth-plain-v3' | 'wealth-plain-v3.1' | 'wealth-plain-v3.2' | 'wealth-plain-v3.3' | 'wealth-plain-v3.4' | 'wealth-plain-v3.5'
   headlinePlannerVersion?: 'wealth-headline-v1'
   thesis: WealthBlockV3
   summary: WealthBlockV3
