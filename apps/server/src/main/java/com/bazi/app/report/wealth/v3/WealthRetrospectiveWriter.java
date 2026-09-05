@@ -18,10 +18,10 @@ public final class WealthRetrospectiveWriter {
         : line("次判断：再回看", plan.secondary());
     String hidden = plan.hidden() == null
         ? "隐性影响：本次回看不再加入另一项具体影响。"
-        : line("隐性影响：还要回看", plan.hidden());
+        : hiddenLine(plan.hidden());
     return new NarrativeTimeline.PastReview(
         plan.year(),
-        line("主判断：" + plan.year() + "年先回看", plan.primary()),
+        line("主判断：" + plan.year() + "年先回看", "命盘提示，", plan.primary()),
         List.of(secondary, hidden),
         WealthPlainCopyV3.retrospectiveBridge(
             plan.primary().subject(), plan.primary().direction()),
@@ -29,8 +29,21 @@ public final class WealthRetrospectiveWriter {
   }
 
   private String line(String prefix, Observation observation) {
+    return line(prefix, "同时，", observation);
+  }
+
+  private String line(String prefix, String transition, Observation observation) {
     return prefix + WealthPlainCopyV3.retrospectiveQuestion(observation.subject()) + "。"
-        + WealthPlainCopyV3.retrospectiveDirection(observation.direction(), observation.strength())
+        + transition + WealthPlainCopyV3.retrospectiveDirection(
+            observation.direction(), observation.strength())
         + WealthPlainCopyV3.retrospectiveAngle(observation.angle());
+  }
+
+  private String hiddenLine(Observation observation) {
+    return "隐性影响：还要回看"
+        + WealthPlainCopyV3.retrospectiveAngleQuestion(observation.angle()) + "。"
+        + "它主要关系到" + WealthPlainCopyV3.retrospectiveObject(observation.subject()) + "。"
+        + "从整体收支看，" + WealthPlainCopyV3.retrospectiveDirection(
+            observation.direction(), observation.strength());
   }
 }

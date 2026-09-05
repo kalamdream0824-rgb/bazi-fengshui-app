@@ -226,6 +226,10 @@ git commit -m "feat(report): arbitrate retrospective wealth angles"
 
 ## 批次 C：生成自然语言并接入现有报告
 
+**执行状态（2026-09-05）：Task 5–6 已完成。** 新回顾写入器已接入 `DefaultWealthReportGenerator → WealthTimelinePlanner` 正式链路。跨命盘基线由 12 份样本、4 种完整回顾、20 对跨签名同文碰撞，变为 12 份样本、12 种完整回顾、0 对碰撞，最大碰撞组为 1。相关 99 项测试通过；后端全量 595 项全部通过。文案版本仍为 `wealth-plain-v3.4`，需 Task 7 升级并完成前端兼容后再作为 v3.5 对外验收。
+
+人工复核后增加了三条语言约束：每份回顾只出现一次“命盘提示”；隐性影响直接描述其证据角度，不能重复次判断的问题；桥接句使用“核对清楚／分开看”，避免“责任是否有改善”等不自然搭配。详情见 `docs/samples/wealth-retrospective-batch-c-preflight-2026-09-05.md`。
+
 ### Task 5：把整段模板改成按结构字段组合
 
 **Files:**

@@ -73,13 +73,47 @@ class WealthRetrospectiveWriterTest {
     assertTrue(review.checkpoints().get(1).startsWith("隐性影响：还要回看"), review.checkpoints().toString());
     assertEquals(plan.evidenceKeys(), review.evidenceKeys());
     assertEquals(review, writer.write(plan));
+    assertEquals(1, Stream.of(visible(review).split("命盘提示", -1)).count() - 1,
+        visible(review));
+    assertTrue(review.checkpoints().get(0).contains("同时，这方面"), review.checkpoints().get(0));
+    assertTrue(review.checkpoints().get(1).contains("从整体收支看，这方面"), review.checkpoints().get(1));
     for (String forbidden : List.of(
-        "工资", "客户", "项目", "订单", "按次", "卡点", "抓手", "闭环", "原局", "十神", "大运", "流年")) {
+        "工资", "客户", "项目", "订单", "按次", "卡点", "抓手", "闭环", "原局", "十神", "大运", "流年",
+        "这一点有支持", "这一点的支持")) {
       assertFalse(visible(review).contains(forbidden), forbidden + " in " + visible(review));
     }
     for (String sentence : visible(review).split("(?<=[。！？])")) {
       assertTrue(sentence.strip().length() <= 48, sentence.length() + " chars: " + sentence);
     }
+  }
+
+  @Test
+  void hiddenImpactUsesItsEvidenceAngleInsteadOfRepeatingTheSecondaryQuestion() {
+    WealthRetrospectivePlan plan = plan(
+        observed("project_income", "mixed", "limited", "natal_structure", "a"),
+        observed("retention", "mixed", "limited", "natal_shared_responsibility", "b"),
+        observed("retention", "mixed", "limited", "annual_stem", "c"));
+
+    NarrativeTimeline.PastReview review = writer.write(plan);
+
+    assertEquals(1, Stream.of(review.checkpoints().get(0), review.checkpoints().get(1))
+        .filter(line -> line.contains("进账以后实际留下的钱有没有增加")).count());
+    assertTrue(review.checkpoints().get(1).contains("当年的直接收支变化"),
+        review.checkpoints().get(1));
+    assertTrue(review.checkpoints().get(1).contains("实际结余"), review.checkpoints().get(1));
+  }
+
+  @Test
+  void bridgeReadsNaturallyForSharedMoneyResponsibility() {
+    WealthRetrospectivePlan plan = plan(
+        observed("cooperation_income", "supportive", "supported", "annual_harmony", "a"),
+        observed("stable_income", "supportive", "supported", "annual_stem", "b"),
+        observed("retention", "restricted", "limited", "annual_harm", "c"));
+
+    String bridge = writer.write(plan).bridge();
+
+    assertFalse(bridge.contains("责任是否有改善"), bridge);
+    assertEquals("去年先把共同用钱时的责任核对清楚，再看今年是否延续。", bridge);
   }
 
   @Test
@@ -133,11 +167,11 @@ class WealthRetrospectiveWriterTest {
 
   private static Stream<Arguments> directionCases() {
     return Stream.of(
-        Arguments.of("supportive", "pronounced", "支持比较明显"),
-        Arguments.of("supportive", "supported", "有一定支持"),
-        Arguments.of("supportive", "limited", "有迹象，但力度不强"),
-        Arguments.of("mixed", "limited", "有支持，也有实际限制"),
-        Arguments.of("restricted", "limited", "限制更明显"));
+        Arguments.of("supportive", "pronounced", "变化比较明显"),
+        Arguments.of("supportive", "supported", "有一定变化"),
+        Arguments.of("supportive", "limited", "变化迹象较弱"),
+        Arguments.of("mixed", "limited", "可能有进展，也容易受到限制"),
+        Arguments.of("restricted", "limited", "受到的限制更明显"));
   }
 
   private static Stream<Arguments> angleCases() {

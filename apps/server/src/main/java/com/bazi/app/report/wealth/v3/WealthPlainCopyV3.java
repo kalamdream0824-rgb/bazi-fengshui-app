@@ -70,13 +70,13 @@ final class WealthPlainCopyV3 {
   static String retrospectiveDirection(String direction, String strength) {
     return switch (direction) {
       case "supportive" -> switch (strength) {
-        case "pronounced" -> "这一点的支持比较明显。";
-        case "supported" -> "这一点有一定支持。";
-        case "limited" -> "这一点有迹象，但力度不强。";
+        case "pronounced" -> "这方面的变化比较明显。";
+        case "supported" -> "这方面有一定变化。";
+        case "limited" -> "这方面的变化迹象较弱。";
         default -> throw new IllegalArgumentException("unknown retrospective strength: " + strength);
       };
-      case "mixed" -> "这一点有支持，也有实际限制。";
-      case "restricted" -> "这一点的限制更明显。";
+      case "mixed" -> "这方面可能有进展，也容易受到限制。";
+      case "restricted" -> "这方面受到的限制更明显。";
       default -> throw new IllegalArgumentException("unknown retrospective direction: " + direction);
     };
   }
@@ -100,12 +100,31 @@ final class WealthPlainCopyV3 {
     };
   }
 
+  static String retrospectiveAngleQuestion(String angle) {
+    return switch (angle) {
+      case "annual_stem" -> "当年的直接收支变化是否和这项结果一致";
+      case "annual_harmony" -> "他人或原有安排是否带来额外影响";
+      case "annual_clash" -> "是否出现突然且明显的收支变动";
+      case "annual_harm" -> "是否有零散且不易察觉的损耗";
+      case "annual_punishment" -> "同类收支问题是否反复出现";
+      case "annual_context" -> "当年的收支条件是否发生改变";
+      case "dayun_context" -> "较长一段时间的收支状态是否持续影响结果";
+      case "natal_output_wealth" -> "长期投入是否真正转成进账";
+      case "natal_wealth_capacity" -> "进账增加后，相关开销是否也跟着增加";
+      case "natal_shared_responsibility" -> "共同用钱是否影响最后结余";
+      case "natal_balance" -> "额外开销是否随着进账一起增加";
+      case "natal_combination" -> "原有收支条件是否相互牵动";
+      case "natal_structure" -> "自己一贯的收支方式是否影响结果";
+      default -> throw new IllegalArgumentException("unknown retrospective angle: " + angle);
+    };
+  }
+
   static String retrospectiveBridge(String subject, String direction) {
     String object = retrospectiveObject(subject);
     return switch (direction) {
-      case "supportive" -> "去年主要核对" + object + "是否有改善，再判断今年是否值得继续。";
-      case "mixed" -> "去年主要核对" + object + "的有利和受限两面，再决定今年怎么安排。";
-      case "restricted" -> "去年主要核对" + object + "受到哪些限制，再决定今年先守住什么。";
+      case "supportive" -> "去年先把" + object + "核对清楚，再看今年是否延续。";
+      case "mixed" -> "去年先把" + object + "的进展和反复分开看，再决定今年怎么安排。";
+      case "restricted" -> "去年先看清" + object + "受到哪些限制，再决定今年先守住什么。";
       default -> throw new IllegalArgumentException("unknown retrospective direction: " + direction);
     };
   }

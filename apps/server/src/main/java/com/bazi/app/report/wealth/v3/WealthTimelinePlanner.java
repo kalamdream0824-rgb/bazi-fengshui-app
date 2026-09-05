@@ -28,7 +28,8 @@ public final class WealthTimelinePlanner {
       throw new IllegalArgumentException("wealth previous year must precede product years");
     }
 
-    WealthAssessment.Decision pastDecision = reviewDecision(previous);
+    NarrativeTimeline.PastReview past = new WealthRetrospectiveWriter()
+        .write(new WealthRetrospectiveArbitrator().plan(previous));
     WealthNarrativeV3.Year presentYear = content.years().get(0);
     String presentPath = presentPath(presentYear);
     WealthAssessment presentAssessment = assessment(presentYear);
@@ -50,12 +51,7 @@ public final class WealthTimelinePlanner {
     }
 
     NarrativeTimeline timeline = new NarrativeTimeline(
-        new NarrativeTimeline.PastReview(
-            previous.year(),
-            reviewHeadline(previous.year(), pastDecision.path()),
-            pastCheckpoints(previous.year(), pastDecision.path()),
-            pastBridge(pastDecision.path()),
-            evidenceKeys(previous, List.of(pastDecision))),
+        past,
         new NarrativeTimeline.PresentReading(
             presentYear.year(),
             presentHeadline(presentPath),
@@ -66,10 +62,7 @@ public final class WealthTimelinePlanner {
     return new NarrativeTimelineValidator(CORE_PHRASES).validate(timeline);
   }
 
-  private WealthAssessment.Decision reviewDecision(WealthAssessment assessment) {
-    if (!assessment.focus().primaryCandidates().isEmpty()) {
-      return decision(assessment, assessment.focus().primaryCandidates().get(0));
-    }
+  private WealthAssessment.Decision strongestDecision(WealthAssessment assessment) {
     WealthAssessment.Decision selected = null;
     int selectedWeight = -1;
     for (WealthAssessment.Decision candidate : assessment.decisions()) {
@@ -85,51 +78,8 @@ public final class WealthTimelinePlanner {
 
   private String presentPath(WealthNarrativeV3.Year year) {
     if (!year.focus().primaryCandidates().isEmpty()) return year.focus().primaryCandidates().get(0);
-    WealthAssessment.Decision selected = reviewDecision(assessment(year));
+    WealthAssessment.Decision selected = strongestDecision(assessment(year));
     return selected.path();
-  }
-
-  private List<String> pastCheckpoints(int year, String path) {
-    return switch (path) {
-      case "stable_income" -> List.of(
-          "次判断：回看" + year + "年进账是否比此前更稳定，有没有出现明显中断",
-          "隐性影响：如果" + year + "年进账金额变化不大，到账间隔是否变得不规律");
-      case "skill_income" -> List.of(
-          "次判断：回看" + year + "年增加投入以后，实际进账是否同步变化",
-          "隐性影响：如果" + year + "年比以前更忙，最后留下的钱是否反而没有增加");
-      case "project_income" -> List.of(
-          "次判断：回看" + year + "年预计进账是否按时到账，有没有明显延后",
-          "隐性影响：如果" + year + "年到账节奏改变，日常支出安排是否受到影响");
-      case "cooperation_income" -> List.of(
-          "次判断：回看" + year + "年与他人有关的钱是否增加，责任和用途是否清楚",
-          "隐性影响：如果" + year + "年有共同开销，最后承担的部分是否超出原先预期");
-      case "retention" -> List.of(
-          "次判断：回看" + year + "年支出压力是否增加，固定开销有没有变多",
-          "隐性影响：如果" + year + "年进账提高，最后留下的钱是否也跟着增加");
-      default -> throw new IllegalArgumentException("unknown wealth path: " + path);
-    };
-  }
-
-  private String reviewHeadline(int year, String path) {
-    return switch (path) {
-      case "stable_income" -> "主判断：" + year + "年最值得回看的是进账能否持续";
-      case "skill_income" -> "主判断：" + year + "年最值得回看的是投入与进账是否相称";
-      case "project_income" -> "主判断：" + year + "年最值得回看的是预计与实际到账是否错开";
-      case "cooperation_income" -> "主判断：" + year + "年最值得回看的是与他人有关的钱是否增加责任";
-      case "retention" -> "主判断：" + year + "年最值得回看的是进账最终能否留下";
-      default -> throw new IllegalArgumentException("unknown wealth path: " + path);
-    };
-  }
-
-  private String pastBridge(String path) {
-    return switch (path) {
-      case "stable_income" -> "去年只用来核对进账是否稳定，再看今年怎么安排。";
-      case "skill_income" -> "去年只用来核对投入与进账是否相称，再看今年怎么调整。";
-      case "project_income" -> "去年只用来核对预计和实际到账的差距，再看今年怎么安排。";
-      case "cooperation_income" -> "去年只用来核对资金责任和开销，再看今年怎么分配。";
-      case "retention" -> "去年只用来核对钱最后留下多少，再看今年怎么调整。";
-      default -> throw new IllegalArgumentException("unknown wealth path: " + path);
-    };
   }
 
   private String presentHeadline(String path) {

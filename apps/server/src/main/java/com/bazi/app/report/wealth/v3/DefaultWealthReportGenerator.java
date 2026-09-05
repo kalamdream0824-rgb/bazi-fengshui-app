@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 public final class DefaultWealthReportGenerator implements WealthReportGenerator {
   private final WealthV3Analyzer analyzer = new WealthV3Analyzer();
   private final WealthNarrativeWriter writer = new WealthNarrativeWriter();
+  private final WealthTimelinePlanner timelinePlanner = new WealthTimelinePlanner();
 
   @Override
   public WealthNarrativeV3 generate(PaipanResultDto chart, List<AnnualContext> contexts, LocalDate asOf) {
@@ -34,7 +35,7 @@ public final class DefaultWealthReportGenerator implements WealthReportGenerator
     var assessments = analyzer.analyze(chart, analysisContexts);
     WealthNarrativeV3 base = writer.plan(assessments.subList(1, assessments.size()), asOf);
     WealthNarrativeV3 content = base.withTimeline(
-        new WealthTimelinePlanner().plan(assessments.get(0), base));
+        timelinePlanner.plan(assessments.get(0), base));
     writer.validateDraft(content);
     return content;
   }

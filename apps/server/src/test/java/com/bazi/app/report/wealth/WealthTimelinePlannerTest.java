@@ -2,9 +2,12 @@ package com.bazi.app.report.wealth;
 
 import static com.bazi.app.report.wealth.WealthRemediationFixtures.scoredCase;
 import static com.bazi.app.report.wealth.WealthRemediationFixtures.withPathWeights;
+import static com.bazi.app.report.wealth.WealthRetrospectiveSignalExtractorTest.assessment;
+import static com.bazi.app.report.wealth.WealthRetrospectiveSignalExtractorTest.source;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bazi.app.dto.PaipanRequest;
@@ -44,7 +47,7 @@ class WealthTimelinePlannerTest {
     Generated generated = generated(path);
 
     NarrativeTimeline timeline = planner.plan(generated.previous(), generated.content());
-    String review = String.join("", timeline.past().checkpoints());
+    String review = visiblePast(timeline.past());
 
     assertEquals(2025, timeline.past().year());
     assertEquals(2026, timeline.present().year());
@@ -79,6 +82,41 @@ class WealthTimelinePlannerTest {
     assertTrue(past.headline().startsWith("主判断："), past.headline());
     assertTrue(past.checkpoints().get(0).startsWith("次判断："), past.checkpoints().toString());
     assertTrue(past.checkpoints().get(1).startsWith("隐性影响："), past.checkpoints().toString());
+  }
+
+  @Test
+  void samePrimaryPathWithDifferentSecondaryAndHiddenEvidenceChangesTheCompleteReview()
+      throws Exception {
+    WealthNarrativeV3 content = generated(WealthPath.PROJECT_INCOME).content();
+    WealthAssessment first = assessment(List.of(
+        source("project-a", "project_income", "annual.stem.ten_god", 8,
+            EvidenceFamily.ANNUAL_TRIGGER),
+        source("skill-a", "skill_income", "natal.combination.output_wealth", 4,
+            EvidenceFamily.NATAL_COMBINATION),
+        source("retention-a", "retention", "annual.branch.harm.day", -2,
+            EvidenceFamily.ANNUAL_TRIGGER)));
+    WealthAssessment second = assessment(List.of(
+        source("project-b", "project_income", "annual.stem.ten_god", 8,
+            EvidenceFamily.ANNUAL_TRIGGER),
+        source("stable-b", "stable_income", "dayun.stem.ten_god", 5,
+            EvidenceFamily.DAYUN_CONTEXT),
+        source("retention-b", "retention", "annual.branch.clash.day", -3,
+            EvidenceFamily.ANNUAL_TRIGGER)));
+
+    assertEquals(List.of("project_income"), first.focus().primaryCandidates());
+    assertEquals(List.of("project_income"), second.focus().primaryCandidates());
+    assertNotEquals(visiblePast(planner.plan(first, content).past()),
+        visiblePast(planner.plan(second, content).past()));
+  }
+
+  @Test
+  void sameAssessmentProducesTheSameTimelineOneHundredTimes() throws Exception {
+    Generated generated = generated(WealthPath.COOPERATION_INCOME);
+    NarrativeTimeline expected = planner.plan(generated.previous(), generated.content());
+
+    for (int index = 0; index < 100; index++) {
+      assertEquals(expected, planner.plan(generated.previous(), generated.content()));
+    }
   }
 
   @ParameterizedTest
@@ -195,13 +233,17 @@ class WealthTimelinePlannerTest {
     assertTrue(available.containsAll(keys), keys + " not in " + available);
   }
 
+  private String visiblePast(NarrativeTimeline.PastReview past) {
+    return String.join("\n", past.headline(), String.join("\n", past.checkpoints()), past.bridge());
+  }
+
   private static Stream<Arguments> pathReviewCases() {
     return Stream.of(
-        Arguments.of(WealthPath.STABLE_INCOME, List.of("进账", "到账")),
+        Arguments.of(WealthPath.STABLE_INCOME, List.of("进账", "持续")),
         Arguments.of(WealthPath.SKILL_INCOME, List.of("投入", "进账")),
-        Arguments.of(WealthPath.PROJECT_INCOME, List.of("到账", "支出")),
-        Arguments.of(WealthPath.COOPERATION_INCOME, List.of("责任", "共同开销")),
-        Arguments.of(WealthPath.RETENTION, List.of("支出", "留下")));
+        Arguments.of(WealthPath.PROJECT_INCOME, List.of("预计进账", "实际到账")),
+        Arguments.of(WealthPath.COOPERATION_INCOME, List.of("他人", "责任")),
+        Arguments.of(WealthPath.RETENTION, List.of("留下", "结余")));
   }
 
   private record Generated(WealthAssessment previous, WealthNarrativeV3 content) {}
