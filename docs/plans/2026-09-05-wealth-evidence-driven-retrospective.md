@@ -318,6 +318,8 @@ git commit -m "refactor(report): use retrospective wealth planner"
 
 ## 批次 D：版本、兼容与全量验收
 
+**执行状态（2026-09-05）：Task 7–8 已完成，批次 D 完成。** 新报告已升级为 `wealth-plain-v3.5`，前端同时兼容 v3.4 与 v3.5 的资金状态标签，既有 v3.0–v3.4 报告不改写。跨命盘验收已改用 `WealthRetrospectivePlan.evidenceSignature()`，12 份样本得到 12 种结构化签名和 12 种可见回顾，跨签名同文碰撞为 0；每份输入重复规划 100 次保持一致。后端全量 595 项、前端全量 214 项全部通过，前端生产构建成功。人工验收样本见 `docs/samples/wealth-v3.5-retrospective-preflight-2026-09-05.md`。
+
 ### Task 7：升级文案版本并保持历史报告兼容
 
 **Files:**

@@ -1,7 +1,6 @@
 package com.bazi.app.report.wealth;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bazi.app.dto.PaipanRequest;
@@ -9,18 +8,18 @@ import com.bazi.app.report.AnnualContextFactory;
 import com.bazi.app.report.NarrativeTimeline;
 import com.bazi.app.report.ReportHorizon;
 import com.bazi.app.report.wealth.v3.DefaultWealthReportGenerator;
+import com.bazi.app.report.wealth.v3.WealthRetrospectiveArbitrator;
+import com.bazi.app.report.wealth.v3.WealthRetrospectivePlan;
+import com.bazi.app.report.wealth.v3.WealthV3Analyzer;
 import com.bazi.app.service.BaziService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.MessageDigest;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,20 +49,33 @@ class WealthRetrospectiveCollisionTest {
       AnnualContextFactory factory = new AnnualContextFactory(clock);
       var product = factory.create(request, chart, ReportHorizon.WEALTH_PRODUCT);
       var previous = factory.createYear(request, chart, product.get(0).year() - 1);
-      var past = new DefaultWealthReportGenerator()
-          .generate(chart, previous, product, asOf).timeline().past();
+      var contexts = new ArrayList<com.bazi.app.report.AnnualContext>();
+      contexts.add(previous);
+      contexts.addAll(product);
+      var previousAssessment = new WealthV3Analyzer().analyze(chart, contexts).get(0);
+      var arbitrator = new WealthRetrospectiveArbitrator();
+      WealthRetrospectivePlan plan = arbitrator.plan(previousAssessment);
+      for (int repetition = 0; repetition < 100; repetition++) {
+        assertEquals(plan, arbitrator.plan(previousAssessment),
+            fixture.get("id").asText() + " repetition " + repetition);
+      }
+      var report = new DefaultWealthReportGenerator().generate(chart, previous, product, asOf);
+      assertEquals("wealth-plain-v3.5", report.copyVersion());
+      var past = report.timeline().past();
       assertEquals(asOf.getYear() - 1, past.year());
       assertTrue(!past.evidenceKeys().isEmpty()
           && past.evidenceKeys().stream().noneMatch(String::isBlank));
-      generated.add(reviewCase(fixture.get("id").asText(), past));
+      assertEquals(plan.evidenceKeys(), past.evidenceKeys());
+      generated.add(reviewCase(fixture.get("id").asText(), plan, past));
     }
     cases = List.copyOf(generated);
 
     Map<String, Object> output = new LinkedHashMap<>();
-    output.put("signatureVersion", "past-review-evidence-keys-v1");
+    output.put("signatureVersion", WealthRetrospectivePlan.VERSION);
     output.put("signatureDefinition",
-        "SHA-256 of UTF-8 JSON containing sorted distinct PastReview.evidenceKeys; "
-            + "no fixture identity, birth data, copy or wall-clock time");
+        "WealthRetrospectivePlan.evidenceSignature: SHA-256 of the planner version, year, "
+            + "selected subjects, directions, strengths, angles, cited rules and resolved root values; "
+            + "no fixture identity, copy or wall-clock time");
     output.put("collisionCountDefinition",
         "Unordered pairs of cases with identical visibleBlock and different evidenceSignature");
     output.put("largestGroupDefinition",
@@ -106,49 +118,16 @@ class WealthRetrospectiveCollisionTest {
         "R03/R04/R05 cite different evidence but all show the same complete review; inspect " + BASELINE);
   }
 
-  @Test
-  void signatureIgnoresEvidenceOrderDuplicatesAndFixtureIdentity() throws Exception {
-    ReviewCase original = reviewCase("first", past(List.of("fact.b", "fact.a", "fact.a")));
-    ReviewCase reordered = reviewCase("renamed", past(List.of("fact.a", "fact.b")));
-    assertEquals(original.evidenceSignature(), reordered.evidenceSignature());
-    assertEquals(List.of("fact.a", "fact.b"), original.evidenceKeys());
-    assertEquals(0, differentSignatureSameBlockCount(List.of(original, reordered)));
-    assertEquals(1, largestDifferentSignatureCollisionGroup(List.of(original, reordered)));
-  }
-
-  @Test
-  void changedEvidenceCannotMasqueradeAsAVisibleCopyDifference() throws Exception {
-    ReviewCase first = reviewCase("first", past(List.of("fact.a")));
-    ReviewCase repeated = reviewCase("repeated", past(List.of("fact.a")));
-    ReviewCase changed = reviewCase("changed", past(List.of("fact.b")));
-    assertNotEquals(first.evidenceSignature(), changed.evidenceSignature());
-    assertEquals("主判断\n次判断：回看进账是否变化\n隐性影响：回看支出是否变化\n回看与今年的联系",
-        first.visibleBlock());
-    assertEquals(first.visibleBlock(), changed.visibleBlock());
-    // Two A/B sample pairs collide; the A/A pair is explicitly allowed.
-    assertEquals(2, differentSignatureSameBlockCount(List.of(first, repeated, changed)));
-    assertEquals(2, largestDifferentSignatureCollisionGroup(List.of(first, repeated, changed)));
-
-    var differentCopy = new NarrativeTimeline.PastReview(
-        2025, "另一条主判断", past(List.of("fact.b")).checkpoints(),
-        "回看与今年的联系", List.of("fact.b"));
-    ReviewCase rewritten = reviewCase("different-copy", differentCopy);
-    assertEquals(changed.evidenceSignature(), rewritten.evidenceSignature());
-    assertEquals(0, differentSignatureSameBlockCount(List.of(first, rewritten)));
-  }
-
-  private static ReviewCase reviewCase(String fixtureId, NarrativeTimeline.PastReview past)
-      throws Exception {
-    // Use the current planner's cited evidence set, not every fact in a chart.
-    // This Task 1 baseline is not the future structured-plan signature from Task 2.
+  private static ReviewCase reviewCase(
+      String fixtureId, WealthRetrospectivePlan plan, NarrativeTimeline.PastReview past) {
     List<String> keys = past.evidenceKeys().stream().distinct().sorted().toList();
-    String signature = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
-        .digest(JSON.writeValueAsString(keys).getBytes(StandardCharsets.UTF_8)));
     List<String> lines = new ArrayList<>();
     lines.add(past.headline());
     lines.addAll(past.checkpoints());
     lines.add(past.bridge());
-    return new ReviewCase(fixtureId, signature, String.join("\n", lines), keys);
+    return new ReviewCase(fixtureId, plan.plannerVersion(), plan.completeness(),
+        plan.evidenceSignature(), String.join("\n", lines), keys,
+        past.headline(), past.checkpoints().get(0), past.checkpoints().get(1), past.bridge());
   }
 
   private static int differentSignatureSameBlockCount(List<ReviewCase> samples) {
@@ -183,12 +162,8 @@ class WealthRetrospectiveCollisionTest {
         .map(group -> group.stream().map(ReviewCase::fixtureId).toList()).toList();
   }
 
-  private static NarrativeTimeline.PastReview past(List<String> evidenceKeys) {
-    return new NarrativeTimeline.PastReview(
-        2025, "主判断", List.of("次判断：回看进账是否变化", "隐性影响：回看支出是否变化"),
-        "回看与今年的联系", evidenceKeys);
-  }
-
   private record ReviewCase(
-      String fixtureId, String evidenceSignature, String visibleBlock, List<String> evidenceKeys) {}
+      String fixtureId, String plannerVersion, String completeness, String evidenceSignature,
+      String visibleBlock, List<String> evidenceKeys, String primary, String secondary,
+      String hidden, String bridge) {}
 }

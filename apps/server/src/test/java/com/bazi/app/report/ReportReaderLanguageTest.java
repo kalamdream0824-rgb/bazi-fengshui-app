@@ -253,6 +253,19 @@ class ReportReaderLanguageTest {
     String past = pastReviewCopy(timeline.past());
     RETROSPECTIVE_ASSERTIONS.stream().filter(past::contains)
         .forEach(word -> failures.add("过去回看出现确定断言：" + word));
+    if (sample.topic().equals("wealth")) {
+      if (occurrences(past, "命盘提示") != 1) {
+        failures.add("财富回顾必须且只能出现一次命盘提示");
+      }
+      if (!timeline.past().headline().startsWith("主判断：")
+          || !timeline.past().checkpoints().get(0).startsWith("次判断：")
+          || !timeline.past().checkpoints().get(1).startsWith("隐性影响：")) {
+        failures.add("财富回顾缺少主判断、次判断或隐性影响标签");
+      }
+      for (String vague : List.of("现在卡住了", "这一点有支持", "这一点的支持", "回看是否出现变化")) {
+        if (past.contains(vague)) failures.add("财富回顾出现悬空表达：" + vague);
+      }
+    }
     String all = String.join("", copy);
     PLAIN_LANGUAGE_FORBIDDEN.stream().filter(all::contains)
         .forEach(word -> failures.add("出现工作黑话：" + word));
@@ -265,6 +278,10 @@ class ReportReaderLanguageTest {
       failures.add("未来行动出现重复");
     }
     return List.copyOf(failures);
+  }
+
+  private int occurrences(String text, String fragment) {
+    return (text.length() - text.replace(fragment, "").length()) / fragment.length();
   }
 
   private List<String> contamination(String topic) {
