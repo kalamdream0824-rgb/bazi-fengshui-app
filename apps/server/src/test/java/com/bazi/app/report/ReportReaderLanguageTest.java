@@ -28,8 +28,10 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
@@ -104,7 +106,7 @@ class ReportReaderLanguageTest {
     writePreflightArtifact(samples);
     System.out.printf(
         "FOUR_TOPIC_TIMELINE_PREFLIGHT samples=%d retrospectiveAssertions=0 emptyEvidence=0 "
-            + "duplicateCopy=0 duplicateFutureAction=0 topicContamination=0%n",
+            + "crossSectionDuplicateCopy=0 duplicateFutureAction=0 topicContamination=0%n",
         samples.size());
   }
 
@@ -120,6 +122,16 @@ class ReportReaderLanguageTest {
     output.put("crossSectionDuplicateCount", 0);
     output.put("duplicateFutureActionCount", 0);
     output.put("topicContaminationCount", 0);
+    // Cross-section language checks do not establish cross-chart diversity. Record visible
+    // repetitions separately; WealthRetrospectiveCollisionTest gates different-evidence collisions.
+    Map<String, List<String>> wealthReviews = new LinkedHashMap<>();
+    samples.stream().filter(sample -> sample.topic().equals("wealth"))
+        .forEach(sample -> wealthReviews
+            .computeIfAbsent(pastReviewCopy(sample.timeline().past()), key -> new ArrayList<>())
+            .add(sample.id()));
+    output.put("wealthUniqueVisiblePastReviewCount", wealthReviews.size());
+    output.set("wealthRepeatedPastReviewGroups", JSON.valueToTree(wealthReviews.values().stream()
+        .filter(group -> group.size() > 1).toList()));
     output.set("cases", JSON.valueToTree(samples));
     Files.writeString(
         Path.of("target/four-topic-timeline-preflight.json"),
@@ -238,9 +250,7 @@ class ReportReaderLanguageTest {
         || timeline.future().stream().anyMatch(step -> step.evidenceKeys().isEmpty())) {
       failures.add("存在空依据");
     }
-    String past = timeline.past().headline()
-        + String.join("", timeline.past().checkpoints())
-        + timeline.past().bridge();
+    String past = pastReviewCopy(timeline.past());
     RETROSPECTIVE_ASSERTIONS.stream().filter(past::contains)
         .forEach(word -> failures.add("过去回看出现确定断言：" + word));
     String all = String.join("", copy);
@@ -279,6 +289,14 @@ class ReportReaderLanguageTest {
       copy.add(step.action());
     });
     return List.copyOf(copy);
+  }
+
+  private String pastReviewCopy(NarrativeTimeline.PastReview past) {
+    List<String> lines = new ArrayList<>();
+    lines.add(past.headline());
+    lines.addAll(past.checkpoints());
+    lines.add(past.bridge());
+    return String.join("\n", lines);
   }
 
   private PaipanRequest request() {
