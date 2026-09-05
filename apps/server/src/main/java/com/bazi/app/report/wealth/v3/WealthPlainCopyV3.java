@@ -45,6 +45,71 @@ final class WealthPlainCopyV3 {
     };
   }
 
+  static String retrospectiveQuestion(String subject) {
+    return switch (subject) {
+      case "stable_income" -> "进账是否能够持续";
+      case "skill_income" -> "时间和花费是否换来相称的进账";
+      case "project_income" -> "预计进账与实际到账是否一致";
+      case "cooperation_income" -> "与他人有关的钱是否增加额外责任";
+      case "retention" -> "进账以后实际留下的钱有没有增加";
+      default -> throw new IllegalArgumentException("unknown wealth retrospective subject: " + subject);
+    };
+  }
+
+  static String retrospectiveObject(String subject) {
+    return switch (subject) {
+      case "stable_income" -> "进账持续性";
+      case "skill_income" -> "投入和回报";
+      case "project_income" -> "到账时间";
+      case "cooperation_income" -> "共同用钱时的责任";
+      case "retention" -> "实际结余";
+      default -> throw new IllegalArgumentException("unknown wealth retrospective subject: " + subject);
+    };
+  }
+
+  static String retrospectiveDirection(String direction, String strength) {
+    return switch (direction) {
+      case "supportive" -> switch (strength) {
+        case "pronounced" -> "这一点的支持比较明显。";
+        case "supported" -> "这一点有一定支持。";
+        case "limited" -> "这一点有迹象，但力度不强。";
+        default -> throw new IllegalArgumentException("unknown retrospective strength: " + strength);
+      };
+      case "mixed" -> "这一点有支持，也有实际限制。";
+      case "restricted" -> "这一点的限制更明显。";
+      default -> throw new IllegalArgumentException("unknown retrospective direction: " + direction);
+    };
+  }
+
+  static String retrospectiveAngle(String angle) {
+    return switch (angle) {
+      case "annual_stem" -> "重点核对这一年直接出现的收支变化。";
+      case "annual_harmony" -> "重点核对它是否受到他人或原有安排牵动。";
+      case "annual_clash" -> "重点核对是否出现突然且明显的变动。";
+      case "annual_harm" -> "重点核对是否有零散且不易察觉的损耗。";
+      case "annual_punishment" -> "重点核对同类收支问题是否反复出现。";
+      case "annual_context" -> "重点核对这一年的收支条件是否改变。";
+      case "dayun_context" -> "还要结合较长一段时间的收支状态核对。";
+      case "natal_output_wealth" -> "还要核对长期投入能否转成实际进账。";
+      case "natal_wealth_capacity" -> "还要核对进账增加后能否承受相应开销。";
+      case "natal_shared_responsibility" -> "还要核对共同用钱是否影响最后结余。";
+      case "natal_balance" -> "还要核对进账增加时，额外开销是否同步增加。";
+      case "natal_combination" -> "还要核对原有收支条件是否相互牵动。";
+      case "natal_structure" -> "还要和自己一贯的收支方式对照。";
+      default -> throw new IllegalArgumentException("unknown retrospective angle: " + angle);
+    };
+  }
+
+  static String retrospectiveBridge(String subject, String direction) {
+    String object = retrospectiveObject(subject);
+    return switch (direction) {
+      case "supportive" -> "去年主要核对" + object + "是否有改善，再判断今年是否值得继续。";
+      case "mixed" -> "去年主要核对" + object + "的有利和受限两面，再决定今年怎么安排。";
+      case "restricted" -> "去年主要核对" + object + "受到哪些限制，再决定今年先守住什么。";
+      default -> throw new IllegalArgumentException("unknown retrospective direction: " + direction);
+    };
+  }
+
   static List<String> causes(WealthAssessment year, Decision d) {
     Set<String> result = new LinkedHashSet<>();
     for (var e : year.evidence()) {
