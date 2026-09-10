@@ -8,9 +8,18 @@ import java.util.Set;
 
 /** Closed, versioned plain-language vocabulary. No user data, random wording or report-position branches. */
 final class WealthPlainCopyV3 {
-  static final String VERSION = "wealth-plain-v3.5";
+  static final String VERSION = "wealth-plain-v3.16";
 
   record Words(String object, String meaning, String limitation, String observation, String action) {}
+  record RetrospectiveWords(
+      String question,
+      String object,
+      String supportiveSignal,
+      String limitingSignal,
+      String mixedSentence,
+      String supportiveCondition,
+      String limitingCondition,
+      String mixedCondition) {}
   private static final Map<String, Words> WORDS = Map.of(
       "stable_income", new Words("进账的持续性", "它看的是钱能否持续进入，不判断这笔钱来自哪种工作。",
           "进账持续性也可能发生变化，安排长期支出前要留出余地。",
@@ -32,8 +41,44 @@ final class WealthPlainCopyV3 {
           "留钱方面存在限制，新增花费需要与收入一起衡量。",
           "可以留意收入增加时，支出是否也跟着增加。",
           "给日常必需开支和新增投入分别设一个上限。"));
+  private static final Map<String, RetrospectiveWords> RETROSPECTIVE_WORDS = Map.of(
+      "stable_income", new RetrospectiveWords(
+          "进账有没有持续下来", "持续进账", "进账保持连续", "进账中断或波动",
+          "有些时候进账连续，也可能出现中断或波动。",
+          "确实有持续进账", "进账经常中断或波动", "有持续进账，也有进账中断或波动"),
+      "skill_income", new RetrospectiveWords(
+          "投入增加后，实际进账有没有跟着提高", "投入后的实际进账", "投入后实际进账提高",
+          "投入增加但进账没有同步提高", "有些投入能带来更高进账，也可能忙得更多、进账却没提高。",
+          "增加投入后，实际进账有所提高", "投入增加了，但实际进账没有提高",
+          "有些投入带来更高进账，也有些投入没有带来进账提高"),
+      "project_income", new RetrospectiveWords(
+          "预计进账与实际到账是否一致", "预计进账的到账情况", "预计进账按时到账",
+          "到账延后或金额变化", "有些预计的钱能按时到账，也可能出现延期或金额变化。",
+          "预计的钱确实按时到账", "到账出现延期或金额变化",
+          "有些预计的钱按时到账，也有些到账延期或金额有变化"),
+      "cooperation_income", new RetrospectiveWords(
+          "与他人共同用钱时，责任和开销有没有说清", "共同用钱的责任和开销", "资金责任容易分清",
+          "额外责任和开销增加", "有些共同用钱的责任容易说清，也可能增加额外责任和开销。",
+          "确实把共同用钱的责任和开销说清了", "共同用钱带来额外责任和开销",
+          "有些共同用钱的责任和开销说得清楚，也有些带来额外负担"),
+      "retention", new RetrospectiveWords(
+          "进账增加后，实际留下的钱有没有变多", "实际结余", "实际结余增加",
+          "进账增加但结余没有同步增加", "有些时候能多留下一点钱，有些时候进账增加了，结余却没有跟着增加。",
+          "实际结余确实有所增加", "进账增加了，但实际结余没有提高",
+          "有些月份实际结余增加，也有些月份进账增加但结余没有提高"));
 
   static Words words(String path) { return WORDS.get(path); }
+
+  static String weakSupportNote(String profile) {
+    return switch (profile) {
+      case "ROOTLESS" -> "基础命盘里的支持条件较少，所以增加投入或提前安排支出时，建议采用较保守的金额。";
+      case "ROOTED" -> "基础命盘里存在一些支持条件，所以不必按最保守的方式理解；新增投入和支出仍要留出余量。";
+      case "ROOTED_WITH_VISIBLE_RESOURCE" ->
+          "基础命盘里能看到两类支持条件，所以可以保留一定行动空间；但投入和支出不能一次安排到上限。";
+      case "NOT_WEAK", "" -> "";
+      default -> throw new IllegalArgumentException("unknown weak support profile: " + profile);
+    };
+  }
   static String label(String path) {
     return switch (path) {
       case "stable_income" -> "进账稳定";
@@ -46,87 +91,85 @@ final class WealthPlainCopyV3 {
   }
 
   static String retrospectiveQuestion(String subject) {
-    return switch (subject) {
-      case "stable_income" -> "进账是否能够持续";
-      case "skill_income" -> "时间和花费是否换来相称的进账";
-      case "project_income" -> "预计进账与实际到账是否一致";
-      case "cooperation_income" -> "与他人有关的钱是否增加额外责任";
-      case "retention" -> "进账以后实际留下的钱有没有增加";
-      default -> throw new IllegalArgumentException("unknown wealth retrospective subject: " + subject);
-    };
+    return retrospectiveWords(subject).question();
   }
 
   static String retrospectiveObject(String subject) {
-    return switch (subject) {
-      case "stable_income" -> "进账持续性";
-      case "skill_income" -> "投入和回报";
-      case "project_income" -> "到账时间";
-      case "cooperation_income" -> "共同用钱时的责任";
-      case "retention" -> "实际结余";
-      default -> throw new IllegalArgumentException("unknown wealth retrospective subject: " + subject);
-    };
+    return retrospectiveWords(subject).object();
   }
 
-  static String retrospectiveDirection(String direction, String strength) {
+  static String retrospectiveDirection(String subject, String direction, String strength) {
+    RetrospectiveWords words = retrospectiveWords(subject);
     return switch (direction) {
       case "supportive" -> switch (strength) {
-        case "pronounced" -> "这方面的变化比较明显。";
-        case "supported" -> "这方面有一定变化。";
-        case "limited" -> "这方面的变化迹象较弱。";
+        case "pronounced" -> words.supportiveSignal() + "的信号较明显。";
+        case "supported" -> words.supportiveSignal() + "的迹象存在，但不算突出。";
+        case "limited" -> words.supportiveSignal() + "的信号较弱。";
         default -> throw new IllegalArgumentException("unknown retrospective strength: " + strength);
       };
-      case "mixed" -> "这方面可能有进展，也容易受到限制。";
-      case "restricted" -> "这方面受到的限制更明显。";
+      case "mixed" -> words.mixedSentence();
+      case "restricted" -> words.limitingSignal() + "的信号更明显。";
       default -> throw new IllegalArgumentException("unknown retrospective direction: " + direction);
     };
   }
 
   static String retrospectiveAngle(String angle) {
     return switch (angle) {
-      case "annual_stem" -> "重点核对这一年直接出现的收支变化。";
-      case "annual_harmony" -> "重点核对它是否受到他人或原有安排牵动。";
-      case "annual_clash" -> "重点核对是否出现突然且明显的变动。";
-      case "annual_harm" -> "重点核对是否有零散且不易察觉的损耗。";
-      case "annual_punishment" -> "重点核对同类收支问题是否反复出现。";
-      case "annual_context" -> "重点核对这一年的收支条件是否改变。";
-      case "dayun_context" -> "还要结合较长一段时间的收支状态核对。";
-      case "natal_output_wealth" -> "还要核对长期投入能否转成实际进账。";
-      case "natal_wealth_capacity" -> "还要核对进账增加后能否承受相应开销。";
-      case "natal_shared_responsibility" -> "还要核对共同用钱是否影响最后结余。";
-      case "natal_balance" -> "还要核对进账增加时，额外开销是否同步增加。";
-      case "natal_combination" -> "还要核对原有收支条件是否相互牵动。";
-      case "natal_structure" -> "还要和自己一贯的收支方式对照。";
+      case "annual_stem" -> "再对照这一年实际发生的收支变化。";
+      case "annual_harmony" -> "再核对他人或原有安排有没有影响收支。";
+      case "annual_clash" -> "再核对收支是否出现突然且明显的变动。";
+      case "annual_harm" -> "再检查有没有零散、不易察觉的损耗。";
+      case "annual_punishment" -> "再看同类收支问题是否反复出现。";
+      case "annual_context" -> "再看这一年的收支条件是否改变。";
+      case "dayun_context" -> "再和前后一段时间的收支状态对照。";
+      case "natal_output_wealth" -> "再核对长期投入有没有转成实际进账。";
+      case "natal_wealth_capacity" -> "再核对进账增加后，相关开销是否也增加。";
+      case "natal_shared_responsibility" -> "再核对共同用钱是否影响最后结余。";
+      case "natal_balance" -> "再核对额外开销是否随着进账增加。";
+      case "natal_combination" -> "再核对原有收支条件是否相互影响。";
+      case "natal_structure" -> "再和自己一贯的收支方式对照。";
       default -> throw new IllegalArgumentException("unknown retrospective angle: " + angle);
     };
   }
 
   static String retrospectiveAngleQuestion(String angle) {
     return switch (angle) {
-      case "annual_stem" -> "当年的直接收支变化是否和这项结果一致";
-      case "annual_harmony" -> "他人或原有安排是否带来额外影响";
-      case "annual_clash" -> "是否出现突然且明显的收支变动";
-      case "annual_harm" -> "是否有零散且不易察觉的损耗";
-      case "annual_punishment" -> "同类收支问题是否反复出现";
-      case "annual_context" -> "当年的收支条件是否发生改变";
-      case "dayun_context" -> "较长一段时间的收支状态是否持续影响结果";
-      case "natal_output_wealth" -> "长期投入是否真正转成进账";
-      case "natal_wealth_capacity" -> "进账增加后，相关开销是否也跟着增加";
-      case "natal_shared_responsibility" -> "共同用钱是否影响最后结余";
-      case "natal_balance" -> "额外开销是否随着进账一起增加";
-      case "natal_combination" -> "原有收支条件是否相互牵动";
-      case "natal_structure" -> "自己一贯的收支方式是否影响结果";
+      case "annual_stem" -> "当年直接出现的收支变化";
+      case "annual_harmony" -> "他人或原有安排对收支的牵动";
+      case "annual_clash" -> "突然且明显的收支变动";
+      case "annual_harm" -> "零散、不易察觉的损耗";
+      case "annual_punishment" -> "反复出现的同类收支问题";
+      case "annual_context" -> "当年收支条件的改变";
+      case "dayun_context" -> "前后一段时间的收支状态";
+      case "natal_output_wealth" -> "长期投入转成实际进账的情况";
+      case "natal_wealth_capacity" -> "进账增加后同步增加的开销";
+      case "natal_shared_responsibility" -> "共同用钱带来的责任";
+      case "natal_balance" -> "随着进账增加的额外开销";
+      case "natal_combination" -> "原有收支条件之间的影响";
+      case "natal_structure" -> "一贯的收支方式";
       default -> throw new IllegalArgumentException("unknown retrospective angle: " + angle);
     };
   }
 
   static String retrospectiveBridge(String subject, String direction) {
-    String object = retrospectiveObject(subject);
+    RetrospectiveWords words = retrospectiveWords(subject);
     return switch (direction) {
-      case "supportive" -> "去年先把" + object + "核对清楚，再看今年是否延续。";
-      case "mixed" -> "去年先把" + object + "的进展和反复分开看，再决定今年怎么安排。";
-      case "restricted" -> "去年先看清" + object + "受到哪些限制，再决定今年先守住什么。";
+      case "supportive" -> "如果去年" + words.supportiveCondition()
+          + "，今年再看这种情况能否延续。";
+      case "mixed" -> "如果去年" + words.mixedCondition()
+          + "，今年安排时要把两种情况都算进去。";
+      case "restricted" -> "如果去年" + words.limitingCondition()
+          + "，今年先避免同类问题再次发生。";
       default -> throw new IllegalArgumentException("unknown retrospective direction: " + direction);
     };
+  }
+
+  private static RetrospectiveWords retrospectiveWords(String subject) {
+    RetrospectiveWords words = RETROSPECTIVE_WORDS.get(subject);
+    if (words == null) {
+      throw new IllegalArgumentException("unknown wealth retrospective subject: " + subject);
+    }
+    return words;
   }
 
   static List<String> causes(WealthAssessment year, Decision d) {
@@ -225,14 +268,4 @@ final class WealthPlainCopyV3 {
     return concerns;
   }
 
-  static String route(String path) {
-    return switch (path) {
-      case "stable_income" -> "先核对进账是否持续，再决定能承担多少长期支出。";
-      case "skill_income" -> "比较投入增加前后的实际进账，避免只看到忙碌程度。";
-      case "project_income" -> "把预计到账和实际到账分开记录，别提前使用尚未收到的钱。";
-      case "cooperation_income" -> "涉及共同用钱时，先明确金额、用途和各自责任。";
-      case "retention" -> "给临时开销留一笔余钱，收入增加后也不要马上提高固定花费。";
-      default -> throw new IllegalArgumentException("unknown wealth route");
-    };
-  }
 }

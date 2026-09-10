@@ -152,12 +152,14 @@ class WealthNarrativeSampleTest {
   }
 
   @Test
-  void repeatedPeriodFocusAppearsOnlyInTheThreeYearThesisNotEveryAnnualHeadline() throws Exception {
+  void periodFocusRemainsInTheThesisWithoutRestoringTheGenericConclusion() throws Exception {
     var content = draft("R12");
-    String sharedFocus = "投入回报可以作为关注的一个方向。";
 
-    assertTrue(content.thesis().text().contains(sharedFocus));
-    assertTrue(content.years().stream().noneMatch(year -> year.overview().text().contains(sharedFocus)));
+    assertTrue(content.thesis().text().contains("新增投入"));
+    assertTrue(content.thesis().text().contains("实际进账"));
+    assertFalse(content.thesis().text().contains("可以作为关注的一个方向"));
+    assertTrue(content.years().stream().noneMatch(year -> year.overview().text()
+        .equals(content.thesis().text())));
     assertEquals(3, content.years().stream().map(year -> year.overview().text()).distinct().count());
   }
 
@@ -181,8 +183,8 @@ class WealthNarrativeSampleTest {
 
   @Test
   void revisedAnnualOverviewHasANewCopyVersion() throws Exception {
-    assertEquals("wealth-plain-v3.5", draft("R12").copyVersion());
-    assertEquals("wealth-headline-v1", draft("R12").headlinePlannerVersion());
+    assertEquals("wealth-plain-v3.16", draft("R12").copyVersion());
+    assertEquals("wealth-headline-v3", draft("R12").headlinePlannerVersion());
   }
 
   @Test
@@ -258,7 +260,7 @@ class WealthNarrativeSampleTest {
     var year = draft("R01").years().get(0);
     assertFalse(year.retention().text().contains("钱有可以考虑的部分"));
     assertFalse(year.retention().text().endsWith(year.risk().reading().text()));
-    assertTrue(year.comparison().reading().text().startsWith("到2027年"));
+    assertTrue(year.comparison().reading().text().startsWith("与2026年相比，2027年"));
   }
 
   @Test

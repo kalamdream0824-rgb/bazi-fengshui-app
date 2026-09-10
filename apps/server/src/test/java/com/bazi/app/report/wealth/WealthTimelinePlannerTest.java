@@ -66,11 +66,26 @@ class WealthTimelinePlannerTest {
 
     NarrativeTimeline timeline = planner.plan(generated.previous(), generated.content());
 
-    assertTrue(timeline.present().judgment().contains("到账节奏"));
-    assertTrue(timeline.present().priority().contains("结余"));
+    assertTrue(timeline.present().judgment().contains("待到账款项"));
+    assertTrue(timeline.present().judgment().contains("实际到账"));
+    assertTrue(timeline.present().priority().contains("实际留下"));
     assertEquals(2, timeline.future().size());
     assertEquals(2, timeline.future().stream().map(NarrativeTimeline.FutureStep::headline).distinct().count());
     assertEquals(2, timeline.future().stream().map(NarrativeTimeline.FutureStep::action).distinct().count());
+  }
+
+  @Test
+  void futureActionChangesWhenTheSameMoneyPathChangesFromSupportiveToRestricted() throws Exception {
+    var supportiveYears = WealthNarrativeV3Test.assessments(
+        withPathWeights(scoredCase("S01"), WealthPath.PROJECT_INCOME, 8, 0));
+    var restrictedYears = WealthNarrativeV3Test.assessments(
+        withPathWeights(scoredCase("S01"), WealthPath.PROJECT_INCOME, 0, 8));
+    var supportive = writer.plan(supportiveYears, AS_OF);
+    var restricted = writer.plan(restrictedYears, AS_OF);
+
+    assertNotEquals(
+        planner.plan(asPrevious(supportiveYears.get(0)), supportive).future().get(0).action(),
+        planner.plan(asPrevious(restrictedYears.get(0)), restricted).future().get(0).action());
   }
 
   @Test

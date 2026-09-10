@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "purpose": "CLASSICAL_RULE_COMPATIBILITY_ONLY",
+  "accuracyEvidence": false,
+  "notice": "这些命例只检查当前规则与所引古籍结构判断的兼容程度，不证明古籍记载、现实经历或未来预测准确。",
+  "cases": [
+    {
+      "id": "ditiansui-summer-fire-wet-earth",
+      "assertionScope": "STRUCTURAL_ONLY",
+      "source": {
+        "title": "滴天髓阐微",
+        "edition": "维基文库繁体转录本",
+        "locator": "通神论·寒暖章，任铁樵自造之前一例",
+        "url": "https://zh.wikisource.org/wiki/滴天髓闡微",
+        "provenanceGrade": "C",
+        "note": "公开数字转录文本；本夹具不主张人物经历已经独立核实。"
+      },
+      "canonicalInput": {
+        "gender": "male",
+        "pillars": ["癸丑", "戊午", "丙午", "壬辰"]
+      },
+      "classicalClaim": {
+        "paraphrase": "丑为湿土，可以缓和夏火，并保存一部分金水条件。",
+        "mappingRationale": "当前引擎尚未实现调候与合化，只用旺衰分数近似检查其火势低于成对的巳年支命例。"
+      },
+      "expectedCurrentEngine": {
+        "balanceLevel": "中和",
+        "wangShuaiScore": 3.0,
+        "requiredWealthEvidenceKeys": [
+          "natal.combination.output_wealth",
+          "natal.combination.wealth_capacity",
+          "natal.combination.peer_wealth"
+        ]
+      }
+    },
+    {
+      "id": "ditiansui-rentieqiao-summer-fire",
+      "assertionScope": "STRUCTURAL_ONLY",
+      "source": {
+        "title": "滴天髓阐微",
+        "edition": "维基文库繁体转录本",
+        "locator": "通神论·寒暖章，任铁樵自造",
+        "url": "https://zh.wikisource.org/wiki/滴天髓闡微",
+        "provenanceGrade": "C",
+        "note": "原文自称任铁樵命造；本夹具不把自述经历当作独立验证事实。"
+      },
+      "canonicalInput": {
+        "gender": "male",
+        "pillars": ["癸巳", "戊午", "丙午", "壬辰"]
+      },
+      "classicalClaim": {
+        "paraphrase": "年支换成巳后火势更强，水金条件比成对命例更弱。",
+        "mappingRationale": "当前引擎只能要求旺衰粗判上调，不能声称复现原文的戊癸合化、阳刃或人生事件结论。"
+      },
+      "expectedCurrentEngine": {
+        "balanceLevel": "偏强",
+        "wangShuaiScore": 4.0,
+        "requiredWealthEvidenceKeys": [
+          "natal.combination.output_wealth",
+          "natal.combination.wealth_capacity",
+          "natal.combination.peer_wealth"
+        ]
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "id": "wet-earth-mitigates-more-than-fire-branch",
+      "lowerCaseId": "ditiansui-summer-fire-wet-earth",
+      "higherCaseId": "ditiansui-rentieqiao-summer-fire",
+      "metric": "wangShuaiScore",
+      "scope": "relative-structure-only"
+    }
+  ]
+}

@@ -652,7 +652,7 @@ describe('ReportReaderPage', () => {
     expect(screen.queryByText('辅助钱路')).not.toBeInTheDocument()
   })
 
-  it.each(['wealth-plain-v3.4', 'wealth-plain-v3.5'] as const)(
+  it.each(['wealth-plain-v3.4', 'wealth-plain-v3.5', 'wealth-plain-v3.6', 'wealth-plain-v3.7', 'wealth-plain-v3.8', 'wealth-plain-v3.9', 'wealth-plain-v3.10', 'wealth-plain-v3.11', 'wealth-plain-v3.12', 'wealth-plain-v3.13', 'wealth-plain-v3.14', 'wealth-plain-v3.15', 'wealth-plain-v3.16'] as const)(
     '财富v4的%s文案使用资金状态标签且不改写历史v3标签', async (copyVersion) => {
     vi.mocked(getReport).mockResolvedValue({
       ...wealthV4Report,
@@ -720,6 +720,67 @@ describe('ReportReaderPage', () => {
     expect(screen.getByRole('heading', { name: '接下来三年，可以这样安排' })).toBeInTheDocument()
     expect(screen.getByText('先记清真实进账，再决定保留哪种收入。')).toBeInTheDocument()
     expect(screen.getByText('这是按年度整理的传统命理参考，不预测具体月份。')).toBeInTheDocument()
+  })
+
+  it('财富v3把跨年相同的正文合并展示一次并标出适用年份', async () => {
+    const repeated = {
+      income: '这三年的进账判断相同，不需要逐年再说一遍。',
+      retention: '这三年的留钱判断相同。',
+      risk: '这三年的提醒相同。',
+      observation: '这三年的观察事项相同。',
+      action: '这三年的行动建议相同。',
+    }
+    vi.mocked(getReport).mockResolvedValue({
+      ...wealthV4Report,
+      content: {
+        ...wealthV4Report.content,
+        copyVersion: 'wealth-plain-v3.14',
+        years: wealthV4Report.content.years.map((year) => ({
+          ...year,
+          income: [wealthBlock(`${year.year}.income`, repeated.income, [year.year])],
+          retention: wealthBlock(`${year.year}.retention`, repeated.retention, [year.year]),
+          risk: {
+            path: 'retention',
+            limitingEvidenceIds: [`${year.year}.risk`],
+            reading: wealthBlock(`${year.year}.risk`, repeated.risk, [year.year]),
+          },
+          observations: [{
+            ...wealthBlock(`${year.year}.observation`, repeated.observation, [year.year]),
+            kind: 'observation' as const,
+          }],
+          actions: [{
+            ...wealthBlock(`${year.year}.action`, repeated.action, [year.year]),
+            kind: 'general_advice' as const,
+          }],
+        })),
+      },
+    } as WealthV3SavedReport)
+    renderReader()
+
+    await screen.findByText(repeated.income)
+    for (const text of Object.values(repeated)) {
+      expect(screen.getAllByText(text)).toHaveLength(1)
+    }
+    expect(screen.getAllByText('适用于 2026、2027、2028 年')).toHaveLength(5)
+  })
+
+  it('财富v3.5及更早的历史报告保持生成时的逐年展示方式', async () => {
+    const historicalText = '这是历史报告生成时保存的留钱判断。'
+    vi.mocked(getReport).mockResolvedValue({
+      ...wealthV4Report,
+      content: {
+        ...wealthV4Report.content,
+        copyVersion: 'wealth-plain-v3.5',
+        years: wealthV4Report.content.years.map((year) => ({
+          ...year,
+          retention: wealthBlock(`${year.year}.retention`, historicalText, [year.year]),
+        })),
+      },
+    } as WealthV3SavedReport)
+    renderReader()
+
+    expect(await screen.findAllByText(historicalText)).toHaveLength(3)
+    expect(screen.queryByText('适用于 2026、2027、2028 年')).not.toBeInTheDocument()
   })
 
   it('财富v3没有负向依据时不渲染提醒卡片或空占位', async () => {

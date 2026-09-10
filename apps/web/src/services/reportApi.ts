@@ -219,7 +219,7 @@ export interface WealthComparisonV3 {
 }
 
 export interface WealthHeadlineMetaV3 {
-  plannerVersion: 'wealth-headline-v1'
+  plannerVersion: 'wealth-headline-v1' | 'wealth-headline-v2' | 'wealth-headline-v3'
   themeKey: string
   pathKey: WealthPathV3
   subjectKey: string
@@ -252,8 +252,8 @@ export interface WealthContentV3 {
   horizonYears: 3
   calculationVersion: 'wealth-path-v2'
   policyVersion: 'wealth-expression-v1'
-  copyVersion: 'wealth-plain-v3' | 'wealth-plain-v3.1' | 'wealth-plain-v3.2' | 'wealth-plain-v3.3' | 'wealth-plain-v3.4' | 'wealth-plain-v3.5'
-  headlinePlannerVersion?: 'wealth-headline-v1'
+  copyVersion: 'wealth-plain-v3' | 'wealth-plain-v3.1' | 'wealth-plain-v3.2' | 'wealth-plain-v3.3' | 'wealth-plain-v3.4' | 'wealth-plain-v3.5' | 'wealth-plain-v3.6' | 'wealth-plain-v3.7' | 'wealth-plain-v3.8' | 'wealth-plain-v3.9' | 'wealth-plain-v3.10' | 'wealth-plain-v3.11' | 'wealth-plain-v3.12' | 'wealth-plain-v3.13' | 'wealth-plain-v3.14' | 'wealth-plain-v3.15' | 'wealth-plain-v3.16'
+  headlinePlannerVersion?: 'wealth-headline-v1' | 'wealth-headline-v2' | 'wealth-headline-v3'
   thesis: WealthBlockV3
   summary: WealthBlockV3
   pathSummaries: Array<{

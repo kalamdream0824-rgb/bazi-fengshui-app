@@ -35,18 +35,25 @@ public final class WealthTimelinePlanner {
     WealthAssessment presentAssessment = assessment(presentYear);
     WealthAssessment.Decision presentDecision = decision(presentAssessment, presentPath);
     WealthAssessment.Decision retention = decision(presentAssessment, "retention");
+    WealthSemanticClaim presentClaim = new WealthSemanticClaimResolver()
+        .resolve(presentAssessment, presentPath);
+    String styleSeed = content.thesis().text();
 
     List<NarrativeTimeline.FutureStep> future = new ArrayList<>();
     String previousActionPath = null;
     for (int index = 1; index < content.years().size(); index++) {
       WealthNarrativeV3.Year year = content.years().get(index);
-      WealthNarrativeV3.Block selected = selectAction(year.actions(), previousActionPath);
+      WealthNarrativeV3.Block selected = selectAction(year.actions(), previousActionPath, year);
       String path = actionPath(selected);
+      List<WealthAssessment.Decision> actionDecisions = decisionsFor(selected, year);
+      WealthAssessment.Decision actionDecision = actionDecisions.get(0);
+      WealthSemanticClaim actionClaim = new WealthSemanticClaimResolver()
+          .resolve(assessment(year), actionDecision.path());
       future.add(new NarrativeTimeline.FutureStep(
           year.year(),
-          futureHeadline(year.year(), path, index - 1),
-          futureAction(path, index - 1),
-          evidenceKeys(assessment(year), decisionsFor(selected, year))));
+          new WealthSemanticClaimWriter().futureHeadline(actionClaim, styleSeed),
+          new WealthSemanticClaimWriter().action(actionClaim, index - 1, styleSeed),
+          evidenceKeys(assessment(year), actionDecisions)));
       previousActionPath = path;
     }
 
@@ -54,9 +61,9 @@ public final class WealthTimelinePlanner {
         past,
         new NarrativeTimeline.PresentReading(
             presentYear.year(),
-            presentHeadline(presentPath),
-            presentJudgment(presentDecision),
-            presentPriority(presentPath, retention),
+            new WealthSemanticClaimWriter().presentHeadline(presentClaim, styleSeed),
+            presentJudgment(presentClaim, styleSeed),
+            presentPriority(presentClaim, retention, styleSeed),
             evidenceKeys(presentAssessment, distinctDecisions(presentDecision, retention))),
         future);
     return new NarrativeTimelineValidator(CORE_PHRASES).validate(timeline);
@@ -82,61 +89,45 @@ public final class WealthTimelinePlanner {
     return selected.path();
   }
 
-  private String presentHeadline(String path) {
-    return switch (path) {
-      case "stable_income" -> "今年先看持续进账能否稳定到账";
-      case "skill_income" -> "今年先看增加投入后进账是否同步变化";
-      case "project_income" -> "今年先看预计进账能否按时到账";
-      case "cooperation_income" -> "今年先看与他人有关的钱能否分清责任";
-      case "retention" -> "今年先看每月结余有没有真正增加";
-      default -> throw new IllegalArgumentException("unknown wealth path: " + path);
-    };
+  private String presentJudgment(WealthSemanticClaim claim, String styleSeed) {
+    var writer = new WealthSemanticClaimWriter();
+    return "今年，" + writer.conclusion(claim, styleSeed + "\u0000present") + "；"
+        + writer.check(claim, styleSeed + "\u0000present") + "。";
   }
 
-  private String presentJudgment(WealthAssessment.Decision decision) {
-    String object = switch (decision.path()) {
-      case "stable_income" -> "持续进账";
-      case "skill_income" -> "投入回报";
-      case "project_income" -> "到账节奏";
-      case "cooperation_income" -> "资金责任";
-      case "retention" -> "把钱留下";
-      default -> throw new IllegalArgumentException("unknown wealth path: " + decision.path());
-    };
-    return switch (decision.stance()) {
-      case "supportive" -> object + ("pronounced".equals(decision.strength())
-          ? "是今年更值得认真经营的方向。"
-          : "今年可以尝试，但不要提前高估。");
-      case "mixed" -> object + "有机会，同时要把成本和变动算进去。";
-      case "restricted" -> object + "今年限制较多，不宜先按理想结果花钱。";
-      case "quiet" -> "今年没有哪种进账方式明显领先，不要只押一个方向。";
-      default -> throw new IllegalArgumentException("unknown wealth stance: " + decision.stance());
-    };
-  }
-
-  private String presentPriority(String path, WealthAssessment.Decision retention) {
-    String first = switch (path) {
-      case "stable_income" -> "先核对每月到账日期和中断可能";
-      case "skill_income" -> "先比较投入增加前后的实际进账";
-      case "project_income" -> "先核对预计到账和实际到账的差距";
-      case "cooperation_income" -> "先核对共同用钱时的用途和各自责任";
-      case "retention" -> "先把固定开销和新增投入分开记录";
-      default -> throw new IllegalArgumentException("unknown wealth path: " + path);
-    };
+  private String presentPriority(WealthSemanticClaim claim, WealthAssessment.Decision retention,
+      String styleSeed) {
+    String first = new WealthSemanticClaimWriter()
+        .check(claim, styleSeed + "\u0000priority");
     return retention.limitationWeight() > 0
-        ? first + "，再留出一部分钱应对变化。"
-        : first + "，再看每月实际结余。";
+        ? "先" + first + "，然后从已到账的钱里预留日常开销，避免临时支出压低实际结余。"
+        : "先" + first + "，月底再核对实际留下多少钱。";
   }
 
   private WealthNarrativeV3.Block selectAction(
       List<WealthNarrativeV3.Block> actions,
-      String previousPath) {
+      String previousPath,
+      WealthNarrativeV3.Year year) {
     if (actions.isEmpty()) throw new IllegalArgumentException("wealth future year requires an action");
+    List<WealthNarrativeV3.Block> traceable = actions.stream()
+        .filter(action -> actionHasEvidence(action, year))
+        .toList();
+    if (traceable.isEmpty()) {
+      throw new IllegalArgumentException("wealth future year requires an evidence-backed action");
+    }
     if (previousPath != null) {
-      for (WealthNarrativeV3.Block action : actions) {
+      for (WealthNarrativeV3.Block action : traceable) {
         if (!previousPath.equals(actionPath(action))) return action;
       }
     }
-    return actions.get(0);
+    return traceable.get(0);
+  }
+
+  private boolean actionHasEvidence(WealthNarrativeV3.Block action, WealthNarrativeV3.Year year) {
+    return year.decisions().stream()
+        .filter(decision -> action.decisionIds().contains(decision.id()))
+        .anyMatch(decision -> !decision.supportingEvidenceIds().isEmpty()
+            || !decision.limitingEvidenceIds().isEmpty());
   }
 
   private String actionPath(WealthNarrativeV3.Block action) {
@@ -147,48 +138,6 @@ public final class WealthTimelinePlanner {
     int marker = id.indexOf(".decision.");
     if (marker < 0) throw new IllegalArgumentException("invalid wealth action decision id: " + id);
     return id.substring(marker + ".decision.".length());
-  }
-
-  private String futureHeadline(int year, String path, int index) {
-    return switch (path) {
-      case "stable_income" -> index == 0
-          ? year + "年先确认持续到账"
-          : year + "年再准备进账中断时的安排";
-      case "skill_income" -> index == 0
-          ? year + "年先比较投入与实际进账"
-          : year + "年再减少回报偏低的投入";
-      case "project_income" -> index == 0
-          ? year + "年先核对预计到账时间"
-          : year + "年再检查到账延后的影响";
-      case "cooperation_income" -> index == 0
-          ? year + "年先分清共同用钱的责任"
-          : year + "年再核对额外责任是否增加";
-      case "retention" -> index == 0
-          ? year + "年先给日常开支设上限"
-          : year + "年再核对实际收支记录";
-      default -> throw new IllegalArgumentException("unknown wealth path: " + path);
-    };
-  }
-
-  private String futureAction(String path, int index) {
-    return switch (path) {
-      case "stable_income" -> index == 0
-          ? "把每月到账日期和可能中断的情况列清楚。"
-          : "提前留出进账暂停时能覆盖日常开销的余钱。";
-      case "skill_income" -> index == 0
-          ? "把增加投入前后的进账放在一起比较，看实际回报有没有提高。"
-          : "减少长期占用时间、实际进账却没有增加的投入。";
-      case "project_income" -> index == 0
-          ? "把预计到账日期单独记下，并与实际到账日期进行核对。"
-          : "到账延后时，先减少非必要支出，避免打乱原有安排。";
-      case "cooperation_income" -> index == 0
-          ? "涉及共同用钱时，先写清金额、用途和各自承担的部分。"
-          : "共同开销发生后及时记录，避免责任一直说不清。";
-      case "retention" -> index == 0
-          ? "给日常必需开支和新增投入分别设一个上限。"
-          : "每月结束后核对实际进账和支出，再决定下月花多少。";
-      default -> throw new IllegalArgumentException("unknown wealth path: " + path);
-    };
   }
 
   private List<WealthAssessment.Decision> decisionsFor(

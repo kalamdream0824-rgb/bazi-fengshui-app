@@ -22,24 +22,32 @@ public final class ReportAnalysis {
       Map.entry("辰", "土"), Map.entry("巳", "火"), Map.entry("午", "火"), Map.entry("未", "土"),
       Map.entry("申", "金"), Map.entry("酉", "金"), Map.entry("戌", "土"), Map.entry("亥", "水"));
   private static final Map<String, String> SHENG = Map.of("木", "火", "火", "土", "土", "金", "金", "水", "水", "木");
+  private static final Map<String, String> PILLAR_LABELS = Map.of(
+      "year", "年支", "month", "月支", "day", "日支", "time", "时支");
 
   private final PaipanRequest request;
   private final PaipanResultDto result;
   private final Map<String, ReportEvidence> facts;
   private final double wangShuaiScore;
   private final String wangShuaiLevel;
+  private final double rootedSupportScore;
+  private final WeakSupportProfile weakSupportProfile;
 
   private ReportAnalysis(
       PaipanRequest request,
       PaipanResultDto result,
       Map<String, ReportEvidence> facts,
       double wangShuaiScore,
-      String wangShuaiLevel) {
+      String wangShuaiLevel,
+      double rootedSupportScore,
+      WeakSupportProfile weakSupportProfile) {
     this.request = request;
     this.result = result;
     this.facts = facts;
     this.wangShuaiScore = wangShuaiScore;
     this.wangShuaiLevel = wangShuaiLevel;
+    this.rootedSupportScore = rootedSupportScore;
+    this.weakSupportProfile = weakSupportProfile;
   }
 
   public static ReportAnalysis from(PaipanRequest request, PaipanResultDto result) {
@@ -50,6 +58,9 @@ public final class ReportAnalysis {
     PillarDto day = result.pillars().get("day");
     String dayElement = GAN_WUXING.getOrDefault(day.gan(), "未识别");
     Score balance = scoreBalance(result, dayElement);
+    Score rootedSupport = scoreRootedSupport(result, dayElement, balance.score);
+    WeakSupportProfile weakSupportProfile = weakSupportProfile(
+        result, dayElement, balance.level);
     String elementCounts = "木" + result.wuXing().getOrDefault("mu", 0)
         + "、火" + result.wuXing().getOrDefault("huo", 0)
         + "、土" + result.wuXing().getOrDefault("tu", 0)
@@ -85,6 +96,9 @@ public final class ReportAnalysis {
     put(facts, "sanYuan", "辅助坐标", "胎元" + result.taiYuan() + "、命宫" + result.mingGong() + "、身宫" + result.shenGong());
     put(facts, "elements", "五行计数", elementCounts);
     put(facts, "balance", "旺衰粗判", balance.level + "（" + formatScore(balance.score) + "分；" + String.join("；", balance.reasons) + "）");
+    put(facts, "rootedSupport", "根气影子评分",
+        formatScore(rootedSupport.score) + "分（" + String.join("；", rootedSupport.reasons) + "）");
+    put(facts, "weakSupportProfile", "偏弱内部状态", weakSupportProfile.label());
     put(facts, "monthCommand", "月令", result.pillars().get("month").zhi() + "（" + ZHI_WUXING.get(result.pillars().get("month").zhi()) + "）");
     put(facts, "currentDayun", "当前大运", current == null ? "暂无" : current.ganZhi() + "，" + current.yearRange() + "，天干十神" + current.shiShen());
     put(facts, "nextDayun", "下一步大运", next == null ? "暂无" : next.ganZhi() + "，" + next.yearRange() + "，天干十神" + next.shiShen());
@@ -93,7 +107,9 @@ public final class ReportAnalysis {
     put(facts, "combinations", "十神组合", combinations.isEmpty() ? "未命中预设组合" : String.join("、", combinations));
     put(facts, "dayHidden", "日支藏干", day.zhi() + "藏" + dayHidden + "；自坐" + day.ziZuo());
     put(facts, "structure", "结构摘要", day.gan() + "日主，" + balance.level + "，五行计数" + elementCounts);
-    return new ReportAnalysis(request, result, facts, balance.score, balance.level);
+    return new ReportAnalysis(
+        request, result, facts, balance.score, balance.level, rootedSupport.score,
+        weakSupportProfile);
   }
 
   public ReportEvidence fact(String key) {
@@ -122,6 +138,14 @@ public final class ReportAnalysis {
 
   public String wangShuaiLevel() {
     return wangShuaiLevel;
+  }
+
+  public double rootedSupportScore() {
+    return rootedSupportScore;
+  }
+
+  public WeakSupportProfile weakSupportProfile() {
+    return weakSupportProfile;
   }
 
   private static void put(Map<String, ReportEvidence> facts, String key, String label, String value) {
@@ -160,6 +184,55 @@ public final class ReportAnalysis {
       }
     }
     return new Score(score, score >= 4 ? "偏强" : score <= 1.5 ? "偏弱" : "中和", reasons);
+  }
+
+  private static Score scoreRootedSupport(
+      PaipanResultDto result, String dayElement, double baseScore) {
+    double score = baseScore;
+    List<String> reasons = new ArrayList<>();
+    reasons.add("基础粗分" + formatScore(baseScore));
+    for (String key : List.of("year", "month", "day", "time")) {
+      PillarDto pillar = result.pillars().get(key);
+      if (supports(dayElement, ZHI_WUXING.get(pillar.zhi()))) {
+        continue;
+      }
+      String hiddenRoot = pillar.hideGan().stream()
+          .map(HideGanDto::gan)
+          .filter(gan -> supports(dayElement, GAN_WUXING.get(gan)))
+          .findFirst()
+          .orElse(null);
+      if (hiddenRoot != null) {
+        score = Math.round((score + 0.1) * 10.0) / 10.0;
+        reasons.add(PILLAR_LABELS.get(key) + pillar.zhi() + "藏" + hiddenRoot + "二级根气+0.1");
+      }
+    }
+    return new Score(score, "影子评分", reasons);
+  }
+
+  private static WeakSupportProfile weakSupportProfile(
+      PaipanResultDto result,
+      String dayElement,
+      String balanceLevel) {
+    if (!"偏弱".equals(balanceLevel)) return WeakSupportProfile.NOT_WEAK;
+
+    int directRoots = 0;
+    int hiddenRoots = 0;
+    for (String key : List.of("year", "month", "day", "time")) {
+      PillarDto pillar = result.pillars().get(key);
+      if (supports(dayElement, ZHI_WUXING.get(pillar.zhi()))) directRoots++;
+      else if (pillar.hideGan().stream()
+          .map(HideGanDto::gan)
+          .map(GAN_WUXING::get)
+          .anyMatch(element -> supports(dayElement, element))) hiddenRoots++;
+    }
+    if (directRoots == 0 && hiddenRoots == 0) return WeakSupportProfile.ROOTLESS;
+
+    boolean visibleResource = List.of("year", "month", "time").stream()
+        .map(key -> GAN_WUXING.get(result.pillars().get(key).gan()))
+        .anyMatch(element -> dayElement.equals(SHENG.get(element)));
+    return directRoots > 0 && visibleResource
+        ? WeakSupportProfile.ROOTED_WITH_VISIBLE_RESOURCE
+        : WeakSupportProfile.ROOTED;
   }
 
   private static boolean supports(String dayElement, String otherElement) {

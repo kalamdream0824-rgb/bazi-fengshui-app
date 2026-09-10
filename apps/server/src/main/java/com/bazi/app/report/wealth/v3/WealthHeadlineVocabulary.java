@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 /** Closed semantic and copy catalog for deterministic annual wealth headlines. */
 public final class WealthHeadlineVocabulary {
-  public static final String VERSION = "wealth-headline-v1";
+  public static final String VERSION = "wealth-headline-v3";
 
   private static final List<Entry> ENTRIES = List.of(
       entry(10, "stable_receipt_support", "stable_income", "stable_receipt", "support",
@@ -174,90 +174,138 @@ public final class WealthHeadlineVocabulary {
     return ENTRIES.stream().filter(entry -> entry.pathKey().equals(pathKey) && entry.stance().equals(stance)).toList();
   }
 
+  public static Entry entry(String themeKey) {
+    return ENTRIES.stream().filter(entry -> entry.themeKey().equals(themeKey)).findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("unknown wealth headline theme: " + themeKey));
+  }
+
   private static Entry entry(int order, String themeKey, String pathKey, String subjectKey,
       String angleKey, String objectKey, String objectText, String corePhraseKey,
       String stance, String text) {
+    String neutralObject = neutralObject(pathKey, order);
+    WealthHeadlineSentenceSpec sentenceSpec = sentenceSpec(themeKey, stance, neutralObject);
     return new Entry(order, themeKey, pathKey, subjectKey, angleKey, objectKey,
-        neutralObject(pathKey, order), List.of(corePhraseKey), stance,
-        neutralText(pathKey, stance, order));
+        neutralObject, List.of(corePhraseKey), stance, sentenceSpec,
+        new WealthHeadlineSentenceWriter().write(sentenceSpec));
   }
 
   private static String neutralObject(String pathKey, int order) {
-    int variant = order % 10;
-    return switch (pathKey) {
-      case "stable_income" -> List.of("进账是否持续", "进账中断的可能", "日常支出承受力").get(variant);
-      case "skill_income" -> List.of("投入增加后的进账", "时间投入", "实际回报").get(variant);
-      case "project_income" -> List.of("预计到账时间", "实际到账情况", "到账后的结余").get(variant);
-      case "cooperation_income" -> List.of("共同用钱的责任", "涉及他人的资金安排", "额外承担的开销").get(variant);
-      case "retention" -> List.of("存钱目标", "每次留下的钱", "实际可存比例").get(variant);
+    int variant = switch (pathKey) {
+      case "stable_income" -> ((order - 10) / 10) * 3 + order % 10;
+      case "skill_income" -> ((order - 40) / 10) * 3 + order % 10;
+      case "project_income" -> ((order - 70) / 10) * 3 + order % 10;
+      case "cooperation_income" -> ((order - 100) / 10) * 3 + order % 10;
+      case "retention" -> ((order - 130) / 10) * 3 + order % 10;
       default -> throw new IllegalArgumentException("unknown wealth headline path: " + pathKey);
     };
-  }
-
-  private static String neutralText(String pathKey, String stance, int order) {
-    String subject = neutralSubject(pathKey, order);
-    String object = neutralObject(pathKey, order);
-    return switch (stance) {
-      case "supportive" -> switch (order % 10) {
-        case 0 -> subject + "出现较多有利条件，先核对" + object + "。";
-        case 1 -> subject + "值得重点留意，同时记录" + object + "。";
-        case 2 -> subject + "有改善空间，可以观察" + object + "是否变化。";
-        default -> throw new IllegalArgumentException("unknown wealth headline variant");
-      };
-      case "mixed" -> switch (order % 10) {
-        case 0 -> subject + "有改善空间也有变数，先核对" + object + "。";
-        case 1 -> subject + "好坏条件同时出现，重点看" + object + "。";
-        case 2 -> subject + "不能只看进账增加，还要检查" + object + "。";
-        default -> throw new IllegalArgumentException("unknown wealth headline variant");
-      };
-      case "restricted" -> switch (order % 10) {
-        case 0 -> subject + "受到的限制较多，先控制" + object + "。";
-        case 1 -> subject + "存在较明显变数，暂缓增加" + object + "。";
-        case 2 -> subject + "需要多留余地，优先准备" + object + "。";
-        default -> throw new IllegalArgumentException("unknown wealth headline variant");
-      };
-      default -> throw new IllegalArgumentException("unknown wealth headline stance: " + stance);
-    };
-  }
-
-  private static String neutralSubject(String pathKey, int order) {
-    int firstGroup = switch (pathKey) {
-      case "stable_income" -> 1;
-      case "skill_income" -> 4;
-      case "project_income" -> 7;
-      case "cooperation_income" -> 10;
-      case "retention" -> 13;
-      default -> throw new IllegalArgumentException("unknown wealth headline path: " + pathKey);
-    };
-    int variant = (order / 10 - firstGroup) * 3 + order % 10;
     return switch (pathKey) {
       case "stable_income" -> List.of(
-          "进账持续性", "进账延续情况", "日常支出承受力",
-          "进账稳定程度", "到账间隔变化", "长期花费基础",
-          "进账中断风险", "可用资金缓冲", "长期支出余地").get(variant);
+          "每笔钱实际到手的日期", "连续收钱有无中断", "现有收入可支付的日常开销",
+          "主要进账所占比例", "进账暂停时的可用余钱", "进账是否过度集中",
+          "新增固定支出金额", "长期支出的总额", "可用余钱能够维持多久").get(variant);
       case "skill_income" -> List.of(
-          "投入与回报", "时间投入变化", "实际进账变化",
-          "忙碌与收益", "新增投入结果", "投入后的结余",
-          "投入负担", "时间占用", "低回报投入").get(variant);
+          "相同投入能否再次产生进账", "每份投入对应的进账", "同类投入持续带来回报的次数",
+          "新增投入占用的时间", "现在还能投入多少时间", "扣除花费后的实际结余",
+          "时间和花费的总投入", "同时增加的投入数量", "新增物品花费").get(variant);
       case "project_income" -> List.of(
-          "到账节奏", "预计与实际到账", "到账后的结余",
-          "进账时间变化", "资金等待期", "花费安排",
-          "到账延后风险", "提前支出压力", "资金周转余地").get(variant);
+          "预计与实际到账日期", "账面金额最后能用的数额", "扣除相关花费后的结余",
+          "首次投入的金额", "约定与实际到账的差距", "相关花费的最高金额",
+          "尚未到账的金额", "首次到账所占比例", "后续增加的投入").get(variant);
       case "cooperation_income" -> List.of(
-          "资金责任", "与他人有关的钱", "额外开销责任",
-          "共同用钱边界", "资金用途约定", "责任分配",
-          "共同支出风险", "额外承担部分", "资金安排余地").get(variant);
+          "各自分得的金额", "共同用钱的事前约定", "最后各自收到的金额",
+          "共同承担的开销", "各自负责的部分", "由谁先承担支出",
+          "分配金额与额外开销", "写下来的资金约定", "停止共同安排的成本").get(variant);
       case "retention" -> List.of(
-          "收支结余", "最后留下的钱", "实际可存比例",
-          "进账与支出差距", "临时开销余地", "收支记录",
-          "固定支出压力", "必需开支保障", "应急余钱").get(variant);
-      default -> throw new IllegalStateException("unreachable wealth headline path");
+          "每月存下的目标金额", "每次进账后先留下多少", "实际可以留下的比例",
+          "日常开销的最高金额", "临时开销预留的金额", "每月进账与支出记录",
+          "每月固定支出的总额", "必需开支的实际金额", "应急余钱能维持多久").get(variant);
+      default -> throw new IllegalArgumentException("unknown wealth headline path: " + pathKey);
     };
+  }
+
+  private static WealthHeadlineSentenceSpec sentenceSpec(
+      String themeKey, String stance, String object) {
+    return switch (themeKey) {
+      case "stable_receipt_support" -> spec("今年收到钱的日期", stance, "较可能保持规律", "", "记下" + object);
+      case "stable_continuity_support" -> spec("今年连续收钱的状态", stance, "较可能延续", "", "查看" + object);
+      case "stable_coverage_support" -> spec("今年可用于日常开支的钱", stance, "较可能增多", "", "计算" + object);
+      case "stable_source_balance" -> spec("今年持续进账", stance, "有保持稳定的机会",
+          "过度依赖单一来源会放大中断影响", "核对" + object);
+      case "stable_buffer_balance" -> spec("今年进账", stance, "有延续机会",
+          "到账时间仍可能波动", "确认" + object);
+      case "stable_client_balance" -> spec("今年长期进账", stance, "有保持稳定的机会",
+          "集中在少数来源时更容易波动", "核对" + object);
+      case "stable_expense_control" -> spec("今年持续进账", stance, "更容易出现中断", "", "核对" + object);
+      case "stable_commitment_control" -> spec("今年长期进账", stance, "稳定性不足", "", "确认" + object);
+      case "stable_reserve_control" -> spec("今年可用资金", stance, "需要更多缓冲", "", "评估" + object);
+
+      case "skill_repeat_payment" -> spec("今年新增投入带来的收入", stance, "较可能同步提高", "", "比较" + object);
+      case "skill_pricing_support" -> spec("今年时间与收入的对应关系", stance, "更容易看清", "", "记录" + object);
+      case "skill_returning_customer" -> spec("今年同类付出得到的回报", stance, "更容易确认", "", "统计" + object);
+      case "skill_time_balance" -> spec("今年增加投入", stance, "可能带来更多进账",
+          "占用的时间也会增加", "记录" + object);
+      case "skill_capacity_balance" -> spec("今年投入机会", stance, "可能增加",
+          "可用时间可能不足", "核对" + object);
+      case "skill_margin_balance" -> spec("今年实际进账", stance, "可能提高",
+          "投入成本也会增加", "核对" + object);
+      case "skill_service_cost" -> spec("今年增加投入后的实际结余", stance, "未必同步增加", "", "比较" + object);
+      case "skill_workload_control" -> spec("今年可投入的时间", stance, "更容易吃紧", "", "记录" + object);
+      case "skill_equipment_control" -> spec("今年新增投入", stance, "回收速度可能较慢", "", "核对" + object);
+
+      case "project_payment_timing" -> spec("今年预计收到的钱", stance, "较可能按计划到手", "", "比较" + object);
+      case "project_actual_receipt" -> spec("今年账面金额", stance, "更容易真正收到", "", "记录" + object);
+      case "project_net_receipt" -> spec("今年到账后的实际结余", stance, "更容易看清", "", "计算" + object);
+      case "project_small_trial" -> spec("今年首次投入", stance, "可能换来额外进账",
+          "最后收到的金额仍可能波动", "用小额尝试核对" + object);
+      case "project_terms_balance" -> spec("今年预计进账", stance, "有实现机会",
+          "实际到账仍可能延后", "记录" + object);
+      case "project_budget_balance" -> spec("今年额外进账", stance, "可能增加",
+          "相关支出也会增加", "计算" + object);
+      case "project_pending_cash" -> spec("今年预计进账", stance, "更容易延后", "", "核对" + object);
+      case "project_deposit_control" -> spec("今年实际到账", stance, "稳定性不足", "", "记录" + object);
+      case "project_scope_control" -> spec("今年新增投入", stance, "更容易超出原有安排", "", "核对" + object);
+
+      case "cooperation_profit_split" -> spec("今年共同安排的钱", stance, "更容易形成清楚结果", "", "写清" + object);
+      case "cooperation_agreement_support" -> spec("今年涉及他人的资金安排", stance, "更容易按约定执行", "", "核对" + object);
+      case "cooperation_actual_split" -> spec("今年共同资金的结果", stance, "更容易完成分配", "", "记录" + object);
+      case "cooperation_shared_expense" -> spec("今年一起安排资金", stance, "能让用钱更方便",
+          "同时可能增加责任和花费", "写清" + object);
+      case "cooperation_responsibility" -> spec("今年与他人有关的资金责任", stance, "可能增多",
+          "负责范围容易说不清", "列出" + object);
+      case "cooperation_advance_cost" -> spec("今年共同安排支出", stance, "可能更频繁",
+          "一方先垫付会增加压力", "记录" + object);
+      case "cooperation_cost_risk" -> spec("今年分配共同资金", stance, "较容易出现分歧", "", "逐项写清" + object);
+      case "cooperation_written_split" -> spec("今年涉及他人的资金", stance, "更容易因约定不清而延后", "", "记录" + object);
+      case "cooperation_exit_cost" -> spec("今年共同资金安排", stance, "稳定性不足", "", "算清" + object);
+
+      case "retention_savings_goal" -> spec("今年实际结余", stance, "更容易增加", "", "设定" + object);
+      case "retention_fixed_saving" -> spec("今年每次进账后留下的钱", stance, "更容易保持稳定", "", "记录" + object);
+      case "retention_saving_ratio" -> spec("今年实际可存比例", stance, "更容易提高", "", "计算" + object);
+      case "retention_expense_limit" -> spec("今年月底能留下的钱", stance, "可能增多",
+          "新增花费也可能消耗结余", "设好" + object);
+      case "retention_variable_spending" -> spec("今年存钱进度", stance, "有改善机会",
+          "零散花费也会增加", "确认" + object);
+      case "retention_cashflow_record" -> spec("今年收支差额", stance, "可能扩大",
+          "花出去的钱也可能变多", "检查" + object);
+      case "retention_fixed_spending" -> spec("今年实际结余", stance, "更容易被固定支出压缩", "", "重新核对" + object);
+      case "retention_essential_spending" -> spec("今年每月可用的钱", stance, "受到必要开支限制", "", "保证" + object);
+      case "retention_emergency_reserve" -> spec("今年支出压力", stance, "更容易增加", "", "按" + object + "留出应急余量");
+      default -> throw new IllegalArgumentException("unknown wealth headline theme: " + themeKey);
+    };
+  }
+
+  private static WealthHeadlineSentenceSpec spec(
+      String subject,
+      String tone,
+      String judgment,
+      String limitation,
+      String verification) {
+    return new WealthHeadlineSentenceSpec(subject, tone, judgment, limitation, verification);
   }
 
   public record Entry(int catalogOrder, String themeKey, String pathKey, String subjectKey,
       String angleKey, String objectKey, String objectText, List<String> corePhraseKeys,
-      String stance, String text) {
+      String stance, WealthHeadlineSentenceSpec sentenceSpec, String text) {
     public Entry {
       corePhraseKeys = List.copyOf(corePhraseKeys);
     }

@@ -260,8 +260,8 @@ class SavedReportIntegrationTest {
         .andExpect(jsonPath("$.content.timeline.future.length()").value(2))
         .andExpect(jsonPath("$.content.calculationVersion").value("wealth-path-v2"))
         .andExpect(jsonPath("$.content.policyVersion").value("wealth-expression-v1"))
-        .andExpect(jsonPath("$.content.copyVersion").value("wealth-plain-v3.5"))
-        .andExpect(jsonPath("$.content.headlinePlannerVersion").value("wealth-headline-v1"))
+        .andExpect(jsonPath("$.content.copyVersion").value("wealth-plain-v3.16"))
+        .andExpect(jsonPath("$.content.headlinePlannerVersion").value("wealth-headline-v3"))
         .andExpect(jsonPath("$.content.pathSummaries.length()").value(5))
         .andExpect(jsonPath("$.content.years.length()").value(3))
         .andExpect(jsonPath("$.content.years[0].facts").isArray())
@@ -291,7 +291,7 @@ class SavedReportIntegrationTest {
         .put("asOf", asOf.toString())
         .put("calculationVersion", "wealth-path-v2")
         .put("policyVersion", "wealth-expression-v1")
-        .put("copyVersion", "wealth-plain-v3.5");
+        .put("copyVersion", "wealth-plain-v3.16");
     assertEquals(expectedContext, objectMapper.readTree(stored.getContextJson()));
 
     MvcResult read = mvc.perform(get("/api/v1/reports/{id}", id)

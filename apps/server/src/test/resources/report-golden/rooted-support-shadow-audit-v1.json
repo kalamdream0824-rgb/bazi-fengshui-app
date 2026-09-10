@@ -1,0 +1,155 @@
+{
+  "sampleCount": 12,
+  "uniqueChartCount": 11,
+  "projectionOnly": true,
+  "scoreChangedCount": 7,
+  "projectedCrossBandCount": 1,
+  "minimumPotentiallyAffectedTopicYears": 10,
+  "maximumPotentiallyAffectedTopicYears": 11,
+  "averageDelta": 0.092,
+  "maxDelta": 0.3,
+  "servingLevelDistribution": {
+    "偏弱": 1,
+    "中和": 6,
+    "偏强": 5
+  },
+  "projectedLevelDistribution": {
+    "偏弱": 0,
+    "中和": 7,
+    "偏强": 5
+  },
+  "cases": [
+    {
+      "id": "R01",
+      "pillars": "乙亥·乙酉·壬申·丁未",
+      "servingScore": 4.0,
+      "rootedSupportScore": 4.0,
+      "delta": 0.0,
+      "servingLevel": "偏强",
+      "projectedLevel": "偏强",
+      "projectedCrossBand": false,
+      "evidence": "4分（基础粗分4）"
+    },
+    {
+      "id": "R02",
+      "pillars": "乙亥·乙酉·壬申·丁未",
+      "servingScore": 4.0,
+      "rootedSupportScore": 4.0,
+      "delta": 0.0,
+      "servingLevel": "偏强",
+      "projectedLevel": "偏强",
+      "projectedCrossBand": false,
+      "evidence": "4分（基础粗分4）"
+    },
+    {
+      "id": "R03",
+      "pillars": "丁卯·癸丑·己丑·己巳",
+      "servingScore": 5.5,
+      "rootedSupportScore": 5.5,
+      "delta": 0.0,
+      "servingLevel": "偏强",
+      "projectedLevel": "偏强",
+      "projectedCrossBand": false,
+      "evidence": "5.5分（基础粗分5.5）"
+    },
+    {
+      "id": "R04",
+      "pillars": "戊辰·甲寅·己丑·丙子",
+      "servingScore": 3.5,
+      "rootedSupportScore": 3.6,
+      "delta": 0.1,
+      "servingLevel": "中和",
+      "projectedLevel": "中和",
+      "projectedCrossBand": false,
+      "evidence": "3.6分（基础粗分3.5；月支寅藏丙二级根气+0.1）"
+    },
+    {
+      "id": "R05",
+      "pillars": "壬申·丁未·乙未·己卯",
+      "servingScore": 1.5,
+      "rootedSupportScore": 1.8,
+      "delta": 0.3,
+      "servingLevel": "偏弱",
+      "projectedLevel": "中和",
+      "projectedCrossBand": true,
+      "evidence": "1.8分（基础粗分1.5；年支申藏壬二级根气+0.1；月支未藏乙二级根气+0.1；日支未藏乙二级根气+0.1）"
+    },
+    {
+      "id": "R06",
+      "pillars": "庚申·戊子·壬申·己酉",
+      "servingScore": 5.5,
+      "rootedSupportScore": 5.5,
+      "delta": 0.0,
+      "servingLevel": "偏强",
+      "projectedLevel": "偏强",
+      "projectedCrossBand": false,
+      "evidence": "5.5分（基础粗分5.5）"
+    },
+    {
+      "id": "R07",
+      "pillars": "乙卯·庚辰·壬子·壬寅",
+      "servingScore": 2.5,
+      "rootedSupportScore": 2.6,
+      "delta": 0.1,
+      "servingLevel": "中和",
+      "projectedLevel": "中和",
+      "projectedCrossBand": false,
+      "evidence": "2.6分（基础粗分2.5；月支辰藏癸二级根气+0.1）"
+    },
+    {
+      "id": "R08",
+      "pillars": "庚辰·戊子·甲子·甲子",
+      "servingScore": 5.0,
+      "rootedSupportScore": 5.1,
+      "delta": 0.1,
+      "servingLevel": "偏强",
+      "projectedLevel": "偏强",
+      "projectedCrossBand": false,
+      "evidence": "5.1分（基础粗分5；年支辰藏乙二级根气+0.1）"
+    },
+    {
+      "id": "R09",
+      "pillars": "庚午·乙酉·己丑·庚午",
+      "servingScore": 3.0,
+      "rootedSupportScore": 3.0,
+      "delta": 0.0,
+      "servingLevel": "中和",
+      "projectedLevel": "中和",
+      "projectedCrossBand": false,
+      "evidence": "3分（基础粗分3）"
+    },
+    {
+      "id": "R10",
+      "pillars": "丙午·辛卯·庚午·甲申",
+      "servingScore": 2.0,
+      "rootedSupportScore": 2.2,
+      "delta": 0.2,
+      "servingLevel": "中和",
+      "projectedLevel": "中和",
+      "projectedCrossBand": false,
+      "evidence": "2.2分（基础粗分2；年支午藏己二级根气+0.1；日支午藏己二级根气+0.1）"
+    },
+    {
+      "id": "R11",
+      "pillars": "甲申·甲戌·戊子·癸亥",
+      "servingScore": 2.0,
+      "rootedSupportScore": 2.1,
+      "delta": 0.1,
+      "servingLevel": "中和",
+      "projectedLevel": "中和",
+      "projectedCrossBand": false,
+      "evidence": "2.1分（基础粗分2；年支申藏戊二级根气+0.1）"
+    },
+    {
+      "id": "R12",
+      "pillars": "乙丑·壬午·庚子·辛巳",
+      "servingScore": 2.0,
+      "rootedSupportScore": 2.2,
+      "delta": 0.2,
+      "servingLevel": "中和",
+      "projectedLevel": "中和",
+      "projectedCrossBand": false,
+      "evidence": "2.2分（基础粗分2；月支午藏己二级根气+0.1；时支巳藏庚二级根气+0.1）"
+    }
+  ]
+}

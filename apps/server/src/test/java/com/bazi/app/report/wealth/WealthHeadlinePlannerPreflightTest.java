@@ -10,6 +10,7 @@ import com.bazi.app.report.wealth.v3.WealthAnnualComparator;
 import com.bazi.app.report.wealth.v3.WealthAnnualHeadlinePlanner;
 import com.bazi.app.report.wealth.v3.WealthAnnualHeadlinePlanner.Headline;
 import com.bazi.app.report.wealth.v3.WealthHeadlinePlanningException;
+import com.bazi.app.report.wealth.v3.WealthHeadlineVocabulary;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.nio.file.Files;
@@ -53,6 +54,16 @@ class WealthHeadlinePlannerPreflightTest {
     assertEquals(23, results.size());
     assertTrue(results.stream().flatMap(result -> result.headlines().stream())
         .allMatch(headline -> headline.objectKey() != null && !headline.objectKey().isBlank()));
+    assertTrue(results.stream().filter(Result::success).allMatch(result ->
+        result.headlines().stream().map(headline -> WealthHeadlineVocabulary
+            .entry(headline.themeKey()).sentenceSpec().verification()).distinct().count()
+            == result.headlines().size()),
+        () -> "Selected years collapse different themes into the same visible check object");
+    assertTrue(results.stream().filter(Result::success)
+        .allMatch(result -> result.textWarnings().isEmpty()),
+        () -> "Four-character headline fragments still repeat across years: "
+            + results.stream().filter(result -> !result.textWarnings().isEmpty())
+                .map(result -> result.id() + "=" + result.textWarnings()).toList());
 
     results.forEach(this::printCase);
     ObjectNode summary = summary(results);

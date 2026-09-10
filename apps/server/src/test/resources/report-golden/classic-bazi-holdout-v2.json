@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 2,
+  "purpose": "CLASSICAL_RULE_COMPATIBILITY_ONLY",
+  "accuracyEvidence": false,
+  "partition": "HOLDOUT",
+  "freezePolicy": "SOURCE_FIRST_NO_RETROACTIVE_RELABEL",
+  "notice": "隔离评估区在记录原文方向后才运行当前引擎。禁止为提高通过率而改写来源方向或移入校准区。",
+  "cases": [
+    {
+      "id": "ditiansui-winter-fire-day-root",
+      "partition": "HOLDOUT",
+      "captureOrder": "SOURCE_RECORDED_BEFORE_ENGINE_REVIEW",
+      "assertionScope": "STRUCTURAL_ONLY",
+      "source": {
+        "title": "滴天髓阐微",
+        "edition": "维基文库繁体转录本",
+        "locator": "通神论·官杀章，合官留杀格第三例",
+        "url": "https://zh.wikisource.org/wiki/滴天髓闡微",
+        "provenanceGrade": "C"
+      },
+      "canonicalInput": {
+        "gender": "male",
+        "pillars": ["戊申", "癸亥", "丙午", "壬辰"]
+      },
+      "classicalClaim": {
+        "paraphrase": "原文认为丙火虽坐午刃，但生于亥月仍属休囚。",
+        "mappingRationale": "与下一例比较火的支持位置；不检查原文记载的科名。"
+      },
+      "observedCurrentEngine": {
+        "balanceLevel": "偏弱",
+        "wangShuaiScore": 1.0
+      }
+    },
+    {
+      "id": "ditiansui-winter-fire-year-support",
+      "partition": "HOLDOUT",
+      "captureOrder": "SOURCE_RECORDED_BEFORE_ENGINE_REVIEW",
+      "assertionScope": "STRUCTURAL_ONLY",
+      "source": {
+        "title": "滴天髓阐微",
+        "edition": "维基文库繁体转录本",
+        "locator": "通神论·官杀章，合官留杀格第四例",
+        "url": "https://zh.wikisource.org/wiki/滴天髓闡微",
+        "provenanceGrade": "C"
+      },
+      "canonicalInput": {
+        "gender": "male",
+        "pillars": ["戊午", "癸亥", "丙戌", "壬辰"]
+      },
+      "classicalClaim": {
+        "paraphrase": "原文以年支午火帮助日主、命局无金为理由，认为本例结构稍胜前例。",
+        "mappingRationale": "期望粗分体现年支午火对冬生丙火的额外帮助；若仍与前例同分，应登记位置权重缺口。"
+      },
+      "observedCurrentEngine": {
+        "balanceLevel": "偏弱",
+        "wangShuaiScore": 1.0
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "id": "year-fire-support-should-outrank-replaced-day-fire",
+      "lowerCaseId": "ditiansui-winter-fire-day-root",
+      "higherCaseId": "ditiansui-winter-fire-year-support",
+      "metric": "wangShuaiScore",
+      "sourceExpectedRelation": "LOWER_THAN",
+      "observedEngineRelation": "EQUAL",
+      "engineCompatibility": "KNOWN_GAP",
+      "gapCode": "BALANCE_POSITION_WEIGHT_COLLISION",
+      "gapReason": "当前旺衰粗分把年支午火与日支午火都固定计为加一，未结合亥月、坐支和位置关系，因此两例同为1.0。"
+    }
+  ]
+}

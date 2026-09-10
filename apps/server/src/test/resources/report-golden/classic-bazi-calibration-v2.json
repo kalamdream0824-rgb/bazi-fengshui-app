@@ -1,0 +1,189 @@
+{
+  "schemaVersion": 2,
+  "purpose": "CLASSICAL_RULE_COMPATIBILITY_ONLY",
+  "accuracyEvidence": false,
+  "partition": "CALIBRATION",
+  "notice": "校准区只用于检查传统结构语义与当前规则的对应关系，不证明现实经历或预测准确。",
+  "cases": [
+    {
+      "id": "ditiansui-summer-fire-wet-earth",
+      "partition": "CALIBRATION",
+      "captureOrder": "SOURCE_RECORDED_BEFORE_ENGINE_REVIEW",
+      "assertionScope": "STRUCTURAL_ONLY",
+      "source": {
+        "title": "滴天髓阐微",
+        "edition": "维基文库繁体转录本",
+        "locator": "通神论·寒暖章，合官留杀格第一例",
+        "url": "https://zh.wikisource.org/wiki/滴天髓闡微",
+        "provenanceGrade": "C"
+      },
+      "canonicalInput": {
+        "gender": "male",
+        "pillars": ["癸丑", "戊午", "丙午", "壬辰"]
+      },
+      "classicalClaim": {
+        "paraphrase": "丑为湿土，原文认为它能缓和夏火，并保存部分金水条件。",
+        "mappingRationale": "只检查其旺衰粗分低于年支为巳的成对命例，不检查人生经历。"
+      },
+      "observedCurrentEngine": {
+        "balanceLevel": "中和",
+        "wangShuaiScore": 3.0
+      }
+    },
+    {
+      "id": "ditiansui-rentieqiao-summer-fire",
+      "partition": "CALIBRATION",
+      "captureOrder": "SOURCE_RECORDED_BEFORE_ENGINE_REVIEW",
+      "assertionScope": "STRUCTURAL_ONLY",
+      "source": {
+        "title": "滴天髓阐微",
+        "edition": "维基文库繁体转录本",
+        "locator": "通神论·寒暖章，任铁樵自造",
+        "url": "https://zh.wikisource.org/wiki/滴天髓闡微",
+        "provenanceGrade": "C"
+      },
+      "canonicalInput": {
+        "gender": "male",
+        "pillars": ["癸巳", "戊午", "丙午", "壬辰"]
+      },
+      "classicalClaim": {
+        "paraphrase": "年支换成巳后火势增强，金水条件比丑年支命例更弱。",
+        "mappingRationale": "只要求当前旺衰粗分相对上调，不声称复现合化、阳刃和经历判断。"
+      },
+      "observedCurrentEngine": {
+        "balanceLevel": "偏强",
+        "wangShuaiScore": 4.0
+      }
+    },
+    {
+      "id": "ditiansui-killing-print-rooted-seat",
+      "partition": "CALIBRATION",
+      "captureOrder": "SOURCE_RECORDED_BEFORE_ENGINE_REVIEW",
+      "assertionScope": "STRUCTURAL_ONLY",
+      "source": {
+        "title": "滴天髓阐微",
+        "edition": "维基文库繁体转录本",
+        "locator": "通神论·官杀章，杀重用印格第一例",
+        "url": "https://zh.wikisource.org/wiki/滴天髓闡微",
+        "provenanceGrade": "C"
+      },
+      "canonicalInput": {
+        "gender": "male",
+        "pillars": ["戊子", "甲寅", "戊午", "甲寅"]
+      },
+      "classicalClaim": {
+        "paraphrase": "原文强调日坐午火，使日主得到直接生扶，能够承受较重的官杀。",
+        "mappingRationale": "用旺衰粗分检查坐下午火提供的生扶是否高于下一例。"
+      },
+      "observedCurrentEngine": {
+        "balanceLevel": "中和",
+        "wangShuaiScore": 2.0
+      }
+    },
+    {
+      "id": "ditiansui-killing-print-wealth-seat",
+      "partition": "CALIBRATION",
+      "captureOrder": "SOURCE_RECORDED_BEFORE_ENGINE_REVIEW",
+      "assertionScope": "STRUCTURAL_ONLY",
+      "source": {
+        "title": "滴天髓阐微",
+        "edition": "维基文库繁体转录本",
+        "locator": "通神论·官杀章，杀重用印格第二例",
+        "url": "https://zh.wikisource.org/wiki/滴天髓闡微",
+        "provenanceGrade": "C"
+      },
+      "canonicalInput": {
+        "gender": "male",
+        "pillars": ["己亥", "丙寅", "戊子", "甲寅"]
+      },
+      "classicalClaim": {
+        "paraphrase": "原文认为日坐子水反而帮助官杀，日主根基弱于前例。",
+        "mappingRationale": "只检查当前旺衰粗分低于坐下午火的成对命例。"
+      },
+      "observedCurrentEngine": {
+        "balanceLevel": "偏弱",
+        "wangShuaiScore": 1.5
+      }
+    },
+    {
+      "id": "ditiansui-transformation-flowing-hour",
+      "partition": "CALIBRATION",
+      "captureOrder": "SOURCE_RECORDED_BEFORE_ENGINE_REVIEW",
+      "assertionScope": "STRUCTURAL_ONLY",
+      "source": {
+        "title": "滴天髓阐微",
+        "edition": "维基文库繁体转录本",
+        "locator": "通神论·化象章，丁壬化木第一例",
+        "url": "https://zh.wikisource.org/wiki/滴天髓闡微",
+        "provenanceGrade": "C"
+      },
+      "canonicalInput": {
+        "gender": "male",
+        "pillars": ["己卯", "丁卯", "壬午", "甲辰"]
+      },
+      "classicalClaim": {
+        "paraphrase": "原文以甲木透出、午火生辰土描述化气流行，本例没有额外壬癸同类干。",
+        "mappingRationale": "当前引擎不能判断化象，只检查同类天干支持少于下一例。"
+      },
+      "observedCurrentEngine": {
+        "balanceLevel": "偏弱",
+        "wangShuaiScore": 0.0
+      }
+    },
+    {
+      "id": "ditiansui-transformation-rival-hour",
+      "partition": "CALIBRATION",
+      "captureOrder": "SOURCE_RECORDED_BEFORE_ENGINE_REVIEW",
+      "assertionScope": "STRUCTURAL_ONLY",
+      "source": {
+        "title": "滴天髓阐微",
+        "edition": "维基文库繁体转录本",
+        "locator": "通神论·化象章，丁壬化木第二例",
+        "url": "https://zh.wikisource.org/wiki/滴天髓闡微",
+        "provenanceGrade": "C"
+      },
+      "canonicalInput": {
+        "gender": "male",
+        "pillars": ["己卯", "丁卯", "壬午", "癸卯"]
+      },
+      "classicalClaim": {
+        "paraphrase": "原文明确指出时干癸水构成同类竞争，使财富结构受到干扰。",
+        "mappingRationale": "这里只检查癸水同类干是否提高日主生扶粗分，不把分数升高解释为整体更吉。"
+      },
+      "observedCurrentEngine": {
+        "balanceLevel": "偏弱",
+        "wangShuaiScore": 1.0
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "id": "wet-earth-mitigates-more-than-fire-branch",
+      "lowerCaseId": "ditiansui-summer-fire-wet-earth",
+      "higherCaseId": "ditiansui-rentieqiao-summer-fire",
+      "metric": "wangShuaiScore",
+      "sourceExpectedRelation": "LOWER_THAN",
+      "observedEngineRelation": "LOWER_THAN",
+      "engineCompatibility": "MATCH"
+    },
+    {
+      "id": "rooted-fire-seat-supports-earth-more-than-wealth-seat",
+      "lowerCaseId": "ditiansui-killing-print-wealth-seat",
+      "higherCaseId": "ditiansui-killing-print-rooted-seat",
+      "metric": "wangShuaiScore",
+      "sourceExpectedRelation": "LOWER_THAN",
+      "observedEngineRelation": "LOWER_THAN",
+      "engineCompatibility": "MATCH"
+    },
+    {
+      "id": "same-element-hour-stem-raises-coarse-support",
+      "lowerCaseId": "ditiansui-transformation-flowing-hour",
+      "higherCaseId": "ditiansui-transformation-rival-hour",
+      "metric": "wangShuaiScore",
+      "sourceExpectedRelation": "LOWER_THAN",
+      "observedEngineRelation": "LOWER_THAN",
+      "engineCompatibility": "MATCH",
+      "note": "这里只比较生扶强度，不比较吉凶或成就。"
+    }
+  ]
+}

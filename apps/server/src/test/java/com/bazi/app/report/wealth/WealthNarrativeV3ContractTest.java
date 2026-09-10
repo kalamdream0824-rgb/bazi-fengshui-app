@@ -45,7 +45,7 @@ class WealthNarrativeV3ContractTest {
         WealthNarrativeV3Test.assessments(scoredCase("S07")), LocalDate.of(2026, 8, 29));
 
     var json = JSON.readTree(JSON.writeValueAsString(current));
-    assertEquals("wealth-headline-v1", json.get("headlinePlannerVersion").asText());
+    assertEquals("wealth-headline-v3", json.get("headlinePlannerVersion").asText());
     assertEquals("stable_receipt_support", json.at("/years/0/headlineMeta/themeKey").asText());
     assertEquals(current, JSON.treeToValue(json, WealthNarrativeV3.class));
   }

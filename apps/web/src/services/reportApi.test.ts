@@ -13,9 +13,9 @@ const request: PaipanRequest = {
 }
 
 describe('reportApi', () => {
-  it('财富 v3.5 类型保留标题规划元数据并兼容历史版本', () => {
+  it('财富 v3.9 类型保留标题规划元数据并兼容历史版本', () => {
     const metadata: WealthHeadlineMetaV3 = {
-      plannerVersion: 'wealth-headline-v1',
+      plannerVersion: 'wealth-headline-v3',
       themeKey: 'project_payment_timing',
       pathKey: 'project_income',
       subjectKey: 'project_terms',
@@ -28,15 +28,15 @@ describe('reportApi', () => {
       copyVersion: 'wealth-plain-v3.2',
     }
     const current: Pick<WealthContentV3, 'copyVersion' | 'headlinePlannerVersion'> = {
-      copyVersion: 'wealth-plain-v3.5',
-      headlinePlannerVersion: 'wealth-headline-v1',
+      copyVersion: 'wealth-plain-v3.16',
+      headlinePlannerVersion: 'wealth-headline-v3',
     }
 
     expect(metadata.pathKey).toBe('project_income')
     expect(historical.headlinePlannerVersion).toBeUndefined()
-    expect(current.headlinePlannerVersion).toBe('wealth-headline-v1')
+    expect(current.headlinePlannerVersion).toBe('wealth-headline-v3')
     expectTypeOf<WealthContentV3['copyVersion']>().toEqualTypeOf<
-      'wealth-plain-v3' | 'wealth-plain-v3.1' | 'wealth-plain-v3.2' | 'wealth-plain-v3.3' | 'wealth-plain-v3.4' | 'wealth-plain-v3.5'
+      'wealth-plain-v3' | 'wealth-plain-v3.1' | 'wealth-plain-v3.2' | 'wealth-plain-v3.3' | 'wealth-plain-v3.4' | 'wealth-plain-v3.5' | 'wealth-plain-v3.6' | 'wealth-plain-v3.7' | 'wealth-plain-v3.8' | 'wealth-plain-v3.9' | 'wealth-plain-v3.10' | 'wealth-plain-v3.11' | 'wealth-plain-v3.12' | 'wealth-plain-v3.13' | 'wealth-plain-v3.14' | 'wealth-plain-v3.15' | 'wealth-plain-v3.16'
     >()
   })
 

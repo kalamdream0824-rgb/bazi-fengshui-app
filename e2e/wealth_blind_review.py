@@ -16,8 +16,22 @@ class ValidationError(ValueError):
 
 RATINGS = {"A", "B", "C", "D"}
 REVIEW_STATUSES = {"none", "pending", "resolved"}
-CURRENT_COPY_VERSION = "wealth-plain-v3.5"
-SUPPORTED_SCORE_COPY_VERSIONS = {"wealth-plain-v3.4", CURRENT_COPY_VERSION}
+CURRENT_COPY_VERSION = "wealth-plain-v3.16"
+SUPPORTED_SCORE_COPY_VERSIONS = {
+    "wealth-plain-v3.4",
+    "wealth-plain-v3.5",
+    "wealth-plain-v3.6",
+    "wealth-plain-v3.7",
+    "wealth-plain-v3.8",
+    "wealth-plain-v3.9",
+    "wealth-plain-v3.10",
+    "wealth-plain-v3.11",
+    "wealth-plain-v3.12",
+    "wealth-plain-v3.13",
+    "wealth-plain-v3.14",
+    "wealth-plain-v3.15",
+    CURRENT_COPY_VERSION,
+}
 FAILURE_REASONS = {
     "RULE_DIRECTION_WRONG",
     "EVIDENCE_TOO_WEAK",

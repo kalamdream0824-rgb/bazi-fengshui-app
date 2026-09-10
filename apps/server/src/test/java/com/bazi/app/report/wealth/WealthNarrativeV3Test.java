@@ -4,6 +4,7 @@ import static com.bazi.app.report.wealth.WealthRemediationFixtures.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.bazi.app.report.wealth.v3.WealthAssessment;
+import com.bazi.app.report.wealth.v3.WealthHeadlineVocabulary;
 import com.bazi.app.report.wealth.v3.WealthNarrativeV3;
 import com.bazi.app.report.wealth.v3.WealthNarrativeV3.Block;
 import com.bazi.app.report.wealth.v3.WealthNarrativeWriter;
@@ -88,16 +89,64 @@ class WealthNarrativeV3Test {
   }
 
   @Test
+  void oneAnnualIncomeParagraphIntroducesTheYearOnlyOnce() throws Exception {
+    for (var year : content(scoredCase("S07")).years()) {
+      for (var block : year.income()) {
+        assertTrue(occurrences(block.text(), "这一年") <= 1, block.text());
+      }
+    }
+  }
+
+  @Test
   void identicalAnnualConditionsKeepTheSameJudgmentButUseDistinctPlannedHeadlines() throws Exception {
     var content = content(scoredCase("S07"));
-    assertEquals("wealth-plain-v3.5", content.copyVersion());
-    assertEquals("wealth-headline-v1", content.headlinePlannerVersion());
+    assertEquals("wealth-plain-v3.16", content.copyVersion());
+    assertEquals("wealth-headline-v3", content.headlinePlannerVersion());
     assertEquals(3, content.years().stream().map(y -> y.overview().text()).distinct().count());
     assertEquals(3, content.years().stream().map(y -> y.headlineMeta().themeKey()).distinct().count());
-    assertEquals(1, content.years().stream().map(y -> y.retention().text()).distinct().count());
+    assertEquals(3, content.years().stream().map(y -> y.retention().text()).distinct().count());
+    assertEquals(content.years().stream().flatMap(y -> y.observations().stream()).count(),
+        content.years().stream().flatMap(y -> y.observations().stream()).map(Block::text).distinct().count());
+    assertEquals(content.years().stream().flatMap(y -> y.actions().stream()).count(),
+        content.years().stream().flatMap(y -> y.actions().stream()).map(Block::text).distinct().count());
     assertEquals("unchanged", content.years().get(0).comparison().direction());
-    assertTrue(content.years().get(0).comparison().reading().text().contains("延续"));
+    assertTrue(content.years().get(0).comparison().reading().text().contains("没有明显变化"));
     assertNull(content.years().get(2).comparison());
+  }
+
+  @Test
+  void incomeParagraphDoesNotBorrowAnUnrelatedHeadlineSubjectToFakeAnnualDifference() throws Exception {
+    var content = content(scoredCase("S08"));
+
+    for (var year : content.years()) {
+      String headlinePath = year.headlineMeta().pathKey();
+      String subject = WealthHeadlineVocabulary.entry(year.headlineMeta().themeKey())
+          .sentenceSpec().subject().replaceFirst("^今年", "");
+      for (var income : year.income()) {
+        boolean coversHeadlinePath = income.decisionIds().stream()
+            .anyMatch(id -> id.endsWith(".decision." + headlinePath));
+        if (!coversHeadlinePath) assertFalse(income.text().contains(subject), income.text());
+      }
+    }
+  }
+
+  @Test
+  void annualObservationAndActionExpandTheObjectNamedByThePlannedHeadline() throws Exception {
+    var content = content(scoredCase("S07"));
+
+    for (var year : content.years()) {
+      String object = WealthHeadlineVocabulary.entry(year.headlineMeta().themeKey()).objectText();
+      assertTrue(year.observations().get(0).text().contains(object), year.observations().toString());
+      assertTrue(year.actions().get(0).text().contains(object), year.actions().toString());
+      assertTrue(year.retention().text().contains(object), year.retention().text());
+      assertTrue(year.retention().templateId().contains(year.headlineMeta().themeKey()),
+          year.retention().templateId());
+      if (year.risk() != null) {
+        assertTrue(year.risk().reading().text().contains(object), year.risk().reading().text());
+        assertTrue(year.risk().reading().templateId().contains(year.headlineMeta().themeKey()),
+            year.risk().reading().templateId());
+      }
+    }
   }
 
   @Test
@@ -105,7 +154,7 @@ class WealthNarrativeV3Test {
     var content = content(scoredCase("S07"));
     for (var year : content.years()) {
       assertNotNull(year.headlineMeta());
-      assertEquals("wealth-headline-v1", year.headlineMeta().plannerVersion());
+      assertEquals("wealth-headline-v3", year.headlineMeta().plannerVersion());
       assertEquals(1, year.overview().decisionIds().size());
       assertTrue(year.overview().decisionIds().stream().allMatch(id -> id.startsWith(year.year() + ".decision.")));
       assertEquals(year.headlineMeta().pathKey(), year.overview().decisionIds().get(0)
@@ -119,8 +168,17 @@ class WealthNarrativeV3Test {
     var stable = content(withPathWeights(scoredCase("S02"), WealthPath.STABLE_INCOME, 8, 0));
     var skill = content(withPathWeights(scoredCase("S02"), WealthPath.SKILL_INCOME, 8, 0));
     assertNotEquals(stable.thesis().text(), skill.thesis().text());
-    assertTrue(stable.thesis().text().contains("进账稳定"));
-    assertTrue(skill.thesis().text().contains("投入回报"));
+    assertTrue(stable.thesis().text().contains("保持连续"));
+    assertTrue(skill.thesis().text().contains("转成实际进账"));
+  }
+
+  @Test
+  void reportRouteReadsAsOneOrderedPlanInsteadOfUnrelatedTips() throws Exception {
+    var route = content(scoredCase("S07")).route();
+
+    assertEquals(2, route.size());
+    assertTrue(route.get(0).text().startsWith("先"), route.toString());
+    assertTrue(route.get(1).text().startsWith("最后"), route.toString());
   }
 
   @Test
@@ -244,6 +302,10 @@ class WealthNarrativeV3Test {
     return content;
   }
 
+  private static int occurrences(String text, String token) {
+    return (text.length() - text.replace(token, "").length()) / token.length();
+  }
+
   @Test
   void becomingTheRelativeLeaderDoesNotClaimThatItsOwnSupportIncreased() throws Exception {
     var period = withPathWeights(scoredCase("S02"), WealthPath.STABLE_INCOME, 8, 0);
@@ -251,8 +313,8 @@ class WealthNarrativeV3Test {
     period = changeEvidence(period, 1, WealthPath.STABLE_INCOME, old -> List.of(
         scored("variant.stable_income.support", 2, EvidenceFamily.ANNUAL_TRIGGER, "合成支持条件")));
     var text = content(period).years().get(0).comparison().reading().text();
-    assertTrue(text.contains("本身"), text);
-    assertTrue(text.contains("相对"), text);
+    assertTrue(text.contains("投入与进账需要优先核对"), text);
+    assertFalse(text.contains("投入后实际进账提高的迹象更明显"), text);
   }
 
   @Test
@@ -264,8 +326,8 @@ class WealthNarrativeV3Test {
     var content = content(period);
     assertEquals("supported", WealthExpressionPolicyTest.decision(assessments(period).get(0), "stable_income").strength());
     assertEquals("pronounced", WealthExpressionPolicyTest.decision(assessments(period).get(1), "stable_income").strength());
-    assertTrue(content.years().get(0).comparison().reading().text().contains("关注程度提高"));
-    assertTrue(content.years().get(1).comparison().reading().text().contains("关注程度降低"));
+    assertTrue(content.years().get(0).comparison().reading().text().contains("进账保持连续的迹象比上年更明显"));
+    assertTrue(content.years().get(1).comparison().reading().text().contains("进账保持连续的迹象比上年减弱"));
   }
 
   @Test

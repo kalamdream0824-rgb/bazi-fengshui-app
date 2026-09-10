@@ -1,0 +1,84 @@
+{
+  "version": "weak-support-profile-corpus-v1",
+  "purpose": "Shadow-only weak-band profile comparison; must not change serving balance bands or path scores.",
+  "cases": [
+    {
+      "id": "W01",
+      "expectedProfile": "ROOTLESS",
+      "expectedScore": 1.0,
+      "expectedShadowScore": 1.0,
+      "request": {
+        "name": "弱档对照W01",
+        "gender": "female",
+        "solarDateTime": "1981-09-15T02:15:00",
+        "birthPlace": "上海市 上海市",
+        "trueSolarTime": false
+      }
+    },
+    {
+      "id": "W02",
+      "expectedProfile": "ROOTLESS",
+      "expectedScore": 1.5,
+      "expectedShadowScore": 1.5,
+      "request": {
+        "name": "弱档对照W02",
+        "gender": "female",
+        "solarDateTime": "1996-03-15T22:15:00",
+        "birthPlace": "上海市 上海市",
+        "trueSolarTime": false
+      }
+    },
+    {
+      "id": "W03",
+      "expectedProfile": "ROOTED",
+      "expectedScore": 1.0,
+      "expectedShadowScore": 1.2,
+      "request": {
+        "name": "弱档对照W03",
+        "gender": "female",
+        "solarDateTime": "1980-01-15T02:15:00",
+        "birthPlace": "上海市 上海市",
+        "trueSolarTime": false
+      }
+    },
+    {
+      "id": "W04",
+      "expectedProfile": "ROOTED",
+      "expectedScore": 1.0,
+      "expectedShadowScore": 1.2,
+      "request": {
+        "name": "弱档对照W04",
+        "gender": "female",
+        "solarDateTime": "1981-08-15T06:15:00",
+        "birthPlace": "上海市 上海市",
+        "trueSolarTime": false
+      }
+    },
+    {
+      "id": "W05",
+      "expectedProfile": "ROOTED_WITH_VISIBLE_RESOURCE",
+      "expectedScore": 1.5,
+      "expectedShadowScore": 1.8,
+      "request": {
+        "name": "弱档对照W05（原R05）",
+        "gender": "female",
+        "solarDateTime": "1992-07-18T06:15:00",
+        "birthPlace": "广东省 广州市",
+        "trueSolarTime": false
+      }
+    },
+    {
+      "id": "W06",
+      "expectedProfile": "ROOTED_WITH_VISIBLE_RESOURCE",
+      "expectedScore": 1.5,
+      "expectedShadowScore": 1.6,
+      "request": {
+        "name": "弱档对照W06",
+        "gender": "female",
+        "solarDateTime": "1981-11-15T10:15:00",
+        "birthPlace": "上海市 上海市",
+        "trueSolarTime": false
+      }
+    }
+  ]
+}

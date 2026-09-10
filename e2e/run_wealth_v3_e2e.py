@@ -17,9 +17,85 @@ from playwright.sync_api import Page, sync_playwright
 ROOT = Path(__file__).resolve().parents[1]
 BASE = os.environ.get("E2E_BASE_URL", "http://localhost:5173").rstrip("/")
 RESULT_PATH = Path(os.environ.get("TASK9_RESULT_PATH", "/tmp/wealth-v3-task9-result.json"))
+SAMPLE_PATH = Path(os.environ.get(
+    "V36_SAMPLE_PATH", "/tmp/wealth-v3.6-candidate-samples.md"
+))
+EXPECTED_CONTENT_VERSION = "wealth-narrative-v4"
+EXPECTED_COPY_VERSION = "wealth-plain-v3.16"
 PASSWORD = "pass123"
 USER = f"task9_wealth_{uuid.uuid4().hex[:10]}"
 OTHER_USER = f"task9_other_{uuid.uuid4().hex[:10]}"
+
+
+def split_sentences(text: str) -> list[str]:
+    return [part.strip() for part in re.findall(r"[^。！？]+[。！？]?", text) if part.strip()]
+
+
+def group_annual_copy(content: dict) -> dict[str, list[dict]]:
+    selectors = {
+        "income": lambda year: [block["text"] for block in year["income"]],
+        "retention": lambda year: [year["retention"]["text"]],
+        "risk": lambda year: [year["risk"]["reading"]["text"]] if year.get("risk") else [],
+        "observations": lambda year: [block["text"] for block in year["observations"]],
+        "actions": lambda year: [block["text"] for block in year["actions"]],
+    }
+    result: dict[str, list[dict]] = {}
+    for category, select in selectors.items():
+        occurrences: dict[str, dict] = {}
+        for year in content["years"]:
+            for text in dict.fromkeys(
+                sentence for value in select(year) for sentence in split_sentences(value)
+            ):
+                if text in occurrences:
+                    occurrences[text]["years"].append(year["year"])
+                else:
+                    occurrences[text] = {
+                        "firstYear": year["year"], "text": text, "years": [year["year"]]
+                    }
+        result[category] = list(occurrences.values())
+    return result
+
+
+def rendered_annual_copy(page: Page) -> dict[str, list[dict]]:
+    selectors = {
+        "income": ".wealth-year__income p",
+        "retention": ".wealth-v3-year__retention p",
+        "risk": ".wealth-v3-year__risk p",
+        "observations": ".wealth-v3-year__observations li",
+        "actions": ".wealth-v3-year__actions li",
+    }
+    result = {category: [] for category in selectors}
+    for article in page.locator(".wealth-year").all():
+        year = int(article.locator("header h2").inner_text().split("·")[0].strip())
+        for category, selector in selectors.items():
+            for item in article.locator(selector).all():
+                text = item.locator(":scope > span").inner_text().strip()
+                badge = item.locator(":scope > .wealth-year__applies")
+                years = [year]
+                if badge.count():
+                    years = [int(value) for value in re.findall(r"\d{4}", badge.inner_text())]
+                result[category].append({"firstYear": year, "text": text, "years": years})
+    return result
+
+
+def repeated_visible_sentences(page: Page) -> list[str]:
+    selectors = [
+        "#wealth-v3-thesis", ".wealth-reader__summary", ".wealth-path p",
+        ".wealth-v3-risk-summary p", ".wealth-year__income p > span",
+        ".wealth-v3-year__retention p > span", ".wealth-v3-year__risk p > span",
+        ".wealth-v3-year__observations li > span", ".wealth-v3-year__actions li > span",
+        ".wealth-v3-year__comparison p", ".wealth-v3-reader__route li",
+        ".wealth-v3-reader__note",
+    ]
+    seen: set[str] = set()
+    repeated: set[str] = set()
+    for selector in selectors:
+        for text in page.locator(selector).all_inner_texts():
+            for sentence in split_sentences(text):
+                if sentence in seen:
+                    repeated.add(sentence)
+                seen.add(sentence)
+    return sorted(repeated)
 
 
 def auth_token(page: Page) -> str:
@@ -70,6 +146,8 @@ def main() -> int:
     console_errors: list[str] = []
     report_ids: list[int] = []
     api_content_bytes: list[int] = []
+    candidate_samples: list[tuple[str, str]] = []
+    visible_collisions: dict[str, list[str]] = {}
 
     def check(name: str, condition: bool) -> None:
         nonlocal total
@@ -136,16 +214,20 @@ def main() -> int:
         report = response.json()
         content = report["content"]
         api_content_bytes.append(len(json.dumps(content, ensure_ascii=False, separators=(",", ":")).encode("utf-8")))
-        check("真实报告使用财富v3", report["contentVersion"] == "wealth-narrative-v3")
-        check("新报告使用年度标题修订版", content["copyVersion"] == "wealth-plain-v3.3")
+        check("真实报告使用财富v4契约", report["contentVersion"] == EXPECTED_CONTENT_VERSION)
+        check("新报告使用当前财富文案版本", content["copyVersion"] == EXPECTED_COPY_VERSION)
         check("真实报告固定三年", content["horizonYears"] == 3 and len(content["years"]) == 3)
         check("真实报告保留五条钱路", len(content["pathSummaries"]) == 5)
         check("页面显示五条钱路", page.locator(".wealth-path").count() == 5)
         check("页面显示三个年度", page.locator(".wealth-year").count() == 3)
-        check("页面显示留钱段", page.locator(".wealth-v3-year__retention").count() == 3)
+        expected_annual = group_annual_copy(content)
+        check("页面年度正文与保存内容分组一致", rendered_annual_copy(page) == expected_annual)
+        check("页面显示合并后的留钱段", page.locator(".wealth-v3-year__retention").count()
+              == len({item["firstYear"] for item in expected_annual["retention"]}))
         check("页面显示年度比较", page.locator(".wealth-v3-year__comparison").count() == 2)
-        expected_risks = sum(1 for year in content["years"] if year["risk"] is not None)
-        check("风险卡数量与保存内容一致", page.locator(".wealth-v3-year__risk").count() == expected_risks)
+        expected_risk_years = {item["firstYear"] for item in expected_annual["risk"]}
+        check("风险卡数量与保存内容分组一致",
+              page.locator(".wealth-v3-year__risk").count() == len(expected_risk_years))
         check(
             "三年风险摘要按内容决定",
             page.locator(".wealth-v3-risk-summary").count() == (1 if content["riskSummary"] is not None else 0),
@@ -164,6 +246,7 @@ def main() -> int:
         check("页面年度标题与保存内容一致", rendered_overviews == annual_overviews)
         reader_text = page.locator(".wealth-v3-reader").inner_text()
         check("通俗页不暴露内部审计字段", all(term not in reader_text for term in ("wealth-path-v2", "净分", "专业依据")))
+        check("真实页面生成正文没有重复句", not repeated_visible_sentences(page))
 
         saved_snapshot = reader_text
         page.reload(wait_until="networkidle")
@@ -246,7 +329,8 @@ def main() -> int:
             api_content_bytes.append(
                 len(json.dumps(payload["content"], ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
             )
-            check(f"{case['id']}-返回v3", payload["contentVersion"] == "wealth-narrative-v3")
+            check(f"{case['id']}-返回v4契约", payload["contentVersion"] == EXPECTED_CONTENT_VERSION)
+            check(f"{case['id']}-返回当前财富文案版本", payload["content"]["copyVersion"] == EXPECTED_COPY_VERSION)
             if case["id"] == "R12":
                 r12_overviews = [year["overview"]["text"] for year in payload["content"]["years"]]
                 check("R12-共同主线不再重复占据年度标题", all(
@@ -258,6 +342,17 @@ def main() -> int:
                 headers={"Authorization": f"Bearer {token}"},
             )
             check(f"{case['id']}-支付后回读", reread.status == 200 and reread.json()["content"] == payload["content"])
+            page.goto(f"{BASE}/reports/{payload['id']}", wait_until="networkidle")
+            page.wait_for_selector(".wealth-v3-reader", timeout=20000)
+            check(f"{case['id']}-保存接口年度正文与页面一致",
+                  rendered_annual_copy(page) == group_annual_copy(payload["content"]))
+            repeated = repeated_visible_sentences(page)
+            if repeated:
+                visible_collisions[case["id"]] = repeated
+                print(f"碰撞明细 {case['id']}: {repeated}")
+            check(f"{case['id']}-真实页面生成正文无碰撞", not repeated)
+            sample_text = page.locator(".wealth-v3-reader").inner_text()
+            candidate_samples.append((case["id"], sample_text.replace(payload["subject"], f"样本 {case['id']}")))
 
         second_context = browser.new_context(viewport={"width": 430, "height": 932})
         second_page = second_context.new_page()
@@ -339,6 +434,16 @@ def main() -> int:
         browser.close()
 
     check("浏览器控制台无错误", not console_errors)
+    SAMPLE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    SAMPLE_PATH.write_text(
+        "# 财富通俗版 v3.6 候选样本（R01–R12）\n\n"
+        "> 由保存接口回读后，经真实前端页面提取；仅供人工审核，尚未代表发布通过。\n\n"
+        + "\n\n---\n\n".join(
+            f"## {fixture_id}\n\n```text\n{text}\n```" for fixture_id, text in candidate_samples
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     RESULT_PATH.write_text(
         json.dumps(
             {
@@ -350,6 +455,8 @@ def main() -> int:
                 "checks": total,
                 "failures": failures,
                 "consoleErrors": console_errors,
+                "candidateSamplePath": str(SAMPLE_PATH),
+                "visibleCollisions": visible_collisions,
             },
             ensure_ascii=False,
             indent=2,
@@ -358,6 +465,7 @@ def main() -> int:
     passed = total - len(failures)
     print(f"\n结果: {passed}/{total} 通过" + (f"，失败: {failures}" if failures else ""))
     print(f"结果文件: {RESULT_PATH}")
+    print(f"候选样本: {SAMPLE_PATH}")
     return 1 if failures else 0
 
 

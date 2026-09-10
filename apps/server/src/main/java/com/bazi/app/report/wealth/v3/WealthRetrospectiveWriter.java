@@ -15,35 +15,38 @@ public final class WealthRetrospectiveWriter {
     }
     String secondary = plan.secondary() == null
         ? "次判断：本次回看不再加入另一项具体判断。"
-        : line("次判断：再回看", plan.secondary());
+        : line("次判断：再回看并核对", plan.secondary());
     String hidden = plan.hidden() == null
         ? "隐性影响：本次回看不再加入另一项具体影响。"
         : hiddenLine(plan.hidden());
-    return new NarrativeTimeline.PastReview(
+    NarrativeTimeline.PastReview result = new NarrativeTimeline.PastReview(
         plan.year(),
-        line("主判断：" + plan.year() + "年先回看", "命盘提示，", plan.primary()),
+        line("主判断：回看" + plan.year() + "年，先核对", "命盘提示，", plan.primary()),
         List.of(secondary, hidden),
         WealthPlainCopyV3.retrospectiveBridge(
             plan.primary().subject(), plan.primary().direction()),
         plan.evidenceKeys());
+    WealthChineseCopyPolicy policy = new WealthChineseCopyPolicy();
+    policy.validateBodyParagraph(result.headline());
+    result.checkpoints().forEach(policy::validateBodyParagraph);
+    policy.validateBodyParagraph(result.bridge());
+    return result;
   }
 
   private String line(String prefix, Observation observation) {
-    return line(prefix, "同时，", observation);
+    return line(prefix, "", observation);
   }
 
   private String line(String prefix, String transition, Observation observation) {
     return prefix + WealthPlainCopyV3.retrospectiveQuestion(observation.subject()) + "。"
         + transition + WealthPlainCopyV3.retrospectiveDirection(
-            observation.direction(), observation.strength())
+            observation.subject(), observation.direction(), observation.strength())
         + WealthPlainCopyV3.retrospectiveAngle(observation.angle());
   }
 
   private String hiddenLine(Observation observation) {
     return "隐性影响：还要回看"
-        + WealthPlainCopyV3.retrospectiveAngleQuestion(observation.angle()) + "。"
-        + "它主要关系到" + WealthPlainCopyV3.retrospectiveObject(observation.subject()) + "。"
-        + "从整体收支看，" + WealthPlainCopyV3.retrospectiveDirection(
-            observation.direction(), observation.strength());
+        + WealthPlainCopyV3.retrospectiveAngleQuestion(observation.angle()) + "是否影响"
+        + WealthPlainCopyV3.retrospectiveObject(observation.subject()) + "。";
   }
 }

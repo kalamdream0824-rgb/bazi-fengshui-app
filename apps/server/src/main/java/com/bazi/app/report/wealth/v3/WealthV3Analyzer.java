@@ -3,6 +3,7 @@ package com.bazi.app.report.wealth.v3;
 import com.bazi.app.dto.PaipanResultDto;
 import com.bazi.app.report.AnnualContext;
 import com.bazi.app.report.ReportHorizon;
+import com.bazi.app.report.WeakSupportProfile;
 import com.bazi.app.report.wealth.WealthFactExtractor;
 import com.bazi.app.report.wealth.WealthPathEvaluator;
 import com.bazi.app.report.wealth.WealthYearFacts;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Comparator;
 
 /** Wealth v3 analysis; ReportService uses the complete chart entry for new snapshots. */
 public final class WealthV3Analyzer {
@@ -40,8 +42,30 @@ public final class WealthV3Analyzer {
     for (int i = 0; i < contexts.size(); i++) {
       var dayun = contexts.get(i).activeDaYun();
       String branch = dayun == null ? null : dayun.ganZhi().substring(1);
-      result.add(assess(facts.get(i), natalBranches, branch));
+      result.add(withWeakSupportProfile(
+          assess(facts.get(i), natalBranches, branch),
+          contexts.get(i).natalAnalysis().weakSupportProfile()));
     }
     return List.copyOf(result);
+  }
+
+  private WealthAssessment withWeakSupportProfile(
+      WealthAssessment assessment,
+      WeakSupportProfile profile) {
+    List<WealthAssessment.Fact> facts = new ArrayList<>(assessment.facts());
+    facts.add(new WealthAssessment.Fact(
+        assessment.year() + ".fact.natal.weak_support_profile",
+        "natal",
+        "natal.weak_support_profile",
+        profile.name()));
+    facts.sort(Comparator.comparing(WealthAssessment.Fact::id));
+    return new WealthAssessment(
+        assessment.year(),
+        assessment.ganZhi(),
+        facts,
+        assessment.evidence(),
+        assessment.decisions(),
+        assessment.focus(),
+        assessment.risk());
   }
 }
