@@ -30,6 +30,9 @@ def main() -> int:
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
+        console_errors: list[str] = []
+        page.on("console", lambda message: console_errors.append(message.text)
+                if message.type == "error" else None)
 
         # 1. 注册登录
         page.goto(f"{BASE}/auth", wait_until="networkidle")
@@ -77,16 +80,29 @@ def main() -> int:
                 check("单身-两种接触情况不增加问卷", "如果你目前没有正在了解的人" in reader
                       and "如果已经有聊得来的人" in reader)
                 check("单身-明年单独摘要", page.locator(".relationship-single-reader__outlook").count() == 1)
+                check("单身-只给当前年一个行动闭环", page.locator(".annual-action-guide").count() == 1)
+                check("单身-行动闭环说明结果与调整", "这样做，可能看到什么变化" in reader
+                      and "没有改善时怎么调整" in reader)
                 page.reload(wait_until="networkidle")
                 page.wait_for_selector(".relationship-single-reader")
                 check("单身-刷新按快照保留正文", page.locator(".relationship-single-reader").inner_text() == single_snapshot)
                 continue
             check(f"{status_label}-三年内容", all(year in reader for year in ("2026", "2027", "2028")))
+            check(f"{status_label}-每年一个行动闭环", page.locator(".annual-action-guide").count() == 3)
+            check(f"{status_label}-新版不再叠加旧行动清单",
+                  page.locator(".relationship-year__actions").count() == 0)
             judgments = page.locator(".relationship-year__judgment p").all_text_contents()
             # This fixture has the same primary/tone in years 2–3 but different annual evidence.
             check(f"{status_label}-相同重点解释年度差异", len(judgments) == 3 and judgments[1] != judgments[2])
             check(f"{status_label}-逐年说明与上年比较", len(judgments) == 3 and all("上一年" in text for text in judgments[1:]))
             check(f"{status_label}-观察提示与最后一年边界", reader.count("现实中可以留意") == 3 and reader.count("阅读提醒：") == 1)
+            if status_label == "已婚或长期共同生活":
+                page.set_viewport_size({"width": 430, "height": 932})
+                page.wait_for_timeout(200)
+                check("已婚命书430px无横向溢出",
+                      page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth"))
+                page.screenshot(path="/tmp/relationship-married-reader-430.png", full_page=True)
+                page.set_viewport_size({"width": 1280, "height": 900})
 
         page.goto(f"{BASE}/reports", wait_until="networkidle")
         library = page.inner_text("body")
@@ -162,6 +178,7 @@ def main() -> int:
         page.wait_for_selector("text=关于与合规", timeout=10000)
         settings_body = page.inner_text("body")
         check("设置-关于与合规", "仅供娱乐与参考" in settings_body and "版本" in settings_body)
+        check("页面控制台无错误", console_errors == [])
 
         browser.close()
 

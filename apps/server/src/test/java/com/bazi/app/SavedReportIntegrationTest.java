@@ -67,7 +67,7 @@ class SavedReportIntegrationTest {
         .andExpect(jsonPath("$.subject").value("林先生"))
         .andExpect(jsonPath("$.topic").value("career"))
         .andExpect(jsonPath("$.edition").value("plain"))
-        .andExpect(jsonPath("$.contentVersion").value("career-narrative-v4"))
+        .andExpect(jsonPath("$.contentVersion").value("career-narrative-v5"))
         .andExpect(jsonPath("$.content.thesis").isNotEmpty())
         .andExpect(jsonPath("$.content.years.length()").value(2))
         .andExpect(jsonPath("$.content.timeline.past.year").value(2025))
@@ -75,6 +75,11 @@ class SavedReportIntegrationTest {
         .andExpect(jsonPath("$.content.timeline.future.length()").value(1))
         .andExpect(jsonPath("$.content.years[0].reasons.length()").value(2))
         .andExpect(jsonPath("$.content.years[0].actions.length()").value(2))
+        .andExpect(jsonPath("$.content.years[0].actionGuide.focusKey").value(org.hamcrest.Matchers.startsWith("career.")))
+        .andExpect(jsonPath("$.content.years[0].actionGuide.expectedChange").isNotEmpty())
+        .andExpect(jsonPath("$.content.years[0].actionGuide.checkTiming").isNotEmpty())
+        .andExpect(jsonPath("$.content.years[0].actionGuide.successSignal").isNotEmpty())
+        .andExpect(jsonPath("$.content.years[0].actionGuide.fallbackAction").isNotEmpty())
         .andReturn();
 
     long id = objectMapper.readTree(created.getResponse().getContentAsString()).get("id").asLong();
@@ -91,6 +96,7 @@ class SavedReportIntegrationTest {
         .andExpect(jsonPath("$.id").value(id))
         .andExpect(jsonPath("$.content.years[1].year").value(2027));
 
+    assertLegacyCloneReadable(token, id, "career-narrative-v4");
     assertLegacyCloneReadable(token, id, "career-narrative-v3");
   }
 
@@ -260,8 +266,8 @@ class SavedReportIntegrationTest {
         .andExpect(jsonPath("$.content.timeline.future.length()").value(2))
         .andExpect(jsonPath("$.content.calculationVersion").value("wealth-path-v2"))
         .andExpect(jsonPath("$.content.policyVersion").value("wealth-expression-v1"))
-        .andExpect(jsonPath("$.content.copyVersion").value("wealth-plain-v3.16"))
-        .andExpect(jsonPath("$.content.headlinePlannerVersion").value("wealth-headline-v3"))
+        .andExpect(jsonPath("$.content.copyVersion").value("wealth-plain-v3.18"))
+        .andExpect(jsonPath("$.content.headlinePlannerVersion").value("wealth-headline-v4"))
         .andExpect(jsonPath("$.content.pathSummaries.length()").value(5))
         .andExpect(jsonPath("$.content.years.length()").value(3))
         .andExpect(jsonPath("$.content.years[0].facts").isArray())
@@ -270,6 +276,11 @@ class SavedReportIntegrationTest {
         .andExpect(jsonPath("$.content.years[0].headlineMeta.themeKey").isString())
         .andExpect(jsonPath("$.content.years[1].headlineMeta.themeKey").isString())
         .andExpect(jsonPath("$.content.years[2].headlineMeta.themeKey").isString())
+        .andExpect(jsonPath("$.content.years[0].actionGuide.path").isString())
+        .andExpect(jsonPath("$.content.years[0].actionGuide.action.text").isNotEmpty())
+        .andExpect(jsonPath("$.content.years[0].actionGuide.expectedChange.text").isNotEmpty())
+        .andExpect(jsonPath("$.content.years[0].actionGuide.successSignal.text").isNotEmpty())
+        .andExpect(jsonPath("$.content.years[0].actionGuide.fallbackAction.text").isNotEmpty())
         .andReturn();
 
     JsonNode createdSnapshot = objectMapper.readTree(created.getResponse().getContentAsString());
@@ -291,7 +302,7 @@ class SavedReportIntegrationTest {
         .put("asOf", asOf.toString())
         .put("calculationVersion", "wealth-path-v2")
         .put("policyVersion", "wealth-expression-v1")
-        .put("copyVersion", "wealth-plain-v3.16");
+        .put("copyVersion", "wealth-plain-v3.18");
     assertEquals(expectedContext, objectMapper.readTree(stored.getContextJson()));
 
     MvcResult read = mvc.perform(get("/api/v1/reports/{id}", id)
@@ -420,7 +431,7 @@ class SavedReportIntegrationTest {
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.topic").value("relationship"))
           .andExpect(jsonPath("$.edition").value("plain"))
-          .andExpect(jsonPath("$.contentVersion").value("relationship-narrative-v2"))
+          .andExpect(jsonPath("$.contentVersion").value("relationship-narrative-v3"))
           .andExpect(jsonPath("$.content.relationshipStatus").value(statusCode))
           .andExpect(jsonPath("$.content.timeline.past.year").value(2025))
           .andExpect(jsonPath("$.content.timeline.present.year").value(2026))
@@ -429,6 +440,10 @@ class SavedReportIntegrationTest {
           .andExpect(jsonPath("$.content.years.length()").value(3))
           .andExpect(jsonPath("$.content.years[0].realitySignals.length()").value(2))
           .andExpect(jsonPath("$.content.years[0].actions.length()").value(2))
+          .andExpect(jsonPath("$.content.years[0].actionGuide.focusKey")
+              .value(org.hamcrest.Matchers.startsWith("relationship." + statusCode)))
+          .andExpect(jsonPath("$.content.years[0].actionGuide.expectedChange").isNotEmpty())
+          .andExpect(jsonPath("$.content.years[0].actionGuide.successSignal").isNotEmpty())
           .andReturn();
       JsonNode report = objectMapper.readTree(created.getResponse().getContentAsString());
       reports.add(report);
@@ -442,11 +457,12 @@ class SavedReportIntegrationTest {
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.content.relationshipStatus").value(statusCode));
 
-      if ("dating".equals(statusCode)) {
-        assertLegacyCloneReadable(
-            token, report.get("id").asLong(), "relationship-narrative-v1");
-      }
     }
+
+    assertLegacyCloneReadable(
+        token, reports.get(0).get("id").asLong(), "relationship-narrative-v2");
+    assertLegacyCloneReadable(
+        token, reports.get(0).get("id").asLong(), "relationship-narrative-v1");
 
     JsonNode baseline = relationshipCalculation(reports.get(0).get("content"));
     assertEquals(baseline, relationshipCalculation(reports.get(1).get("content")));
@@ -463,7 +479,7 @@ class SavedReportIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(relationshipPayload("plain", "single")))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.contentVersion").value("relationship-single-v2"))
+        .andExpect(jsonPath("$.contentVersion").value("relationship-single-v3"))
         .andExpect(jsonPath("$.content.relationshipStatus").value("single"))
         .andExpect(jsonPath("$.content.timeline.past.year").value(2025))
         .andExpect(jsonPath("$.content.timeline.present.year").value(2026))
@@ -473,6 +489,10 @@ class SavedReportIntegrationTest {
         .andExpect(jsonPath("$.content.outlookYear").value(2027))
         .andExpect(jsonPath("$.content.sections.length()").value(3))
         .andExpect(jsonPath("$.content.sections[0].title").value("今年有没有认识人的机会？"))
+        .andExpect(jsonPath("$.content.actionGuide.focusKey")
+            .value(org.hamcrest.Matchers.startsWith("relationship.single.")))
+        .andExpect(jsonPath("$.content.actionGuide.expectedChange").isNotEmpty())
+        .andExpect(jsonPath("$.content.actionGuide.successSignal").isNotEmpty())
         .andExpect(jsonPath("$.content.evaluations.length()").value(2))
         .andExpect(jsonPath("$.content.years").doesNotExist())
         .andReturn();
@@ -483,8 +503,10 @@ class SavedReportIntegrationTest {
     assertEquals(snapshot, objectMapper.readTree(read.getResponse().getContentAsString()));
     mvc.perform(get("/api/v1/reports").header("Authorization", "Bearer " + token))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].contentVersion").value("relationship-single-v2"));
+        .andExpect(jsonPath("$[0].contentVersion").value("relationship-single-v3"));
 
+    assertLegacyCloneReadable(
+        token, snapshot.get("id").asLong(), "relationship-single-v2");
     assertLegacyCloneReadable(
         token, snapshot.get("id").asLong(), "relationship-single-v1");
   }
@@ -518,7 +540,7 @@ class SavedReportIntegrationTest {
     mvc.perform(post("/api/v1/reports").header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON).content(relationshipPayload("plain", "single")))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.contentVersion").value("relationship-single-v2"));
+        .andExpect(jsonPath("$.contentVersion").value("relationship-single-v3"));
     MvcResult stored = mvc.perform(get("/api/v1/reports/{id}", old.getId())
             .header("Authorization", "Bearer " + token))
         .andExpect(status().isOk())

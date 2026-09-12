@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 /** Closed semantic and copy catalog for deterministic annual wealth headlines. */
 public final class WealthHeadlineVocabulary {
-  public static final String VERSION = "wealth-headline-v3";
+  public static final String VERSION = "wealth-headline-v4";
 
   private static final List<Entry> ENTRIES = List.of(
       entry(10, "stable_receipt_support", "stable_income", "stable_receipt", "support",

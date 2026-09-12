@@ -5,6 +5,7 @@ import com.bazi.app.report.NarrativeTimeline;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /** Versioned wealth v3 snapshot. Public product responses remain three years. */
 public record WealthNarrativeV3(String asOf, String zoneId, int horizonYears, String calculationVersion,
@@ -61,11 +62,30 @@ public record WealthNarrativeV3(String asOf, String zoneId, int horizonYears, St
       selectionReasonCodes = List.copyOf(selectionReasonCodes);
     }
   }
+  public record ActionGuide(String path, Block problem, Block action, Block expectedChange,
+      Block checkTiming, Block successSignal, Block adjustmentCondition, Block fallbackAction) {
+    public ActionGuide {
+      if (path == null || path.isBlank()) throw new IllegalArgumentException("action guide path is required");
+      Objects.requireNonNull(problem, "action guide problem");
+      Objects.requireNonNull(action, "action guide action");
+      Objects.requireNonNull(expectedChange, "action guide expected change");
+      Objects.requireNonNull(checkTiming, "action guide check timing");
+      Objects.requireNonNull(successSignal, "action guide success signal");
+      Objects.requireNonNull(adjustmentCondition, "action guide adjustment condition");
+      Objects.requireNonNull(fallbackAction, "action guide fallback action");
+    }
+
+    List<Block> blocks() {
+      return List.of(problem, action, expectedChange, checkTiming, successSignal,
+          adjustmentCondition, fallbackAction);
+    }
+  }
   public record Year(int year, String ganZhi, List<WealthAssessment.Fact> facts, List<WealthAssessment.Evidence> evidence,
       List<WealthAssessment.Decision> decisions, WealthAssessment.Focus focus,
       @JsonInclude(JsonInclude.Include.NON_NULL) HeadlineMeta headlineMeta,
       Block overview, List<Block> income,
-      Block retention, Risk risk, List<Block> observations, List<Block> actions, Comparison comparison) {
+      Block retention, Risk risk, List<Block> observations, List<Block> actions,
+      @JsonInclude(JsonInclude.Include.NON_NULL) ActionGuide actionGuide, Comparison comparison) {
     public Year {
       facts = List.copyOf(facts); evidence = List.copyOf(evidence); decisions = List.copyOf(decisions);
       income = List.copyOf(income); observations = List.copyOf(observations); actions = List.copyOf(actions);
@@ -77,7 +97,7 @@ public record WealthNarrativeV3(String asOf, String zoneId, int horizonYears, St
         WealthAssessment.Focus focus, Block overview, List<Block> income, Block retention, Risk risk,
         List<Block> observations, List<Block> actions, Comparison comparison) {
       this(year, ganZhi, facts, evidence, decisions, focus, null, overview, income, retention,
-          risk, observations, actions, comparison);
+          risk, observations, actions, null, comparison);
     }
   }
 
@@ -90,6 +110,7 @@ public record WealthNarrativeV3(String asOf, String zoneId, int horizonYears, St
       result.add(y.overview()); result.addAll(y.income()); result.add(y.retention());
       if (y.risk() != null) result.add(y.risk().reading());
       result.addAll(y.observations()); result.addAll(y.actions());
+      if (y.actionGuide() != null) result.addAll(y.actionGuide().blocks());
       if (y.comparison() != null) result.add(y.comparison().reading());
     }
     result.addAll(route); result.add(readingNote);

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { CareerV4SavedReport, LegacySavedReport } from '@/services/reportApi'
+import { AnnualActionGuideCard } from './AnnualActionGuide'
 import { NarrativeTimeline } from './NarrativeTimeline'
 
 const TOPIC_META = {
@@ -49,23 +50,23 @@ export function CareerReportReader({ report }: { report: LegacySavedReport | Car
               </header>
               <p className="report-year__verdict">{year.verdict}</p>
 
-              <section className="report-year__grid">
+              <section className={`report-year__grid${year.actionGuide ? ' is-action-guide' : ''}`}>
                 <div>
                   <h3>为什么这么判断</h3>
                   <ol>{year.reasons.map((reason) => <li key={reason}>{reason}</li>)}</ol>
                 </div>
-                <aside>
+                {!year.actionGuide && <aside>
                   <h3>眼下最需要解决的问题</h3>
                   <p>{year.obstacle}</p>
-                </aside>
+                </aside>}
               </section>
 
-              <section className="report-year__actions">
+              {year.actionGuide ? <AnnualActionGuideCard guide={year.actionGuide} /> : <section className="report-year__actions">
                 <h3>这一年，建议先做两件事</h3>
                 <ol>{year.actions.map((action) => <li key={action}>{action}</li>)}</ol>
-              </section>
+              </section>}
 
-              <p className="report-year__boundary"><b>出现下面的情况，就要调整：</b>{year.changeCondition}</p>
+              {!year.actionGuide && <p className="report-year__boundary"><b>出现下面的情况，就要调整：</b>{year.changeCondition}</p>}
 
               {report.edition === 'professional' && (
                 <details className="report-year__evidence">

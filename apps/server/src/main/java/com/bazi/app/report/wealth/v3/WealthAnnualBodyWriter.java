@@ -49,6 +49,10 @@ final class WealthAnnualBodyWriter {
       default -> throw new IllegalArgumentException("unknown wealth copy cause: " + cause);
     }).toList();
     if (items.isEmpty()) return "最后仍要以实际收支记录为准。";
+    if (items.size() > 2) {
+      return "核对结余时，要先扣除" + String.join("、", items.subList(0, 2))
+          + "；还要算上" + String.join("、", items.subList(2, items.size())) + "。";
+    }
     return "核对结余时，要先扣除" + String.join("、", items) + "。";
   }
 

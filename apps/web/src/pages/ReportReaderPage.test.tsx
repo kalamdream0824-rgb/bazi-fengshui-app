@@ -363,6 +363,35 @@ const relationshipV2Report: SavedReport = {
   content: { ...relationshipReport.content, timeline: timelineFor([2027, 2028]) },
 }
 
+function relationshipActionGuide(index: number) {
+  return {
+    focusKey: `relationship.dating.focus-${index}`,
+    problem: `第${index + 1}年先把一件关系问题说清。`,
+    action: `第${index + 1}年完成一次具体沟通。`,
+    expectedChange: `第${index + 1}年双方更容易理解彼此想法。`,
+    checkTiming: `连续${index + 2}周，每周核对一次实际变化。`,
+    successSignal: `第${index + 1}年双方都给出明确回应。`,
+    adjustmentCondition: `第${index + 1}年没有回应时减少单方面投入。`,
+    fallbackAction: `第${index + 1}年把问题缩小后重新沟通。`,
+    evidenceKeys: [`relationship.${index}`],
+  }
+}
+
+const relationshipV3Report = {
+  ...relationshipReport,
+  contentVersion: 'relationship-narrative-v3',
+  content: {
+    ...relationshipReport.content,
+    timeline: timelineFor([2027, 2028]),
+    years: [2026, 2027, 2028].map((year, index) => ({
+      ...relationshipReport.content.years[0],
+      year,
+      ganZhi: ['丙午', '丁未', '戊申'][index],
+      actionGuide: relationshipActionGuide(index),
+    })),
+  },
+} as unknown as SavedReport
+
 const relationshipSingleV2Report: SavedReport = {
   ...relationshipReport,
   contentVersion: 'relationship-single-v2',
@@ -386,6 +415,19 @@ const relationshipSingleV2Report: SavedReport = {
     timeline: timelineFor([2027]),
   },
 }
+
+const relationshipSingleV3Report = {
+  ...relationshipSingleV2Report,
+  contentVersion: 'relationship-single-v3',
+  content: {
+    ...relationshipSingleV2Report.content,
+    actionGuide: {
+      ...relationshipActionGuide(0),
+      focusKey: 'relationship.single.connection.supportive',
+      problem: '现在要看认识机会能否变成真实接触。',
+    },
+  },
+} as unknown as SavedReport
 
 const overallV2Report: SavedReport = {
   ...overallV11Report,
@@ -422,6 +464,36 @@ describe('ReportReaderPage', () => {
     expectTimelineBeforeDetails('.report-reader__years', 1)
   })
 
+  it('事业v5逐年展示行动带来的变化、有效信号和调整办法', async () => {
+    vi.mocked(getReport).mockResolvedValue({
+      ...careerV4Report,
+      contentVersion: 'career-narrative-v5',
+      content: {
+        ...careerV4Report.content,
+        years: careerV4Report.content.years.map((year) => ({
+          ...year,
+          actionGuide: {
+            problem: '工作已经做出成绩，但升职还没有落实。',
+            action: '整理三件最能说明自己成绩的事。',
+            expectedChange: '这样做能让升职沟通有具体依据。',
+            checkTiming: '每周记录一次工作结果；四周后统一检查。',
+            successSignal: '至少一项工作得到负责人明确反馈。',
+            adjustmentCondition: '如果只有工作量增加，就要调整。',
+            fallbackAction: '先和负责人确认职责与下一步安排。',
+            evidenceKeys: year.evidenceKeys,
+          },
+        })),
+      },
+    } as unknown as SavedReport)
+    renderReader()
+
+    expect(await screen.findByRole('heading', { name: '现在怎么做' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '这样做，可能看到什么变化' })).toBeInTheDocument()
+    expect(screen.getByText('这样做能让升职沟通有具体依据。')).toBeInTheDocument()
+    expect(screen.getByText('至少一项工作得到负责人明确反馈。')).toBeInTheDocument()
+    expect(screen.getByText('先和负责人确认职责与下一步安排。')).toBeInTheDocument()
+  })
+
   it('财富v4在总览与三年正文之间展示两条未来行动', async () => {
     vi.mocked(getReport).mockResolvedValue(wealthV4Report)
     renderReader()
@@ -438,12 +510,29 @@ describe('ReportReaderPage', () => {
     expectTimelineBeforeDetails('.report-reader__years', 2)
   })
 
+  it('感情v3逐年展示行动闭环并替代旧行动列表', async () => {
+    vi.mocked(getReport).mockResolvedValue(relationshipV3Report)
+    renderReader()
+
+    expect(await screen.findAllByRole('region', { name: '年度行动闭环' })).toHaveLength(3)
+    expect(screen.queryByRole('heading', { name: '可以怎么做' })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('heading', { name: '什么时候检查' })).toHaveLength(3)
+  })
+
   it('单身感情v2在总览与当年正文之间展示一条未来行动', async () => {
     vi.mocked(getReport).mockResolvedValue(relationshipSingleV2Report)
     renderReader()
 
     await screen.findByRole('region', { name: '命书时间线' })
     expectTimelineBeforeDetails('.relationship-single-reader__current', 1)
+  })
+
+  it('单身感情v3只展示当前年的行动闭环', async () => {
+    vi.mocked(getReport).mockResolvedValue(relationshipSingleV3Report)
+    renderReader()
+
+    expect(await screen.findAllByRole('region', { name: '年度行动闭环' })).toHaveLength(1)
+    expect(screen.getByRole('heading', { name: '2027 年 · 简短参考' })).toBeInTheDocument()
   })
 
   it('综合v2在总览与三年正文之间展示两条未来行动', async () => {
@@ -652,7 +741,7 @@ describe('ReportReaderPage', () => {
     expect(screen.queryByText('辅助钱路')).not.toBeInTheDocument()
   })
 
-  it.each(['wealth-plain-v3.4', 'wealth-plain-v3.5', 'wealth-plain-v3.6', 'wealth-plain-v3.7', 'wealth-plain-v3.8', 'wealth-plain-v3.9', 'wealth-plain-v3.10', 'wealth-plain-v3.11', 'wealth-plain-v3.12', 'wealth-plain-v3.13', 'wealth-plain-v3.14', 'wealth-plain-v3.15', 'wealth-plain-v3.16'] as const)(
+  it.each(['wealth-plain-v3.4', 'wealth-plain-v3.5', 'wealth-plain-v3.6', 'wealth-plain-v3.7', 'wealth-plain-v3.8', 'wealth-plain-v3.9', 'wealth-plain-v3.10', 'wealth-plain-v3.11', 'wealth-plain-v3.12', 'wealth-plain-v3.13', 'wealth-plain-v3.14', 'wealth-plain-v3.15', 'wealth-plain-v3.16', 'wealth-plain-v3.17', 'wealth-plain-v3.18'] as const)(
     '财富v4的%s文案使用资金状态标签且不改写历史v3标签', async (copyVersion) => {
     vi.mocked(getReport).mockResolvedValue({
       ...wealthV4Report,
@@ -720,6 +809,38 @@ describe('ReportReaderPage', () => {
     expect(screen.getByRole('heading', { name: '接下来三年，可以这样安排' })).toBeInTheDocument()
     expect(screen.getByText('先记清真实进账，再决定保留哪种收入。')).toBeInTheDocument()
     expect(screen.getByText('这是按年度整理的传统命理参考，不预测具体月份。')).toBeInTheDocument()
+  })
+
+  it('财富v3.18逐年展示行动、预期变化和无效后的调整办法', async () => {
+    vi.mocked(getReport).mockResolvedValue({
+      ...wealthV4Report,
+      content: {
+        ...wealthV4Report.content,
+        copyVersion: 'wealth-plain-v3.18',
+        years: wealthV4Report.content.years.map((year) => ({
+          ...year,
+          actionGuide: {
+            path: 'stable_income',
+            problem: wealthBlock(`${year.year}.guide.problem`, `当前先看清${year.year}年的进账是否连续。`, [year.year]),
+            action: wealthBlock(`${year.year}.guide.action`, `连续四周记录${year.year}年的实际进账。`, [year.year]),
+            expectedChange: wealthBlock(`${year.year}.guide.expected`, `这样可以看出${year.year}年的进账中断是否减少。`, [year.year]),
+            checkTiming: wealthBlock(`${year.year}.guide.timing`, `每周检查一次，四周后核对${year.year}年的结果。`, [year.year]),
+            successSignal: wealthBlock(`${year.year}.guide.success`, `${year.year}年没有出现无法覆盖日常开支的中断。`, [year.year]),
+            adjustmentCondition: wealthBlock(`${year.year}.guide.condition`, `四周后如果${year.year}年的进账仍不稳定，就需要调整。`, [year.year]),
+            fallbackAction: wealthBlock(`${year.year}.guide.fallback`, `暂停一项${year.year}年可以延后的长期支出。`, [year.year]),
+          },
+        })),
+      },
+    } as unknown as WealthV3SavedReport)
+    renderReader()
+
+    expect(await screen.findAllByRole('heading', { name: '现在怎么做' })).toHaveLength(3)
+    expect(screen.getAllByRole('heading', { name: '这样做，可能看到什么变化' })).toHaveLength(3)
+    expect(screen.getAllByRole('heading', { name: '什么时候检查' })).toHaveLength(3)
+    expect(screen.getAllByRole('heading', { name: '什么情况说明有效' })).toHaveLength(3)
+    expect(screen.getAllByRole('heading', { name: '没有改善时怎么调整' })).toHaveLength(3)
+    expect(screen.getByText('连续四周记录2026年的实际进账。')).toBeInTheDocument()
+    expect(screen.getByText('暂停一项2026年可以延后的长期支出。')).toBeInTheDocument()
   })
 
   it('财富v3把跨年相同的正文合并展示一次并标出适用年份', async () => {

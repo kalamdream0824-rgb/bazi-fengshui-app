@@ -42,7 +42,7 @@ python3 e2e/wealth_blind_review.py .private-evals/wealth-pilot-001.json
 python3 e2e/wealth_blind_review.py .private-evals/private-reports.json --init-reports --batch-id wealth-v35-dry-run-001 --commit 1dc9abf > .private-evals/wealth-v35-dry-run-001.json
 ```
 
-初始化只接受 `wealth-narrative-v4` + `wealth-plain-v3.16` 的已完成财富通俗版报告。统计器仍可复算历史 v3.4、v3.5、v3.6、v3.7、v3.8、v3.9、v3.10、v3.11、v3.12、v3.13、v3.14、v3.15 评分文件，但会拒绝在同一批次混用不同文案版本。填写骨架里的 A/B/C/D、0–3 分和失败原因后，再运行不带 `--init-reports` 的统计命令。
+初始化只接受 `wealth-narrative-v4` + `wealth-plain-v3.18` 的已完成财富通俗版报告。统计器仍可复算历史 v3.4、v3.5、v3.6、v3.7、v3.8、v3.9、v3.10、v3.11、v3.12、v3.13、v3.14、v3.15、v3.16、v3.17 评分文件，但会拒绝在同一批次混用不同文案版本。填写骨架里的 A/B/C/D、0–3 分和失败原因后，再运行不带 `--init-reports` 的统计命令。
 
 统计器会校验版本、重复报告、评分范围和失败原因，并拒绝姓名、生日、出生时间、出生地点、手机号、邮箱等个人字段。汇总输出只包含聚合指标，不回显报告正文或单份哈希。
 

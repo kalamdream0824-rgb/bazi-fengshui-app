@@ -5,6 +5,7 @@ import static com.bazi.app.report.wealth.WealthRemediationFixtures.scoredCase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bazi.app.report.wealth.v3.WealthNarrativeV3;
 import com.bazi.app.report.wealth.v3.WealthNarrativeV3.Year;
@@ -45,9 +46,32 @@ class WealthNarrativeV3ContractTest {
         WealthNarrativeV3Test.assessments(scoredCase("S07")), LocalDate.of(2026, 8, 29));
 
     var json = JSON.readTree(JSON.writeValueAsString(current));
-    assertEquals("wealth-headline-v3", json.get("headlinePlannerVersion").asText());
+    assertEquals("wealth-headline-v4", json.get("headlinePlannerVersion").asText());
     assertEquals("stable_receipt_support", json.at("/years/0/headlineMeta/themeKey").asText());
     assertEquals(current, JSON.treeToValue(json, WealthNarrativeV3.class));
+  }
+
+  @Test
+  void currentSnapshotCarriesOneCompleteEvidenceBackedActionGuidePerYear() throws Exception {
+    var current = new WealthNarrativeWriter().plan(
+        WealthNarrativeV3Test.assessments(scoredCase("S07")), LocalDate.of(2026, 8, 29));
+
+    var json = JSON.readTree(JSON.writeValueAsString(current));
+    for (int index = 0; index < 3; index++) {
+      var year = json.at("/years/" + index);
+      var guide = year.get("actionGuide");
+      assertTrue(guide != null && guide.isObject(), "annual action guide must be present");
+      assertEquals(year.at("/headlineMeta/pathKey").asText(), guide.get("path").asText());
+      for (String field : List.of(
+          "problem", "action", "expectedChange", "checkTiming", "successSignal",
+          "adjustmentCondition", "fallbackAction")) {
+        var block = guide.get(field);
+        assertTrue(block != null && block.isObject(), field + " must be present");
+        assertFalse(block.get("text").asText().isBlank(), field + " must have copy");
+        assertTrue(block.get("decisionIds").toString().contains(
+            year.at("/headlineMeta/pathKey").asText()), field + " must cite the selected decision");
+      }
+    }
   }
 
   @Test

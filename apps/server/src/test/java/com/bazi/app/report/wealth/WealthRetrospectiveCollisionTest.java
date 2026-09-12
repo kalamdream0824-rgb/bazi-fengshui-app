@@ -60,7 +60,7 @@ class WealthRetrospectiveCollisionTest {
             fixture.get("id").asText() + " repetition " + repetition);
       }
       var report = new DefaultWealthReportGenerator().generate(chart, previous, product, asOf);
-      assertEquals("wealth-plain-v3.16", report.copyVersion());
+      assertEquals("wealth-plain-v3.18", report.copyVersion());
       var past = report.timeline().past();
       assertEquals(asOf.getYear() - 1, past.year());
       assertTrue(!past.evidenceKeys().isEmpty()

@@ -21,7 +21,7 @@ SAMPLE_PATH = Path(os.environ.get(
     "V36_SAMPLE_PATH", "/tmp/wealth-v3.6-candidate-samples.md"
 ))
 EXPECTED_CONTENT_VERSION = "wealth-narrative-v4"
-EXPECTED_COPY_VERSION = "wealth-plain-v3.16"
+EXPECTED_COPY_VERSION = "wealth-plain-v3.18"
 PASSWORD = "pass123"
 USER = f"task9_wealth_{uuid.uuid4().hex[:10]}"
 OTHER_USER = f"task9_other_{uuid.uuid4().hex[:10]}"
@@ -36,15 +36,32 @@ def group_annual_copy(content: dict) -> dict[str, list[dict]]:
         "income": lambda year: [block["text"] for block in year["income"]],
         "retention": lambda year: [year["retention"]["text"]],
         "risk": lambda year: [year["risk"]["reading"]["text"]] if year.get("risk") else [],
-        "observations": lambda year: [block["text"] for block in year["observations"]],
-        "actions": lambda year: [block["text"] for block in year["actions"]],
     }
+    if any(year.get("actionGuide") for year in content["years"]):
+        selectors.update({
+            "guideProblem": lambda year: [year["actionGuide"]["problem"]["text"]],
+            "guideAction": lambda year: [year["actionGuide"]["action"]["text"]],
+            "guideExpectedChange": lambda year: [year["actionGuide"]["expectedChange"]["text"]],
+            "guideCheckTiming": lambda year: [year["actionGuide"]["checkTiming"]["text"]],
+            "guideSuccessSignal": lambda year: [year["actionGuide"]["successSignal"]["text"]],
+            "guideAdjustmentCondition": lambda year: [year["actionGuide"]["adjustmentCondition"]["text"]],
+            "guideFallbackAction": lambda year: [year["actionGuide"]["fallbackAction"]["text"]],
+        })
+    else:
+        selectors.update({
+            "observations": lambda year: [block["text"] for block in year["observations"]],
+            "actions": lambda year: [block["text"] for block in year["actions"]],
+        })
     result: dict[str, list[dict]] = {}
     for category, select in selectors.items():
         occurrences: dict[str, dict] = {}
         for year in content["years"]:
+            values = select(year)
+            texts = values if category.startswith("guide") else [
+                sentence for value in values for sentence in split_sentences(value)
+            ]
             for text in dict.fromkeys(
-                sentence for value in select(year) for sentence in split_sentences(value)
+                text.strip() for text in texts if text.strip()
             ):
                 if text in occurrences:
                     occurrences[text]["years"].append(year["year"])
@@ -61,15 +78,29 @@ def rendered_annual_copy(page: Page) -> dict[str, list[dict]]:
         "income": ".wealth-year__income p",
         "retention": ".wealth-v3-year__retention p",
         "risk": ".wealth-v3-year__risk p",
-        "observations": ".wealth-v3-year__observations li",
-        "actions": ".wealth-v3-year__actions li",
     }
+    if page.locator(".wealth-action-guide").count():
+        selectors.update({
+            "guideProblem": ".wealth-action-guide__problem p",
+            "guideAction": ".wealth-action-guide__steps article[data-step='行'] p",
+            "guideExpectedChange": ".wealth-action-guide__steps article[data-step='果'] p",
+            "guideCheckTiming": ".wealth-action-guide__steps article[data-step='验'] p",
+            "guideSuccessSignal": ".wealth-action-guide__steps article[data-step='成'] p",
+            "guideAdjustmentCondition": ".wealth-action-guide__fallback p",
+            "guideFallbackAction": ".wealth-action-guide__fallback strong",
+        })
+    else:
+        selectors.update({
+            "observations": ".wealth-v3-year__observations li",
+            "actions": ".wealth-v3-year__actions li",
+        })
     result = {category: [] for category in selectors}
     for article in page.locator(".wealth-year").all():
         year = int(article.locator("header h2").inner_text().split("·")[0].strip())
         for category, selector in selectors.items():
             for item in article.locator(selector).all():
-                text = item.locator(":scope > span").inner_text().strip()
+                text_node = item.locator(":scope > span")
+                text = (text_node.inner_text() if text_node.count() else item.inner_text()).strip()
                 badge = item.locator(":scope > .wealth-year__applies")
                 years = [year]
                 if badge.count():
@@ -84,6 +115,8 @@ def repeated_visible_sentences(page: Page) -> list[str]:
         ".wealth-v3-risk-summary p", ".wealth-year__income p > span",
         ".wealth-v3-year__retention p > span", ".wealth-v3-year__risk p > span",
         ".wealth-v3-year__observations li > span", ".wealth-v3-year__actions li > span",
+        ".wealth-action-guide__problem p", ".wealth-action-guide__steps p",
+        ".wealth-action-guide__fallback p", ".wealth-action-guide__fallback strong",
         ".wealth-v3-year__comparison p", ".wealth-v3-reader__route li",
         ".wealth-v3-reader__note",
     ]

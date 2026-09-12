@@ -4,6 +4,7 @@ import type {
   RelationshipV1SavedReport,
 } from '@/services/reportApi'
 import { NarrativeTimeline } from './NarrativeTimeline'
+import { AnnualActionGuideCard } from './AnnualActionGuide'
 import './RelationshipReportReader.css'
 
 const ORDINALS = ['第一年', '第二年', '第三年', '第四年', '第五年']
@@ -115,10 +116,14 @@ export function RelationshipReportReader({ report }: { report: RelationshipV1Sav
                 <ol>{year.realitySignals.map((signal) => <li key={signal}>{signal}</li>)}</ol>
               </section>
 
-              <section className="report-year__actions relationship-year__actions">
-                <h3>可以怎么做</h3>
-                <ol>{year.actions.map((action) => <li key={action}>{action}</li>)}</ol>
-              </section>
+              {year.actionGuide ? (
+                <AnnualActionGuideCard guide={year.actionGuide} />
+              ) : (
+                <section className="report-year__actions relationship-year__actions">
+                  <h3>可以怎么做</h3>
+                  <ol>{year.actions.map((action) => <li key={action}>{action}</li>)}</ol>
+                </section>
+              )}
 
               <p className="report-year__boundary">
                 <b>{index + 1 < report.content.years.length ? '下一年怎么看：' : '阅读提醒：'}</b>

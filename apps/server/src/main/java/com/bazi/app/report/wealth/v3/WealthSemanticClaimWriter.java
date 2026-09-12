@@ -32,17 +32,21 @@ public final class WealthSemanticClaimWriter {
     return verification + evidenceTail(claim);
   }
 
+  String briefCheck(WealthSemanticClaim claim, String styleSeed) {
+    return verification(claim, variant(claim, styleSeed, "check"));
+  }
+
   public String presentHeadline(WealthSemanticClaim claim) {
     return presentHeadline(claim, claim.semanticKey());
   }
 
   public String presentHeadline(WealthSemanticClaim claim, String styleSeed) {
-    return headlinePrefix(variant(claim, styleSeed, "present-headline"), "今年")
+    return headlinePrefix(variant(claim, styleSeed, "present-headline", 32), "今年")
         + claim.objectText();
   }
 
   public String futureHeadline(WealthSemanticClaim claim, String styleSeed) {
-    return headlinePrefix(variant(claim, styleSeed, "future-headline"), claim.year() + "年")
+    return headlinePrefix(variant(claim, styleSeed, "future-headline", 32), claim.year() + "年")
         + claim.objectText();
   }
 
@@ -56,7 +60,7 @@ public final class WealthSemanticClaimWriter {
 
   public String action(WealthSemanticClaim claim, int stepIndex, String styleSeed) {
     String verification = verification(claim,
-        variant(claim, styleSeed + "\u0000" + stepIndex, "action"));
+        variant(claim, styleSeed + "\u0000" + stepIndex, "action", 16));
     String next = switch (claim.path()) {
       case "stable_income" -> stepIndex == 0
           ? "确认连续性后，再决定是否增加固定支出"
@@ -87,7 +91,31 @@ public final class WealthSemanticClaimWriter {
       case 4 -> yearText + "先确认";
       case 5 -> yearText + "要核对";
       case 6 -> yearText + "先记清";
-      default -> yearText + "先对照";
+      case 7 -> yearText + "先对照";
+      case 8 -> yearText + "先查清";
+      case 9 -> yearText + "先理清";
+      case 10 -> yearText + "先核实";
+      case 11 -> yearText + "着重核对";
+      case 12 -> yearText + "优先核对";
+      case 13 -> yearText + "先盘点";
+      case 14 -> yearText + "先比较";
+      case 15 -> yearText + "先弄清";
+      case 16 -> yearText + "先查对";
+      case 17 -> yearText + "先梳理";
+      case 18 -> yearText + "先看明白";
+      case 19 -> yearText + "先确认清楚";
+      case 20 -> yearText + "先列清";
+      case 21 -> yearText + "先核验";
+      case 22 -> yearText + "先逐项核对";
+      case 23 -> yearText + "先逐项确认";
+      case 24 -> yearText + "优先确认";
+      case 25 -> yearText + "着重确认";
+      case 26 -> yearText + "重新核对";
+      case 27 -> yearText + "认真核对";
+      case 28 -> yearText + "先按实际结果核对";
+      case 29 -> yearText + "先按记录核对";
+      case 30 -> yearText + "先细看";
+      default -> yearText + "先弄明白";
     };
   }
 
@@ -152,8 +180,8 @@ public final class WealthSemanticClaimWriter {
       case 2 -> subject + "有机会" + outcomes[0] + "，但也可能" + outcomes[1];
       case 3 -> subject + "可能" + outcomes[0] + "，也可能" + outcomes[1];
       case 4 -> condition + "既可能" + outcomes[0] + "，也可能" + outcomes[1];
-      case 5 -> condition + "结果有两种：" + outcomes[0] + "或" + outcomes[1];
-      case 6 -> subject + "可能出现" + outcomes[0] + "或" + outcomes[1];
+      case 5 -> condition + "结果有两种可能：" + outcomes[0] + "，或者" + outcomes[1];
+      case 6 -> subject + "接下来可能" + outcomes[0] + "，也可能" + outcomes[1];
       default -> condition + outcomes[0] + "与" + outcomes[1] + "都要考虑";
     };
   }
@@ -192,17 +220,29 @@ public final class WealthSemanticClaimWriter {
     String object = claim.objectText();
     return switch (variant) {
       case 0 -> WealthHeadlineVocabulary.entry(claim.themeKey()).sentenceSpec().verification();
-      case 1 -> "记录" + object;
+      case 1 -> object.endsWith("记录") ? "整理" + object : "记录" + object;
       case 2 -> "核对" + object;
       case 3 -> "写清" + object;
       case 4 -> "按顺序记下" + object;
       case 5 -> "另记" + object;
       case 6 -> "用真实记录核对" + object;
-      default -> "对照" + object + "与最终结果";
+      case 7 -> "把" + object + "和最终结果作比较";
+      case 8 -> "查清" + object;
+      case 9 -> "确认" + object;
+      case 10 -> "比较" + object;
+      case 11 -> "盘点" + object;
+      case 12 -> object.endsWith("记录") ? "逐项整理" + object : "逐项记录" + object;
+      case 13 -> "按实际结果核对" + object;
+      case 14 -> "根据现有记录查清" + object;
+      default -> "把" + object + "记清";
     };
   }
 
   private int variant(WealthSemanticClaim claim, String styleSeed, String channel) {
+    return variant(claim, styleSeed, channel, 8);
+  }
+
+  private int variant(WealthSemanticClaim claim, String styleSeed, String channel, int bound) {
     if (styleSeed == null || styleSeed.isBlank()) {
       throw new IllegalArgumentException("wealth copy style seed is required");
     }
@@ -210,7 +250,7 @@ public final class WealthSemanticClaimWriter {
       byte[] digest = MessageDigest.getInstance("SHA-256").digest(
           (claim.semanticKey() + "\u0000" + styleSeed + "\u0000" + channel)
               .getBytes(StandardCharsets.UTF_8));
-      return Math.floorMod(java.nio.ByteBuffer.wrap(digest, 8, Integer.BYTES).getInt(), 8);
+      return Math.floorMod(java.nio.ByteBuffer.wrap(digest, 8, Integer.BYTES).getInt(), bound);
     } catch (NoSuchAlgorithmException error) {
       throw new IllegalStateException(error);
     }

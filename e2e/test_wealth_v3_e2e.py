@@ -40,7 +40,7 @@ class WealthV36VisibleCopyTest(unittest.TestCase):
 
     def test_current_saved_report_versions_are_explicit(self):
         self.assertEqual("wealth-narrative-v4", getattr(MODULE, "EXPECTED_CONTENT_VERSION", None))
-        self.assertEqual("wealth-plain-v3.16", getattr(MODULE, "EXPECTED_COPY_VERSION", None))
+        self.assertEqual("wealth-plain-v3.18", getattr(MODULE, "EXPECTED_COPY_VERSION", None))
 
 
 if __name__ == "__main__":

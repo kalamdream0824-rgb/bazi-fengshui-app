@@ -1,0 +1,157 @@
+{
+  "zoneId": "Asia/Shanghai",
+  "asOf": "2026-09-10",
+  "notice": "固定工程测试数据，仅用于验证跨命盘区分度、文案碰撞和确定性，不代表真人经历或预测准确率。",
+  "cases": [
+    {
+      "id": "W01",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W01", "gender": "male", "solarDateTime": "1961-01-07T00:25:00", "birthPlace": "上海", "trueSolarTime": false}
+    },
+    {
+      "id": "W02",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W02", "gender": "female", "solarDateTime": "1963-02-18T02:40:00", "birthPlace": "北京市 北京市", "trueSolarTime": true}
+    },
+    {
+      "id": "W03",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W03", "gender": "male", "solarDateTime": "1965-03-29T04:55:00", "birthPlace": "广州", "trueSolarTime": false}
+    },
+    {
+      "id": "W04",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W04", "gender": "female", "solarDateTime": "1967-05-11T06:20:00", "birthPlace": "四川省 成都市", "trueSolarTime": true}
+    },
+    {
+      "id": "W05",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W05", "gender": "male", "solarDateTime": "1969-06-22T08:35:00", "birthPlace": "杭州", "trueSolarTime": false}
+    },
+    {
+      "id": "W06",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W06", "gender": "female", "solarDateTime": "1971-08-03T10:50:00", "birthPlace": "江苏省 南京市", "trueSolarTime": true}
+    },
+    {
+      "id": "W07",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W07", "gender": "male", "solarDateTime": "1973-09-14T12:05:00", "birthPlace": "武汉", "trueSolarTime": false}
+    },
+    {
+      "id": "W08",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W08", "gender": "female", "solarDateTime": "1975-10-26T14:30:00", "birthPlace": "陕西省 西安市", "trueSolarTime": true}
+    },
+    {
+      "id": "W09",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W09", "gender": "male", "solarDateTime": "1977-12-07T16:45:00", "birthPlace": "长沙", "trueSolarTime": false}
+    },
+    {
+      "id": "W10",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W10", "gender": "female", "solarDateTime": "1979-01-19T18:15:00", "birthPlace": "广东省 深圳市", "trueSolarTime": true}
+    },
+    {
+      "id": "W11",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W11", "gender": "male", "solarDateTime": "1980-04-30T20:25:00", "birthPlace": "厦门", "trueSolarTime": false}
+    },
+    {
+      "id": "W12",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W12", "gender": "female", "solarDateTime": "1982-06-12T22:40:00", "birthPlace": "山东省 青岛市", "trueSolarTime": true}
+    },
+    {
+      "id": "W13",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W13", "gender": "male", "solarDateTime": "1984-07-24T23:50:00", "birthPlace": "大连", "trueSolarTime": false}
+    },
+    {
+      "id": "W14",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W14", "gender": "female", "solarDateTime": "1986-09-05T01:10:00", "birthPlace": "云南省 昆明市", "trueSolarTime": true}
+    },
+    {
+      "id": "W15",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W15", "gender": "male", "solarDateTime": "1988-10-17T03:25:00", "birthPlace": "重庆", "trueSolarTime": false}
+    },
+    {
+      "id": "W16",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W16", "gender": "female", "solarDateTime": "1990-11-28T05:40:00", "birthPlace": "河南省 郑州市", "trueSolarTime": true}
+    },
+    {
+      "id": "W17",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W17", "gender": "male", "solarDateTime": "1992-01-09T07:55:00", "birthPlace": "福州", "trueSolarTime": false}
+    },
+    {
+      "id": "W18",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W18", "gender": "female", "solarDateTime": "1993-03-21T09:05:00", "birthPlace": "河北省 石家庄市", "trueSolarTime": true}
+    },
+    {
+      "id": "W19",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W19", "gender": "male", "solarDateTime": "1994-05-02T11:20:00", "birthPlace": "合肥", "trueSolarTime": false}
+    },
+    {
+      "id": "W20",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W20", "gender": "female", "solarDateTime": "1996-06-13T13:35:00", "birthPlace": "江西省 南昌市", "trueSolarTime": true}
+    },
+    {
+      "id": "W21",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W21", "gender": "male", "solarDateTime": "1997-07-25T15:50:00", "birthPlace": "天津", "trueSolarTime": false}
+    },
+    {
+      "id": "W22",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W22", "gender": "female", "solarDateTime": "1998-09-06T17:05:00", "birthPlace": "吉林省 长春市", "trueSolarTime": true}
+    },
+    {
+      "id": "W23",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W23", "gender": "male", "solarDateTime": "1999-10-18T19:20:00", "birthPlace": "哈尔滨", "trueSolarTime": false}
+    },
+    {
+      "id": "W24",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W24", "gender": "female", "solarDateTime": "2000-11-29T21:35:00", "birthPlace": "贵州省 贵阳市", "trueSolarTime": true}
+    },
+    {
+      "id": "W25",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W25", "gender": "male", "solarDateTime": "2001-01-10T23:45:00", "birthPlace": "南宁", "trueSolarTime": false}
+    },
+    {
+      "id": "W26",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W26", "gender": "female", "solarDateTime": "2002-02-20T00:55:00", "birthPlace": "甘肃省 兰州市", "trueSolarTime": true}
+    },
+    {
+      "id": "W27",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W27", "gender": "male", "solarDateTime": "2003-04-03T02:15:00", "birthPlace": "太原", "trueSolarTime": false}
+    },
+    {
+      "id": "W28",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W28", "gender": "female", "solarDateTime": "2004-05-15T04:30:00", "birthPlace": "海南省 海口市", "trueSolarTime": true}
+    },
+    {
+      "id": "W29",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W29", "gender": "male", "solarDateTime": "2005-07-26T06:45:00", "birthPlace": "乌鲁木齐", "trueSolarTime": false}
+    },
+    {
+      "id": "W30",
+      "asOf": "2026-09-10",
+      "request": {"name": "工程样本W30", "gender": "female", "solarDateTime": "2006-09-08T08:55:00", "birthPlace": "内蒙古自治区 呼和浩特市", "trueSolarTime": true}
+    }
+  ]
+}

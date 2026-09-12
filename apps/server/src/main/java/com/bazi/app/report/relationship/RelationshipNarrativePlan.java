@@ -1,6 +1,8 @@
 package com.bazi.app.report.relationship;
 
 import com.bazi.app.report.NarrativeTimeline;
+import com.bazi.app.report.AnnualActionGuide;
+import com.bazi.app.report.AnnualActionGuide;
 import com.bazi.app.report.ReportContent;
 import com.bazi.app.report.ReportHorizon;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -139,7 +141,25 @@ public record RelationshipNarrativePlan(
       String primaryDimensionCode,
       String secondaryDimensionCode,
       String riskDimensionCode,
-      List<String> evidenceKeys) {
+      List<String> evidenceKeys,
+      @JsonInclude(JsonInclude.Include.NON_NULL) AnnualActionGuide actionGuide) {
+
+    public YearNarrative(
+        int year,
+        String ganZhi,
+        String focus,
+        String judgment,
+        String mainLimit,
+        List<String> realitySignals,
+        List<String> actions,
+        String transition,
+        String primaryDimensionCode,
+        String secondaryDimensionCode,
+        String riskDimensionCode,
+        List<String> evidenceKeys) {
+      this(year, ganZhi, focus, judgment, mainLimit, realitySignals, actions, transition,
+          primaryDimensionCode, secondaryDimensionCode, riskDimensionCode, evidenceKeys, null);
+    }
 
     public YearNarrative {
       ganZhi = requireText(ganZhi, "year GanZhi");

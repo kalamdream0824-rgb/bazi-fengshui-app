@@ -92,12 +92,32 @@ class CareerNarrativePlannerTest {
         assessor.assess(request, chart, ReportTopic.CAREER, context), context);
     JsonNode legacy = mapper.valueToTree(current);
     ((com.fasterxml.jackson.databind.node.ObjectNode) legacy).remove("timeline");
+    legacy.withArray("years").forEach(year ->
+        ((com.fasterxml.jackson.databind.node.ObjectNode) year).remove("actionGuide"));
 
     CareerNarrativePlan restored = mapper.treeToValue(legacy, CareerNarrativePlan.class);
 
     assertNull(restored.timeline());
+    assertTrue(restored.years().stream().allMatch(year -> year.actionGuide() == null));
     assertEquals(current.thesis(), restored.thesis());
-    assertEquals(current.years(), restored.years());
+    assertEquals(current.years().stream().map(CareerNarrativePlan.YearNarrative::headline).toList(),
+        restored.years().stream().map(CareerNarrativePlan.YearNarrative::headline).toList());
+  }
+
+  @Test
+  void readsEarlyV5JsonThatDoesNotContainActionGuideFocusKey() throws Exception {
+    CareerContext context = CareerContext.fromCodes("job_seeking", "job_change", "stalled");
+    ObjectMapper mapper = new ObjectMapper();
+    CareerNarrativePlan current = planner.plan(
+        assessor.assess(request, chart, ReportTopic.CAREER, context), context);
+    JsonNode earlyV5 = mapper.valueToTree(current);
+    earlyV5.withArray("years").forEach(year ->
+        ((com.fasterxml.jackson.databind.node.ObjectNode) year.get("actionGuide")).remove("focusKey"));
+
+    CareerNarrativePlan restored = mapper.treeToValue(earlyV5, CareerNarrativePlan.class);
+
+    assertTrue(restored.years().stream()
+        .allMatch(year -> year.actionGuide().focusKey().equals("legacy.unspecified")));
   }
 
   @Test
@@ -161,6 +181,113 @@ class CareerNarrativePlannerTest {
         assertTrue(line.length() <= 48, line.length() + " chars: " + line);
       }
     }
+  }
+
+  @Test
+  void addsACompleteOutcomeDrivenActionGuideForEveryCareerSituation() {
+    List<CareerContext> contexts = List.of(
+        CareerContext.fromCodes("employed", "promotion", "smooth"),
+        CareerContext.fromCodes("self_employed", "stability", "high_pressure"),
+        CareerContext.fromCodes("job_seeking", "job_change", "stalled"),
+        CareerContext.fromCodes("studying", "transition", "preparing_change"));
+
+    List<CareerNarrativePlan> plans = contexts.stream()
+        .map(context -> planner.plan(
+            assessor.assess(request, chart, ReportTopic.CAREER, context), context))
+        .toList();
+
+    for (CareerNarrativePlan plan : plans) {
+      for (CareerNarrativePlan.YearNarrative year : plan.years()) {
+        AnnualActionGuide guide = year.actionGuide();
+        assertNotNull(guide);
+        assertFalse(guide.focusKey().isBlank());
+        assertFalse(guide.problem().isBlank());
+        assertFalse(guide.action().isBlank());
+        assertFalse(guide.expectedChange().isBlank());
+        assertFalse(guide.checkTiming().isBlank());
+        assertFalse(guide.successSignal().isBlank());
+        assertFalse(guide.adjustmentCondition().isBlank());
+        assertFalse(guide.fallbackAction().isBlank());
+        assertEquals(year.evidenceKeys(), guide.evidenceKeys());
+      }
+    }
+
+    assertContainsAny(actionGuideText(plans.get(0)), "工作", "负责人", "职位", "收入");
+    assertContainsAny(actionGuideText(plans.get(1)), "客户", "项目", "生意", "收入");
+    assertContainsAny(actionGuideText(plans.get(2)), "岗位", "招聘", "面试", "投递");
+    assertContainsAny(actionGuideText(plans.get(3)), "学习", "作品", "实习", "能力");
+  }
+
+  @Test
+  void annualCalculationFocusChangesTheCareerActionGuide() {
+    CareerContext context = CareerContext.fromCodes("employed", "promotion", "smooth");
+    CareerActionGuideWriter writer = new CareerActionGuideWriter();
+
+    AnnualActionGuide visibility = writer.write(
+        context, 0, "career.visibility", AnnualStage.ADVANCE,
+        "工作成绩还没有被看见。", "整理一项已经做成的工作。",
+        "四周后仍没有明确反馈。", "请负责人指出还缺少什么。",
+        List.of("career.visibility", "annual.stem.group.output"));
+    AnnualActionGuide coordination = writer.write(
+        context, 0, "career.coordination_window", AnnualStage.ADVANCE,
+        "工作需要别人配合才能继续。", "找一位相关同事确认分工。",
+        "四周后仍没有人参与。", "把工作拆小后重新确认分工。",
+        List.of("career.coordination_window", "annual.branch.relation.harmony"));
+
+    assertEquals("career.visibility", visibility.focusKey());
+    assertEquals("career.coordination_window", coordination.focusKey());
+    assertNotEquals(visibility.expectedChange(), coordination.expectedChange());
+    assertNotEquals(visibility.successSignal(), coordination.successSignal());
+  }
+
+  @Test
+  void everyCareerCalculationFocusOwnsADistinctDecisionInEverySituation() {
+    List<String> focuses = List.of(
+        "career.role_transition",
+        "career.coordination_window",
+        "career.responsibility_upgrade",
+        "career.visibility",
+        "career.preparation",
+        "career.resource_delivery",
+        "career.overextension");
+    List<CareerContext> contexts = List.of(
+        CareerContext.fromCodes("employed", "promotion", "smooth"),
+        CareerContext.fromCodes("self_employed", "stability", "high_pressure"),
+        CareerContext.fromCodes("job_seeking", "job_change", "stalled"),
+        CareerContext.fromCodes("studying", "transition", "preparing_change"));
+    CareerActionGuideWriter writer = new CareerActionGuideWriter();
+
+    for (CareerContext context : contexts) {
+      List<AnnualActionGuide> guides = focuses.stream()
+          .map(focus -> writer.write(
+              context, 0, focus, AnnualStage.ADVANCE,
+              "当前有一件具体问题需要处理。", "先完成一项具体行动。",
+              "四周后仍没有变化。", "把范围缩小后再试一次。",
+              List.of(focus, "natal.fact")))
+          .toList();
+
+      assertEquals(focuses, guides.stream().map(AnnualActionGuide::focusKey).toList());
+      assertEquals(focuses.size(), guides.stream()
+          .map(guide -> guide.expectedChange() + guide.successSignal())
+          .distinct()
+          .count());
+    }
+  }
+
+  @Test
+  void careerActionGuideDoesNotRepeatSentencesAcrossProductYears() {
+    CareerContext context = CareerContext.fromCodes("employed", "promotion", "smooth");
+    CareerNarrativePlan plan = planner.plan(
+        assessor.assess(request, chart, ReportTopic.CAREER, context), context);
+
+    List<String> sentences = plan.years().stream()
+        .flatMap(year -> year.actionGuide().lines().stream())
+        .flatMap(line -> java.util.Arrays.stream(line.split("(?<=[。！？])")))
+        .map(String::trim)
+        .filter(line -> !line.isBlank())
+        .toList();
+
+    assertEquals(sentences.size(), sentences.stream().distinct().count(), sentences.toString());
   }
 
   @Test
@@ -233,6 +360,16 @@ class CareerNarrativePlannerTest {
             + String.join("", year.actions())
             + year.changeCondition())
         .collect(Collectors.joining());
+  }
+
+  private String actionGuideText(CareerNarrativePlan plan) {
+    return plan.years().stream()
+        .flatMap(year -> year.actionGuide().lines().stream())
+        .collect(Collectors.joining());
+  }
+
+  private void assertContainsAny(String text, String... words) {
+    assertTrue(java.util.Arrays.stream(words).anyMatch(text::contains), text);
   }
 
   private List<String> readerLines(CareerNarrativePlan plan) {

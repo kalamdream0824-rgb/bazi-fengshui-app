@@ -25,7 +25,10 @@
       "const": "ready"
     },
     "contentVersion": {
-      "const": "wealth-narrative-v3"
+      "enum": [
+        "wealth-narrative-v3",
+        "wealth-narrative-v4"
+      ]
     },
     "content": {
       "$ref": "#/definitions/Content"
@@ -566,7 +569,12 @@
       "additionalProperties": false,
       "properties": {
         "plannerVersion": {
-          "const": "wealth-headline-v1"
+          "enum": [
+            "wealth-headline-v1",
+            "wealth-headline-v2",
+            "wealth-headline-v3",
+            "wealth-headline-v4"
+          ]
         },
         "themeKey": {
           "type": "string",
@@ -615,6 +623,46 @@
         "objectKey",
         "corePhraseKeys",
         "selectionReasonCodes"
+      ]
+    },
+    "ActionGuide": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "$ref": "#/definitions/Path"
+        },
+        "problem": {
+          "$ref": "#/definitions/Block"
+        },
+        "action": {
+          "$ref": "#/definitions/Block"
+        },
+        "expectedChange": {
+          "$ref": "#/definitions/Block"
+        },
+        "checkTiming": {
+          "$ref": "#/definitions/Block"
+        },
+        "successSignal": {
+          "$ref": "#/definitions/Block"
+        },
+        "adjustmentCondition": {
+          "$ref": "#/definitions/Block"
+        },
+        "fallbackAction": {
+          "$ref": "#/definitions/Block"
+        }
+      },
+      "required": [
+        "path",
+        "problem",
+        "action",
+        "expectedChange",
+        "checkTiming",
+        "successSignal",
+        "adjustmentCondition",
+        "fallbackAction"
       ]
     },
     "Year": {
@@ -696,6 +744,9 @@
           },
           "minItems": 1,
           "maxItems": 2
+        },
+        "actionGuide": {
+          "$ref": "#/definitions/ActionGuide"
         },
         "comparison": {
           "anyOf": [
@@ -844,11 +895,31 @@
             "wealth-plain-v3",
             "wealth-plain-v3.1",
             "wealth-plain-v3.2",
-            "wealth-plain-v3.3"
+            "wealth-plain-v3.3",
+            "wealth-plain-v3.4",
+            "wealth-plain-v3.5",
+            "wealth-plain-v3.6",
+            "wealth-plain-v3.7",
+            "wealth-plain-v3.8",
+            "wealth-plain-v3.9",
+            "wealth-plain-v3.10",
+            "wealth-plain-v3.11",
+            "wealth-plain-v3.12",
+            "wealth-plain-v3.13",
+            "wealth-plain-v3.14",
+            "wealth-plain-v3.15",
+            "wealth-plain-v3.16",
+            "wealth-plain-v3.17",
+            "wealth-plain-v3.18"
           ]
         },
         "headlinePlannerVersion": {
-          "const": "wealth-headline-v1"
+          "enum": [
+            "wealth-headline-v1",
+            "wealth-headline-v2",
+            "wealth-headline-v3",
+            "wealth-headline-v4"
+          ]
         },
         "thesis": {
           "$ref": "#/definitions/Block"
@@ -939,6 +1010,43 @@
                     {
                       "required": [
                         "headlineMeta"
+                      ]
+                    }
+                  ]
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "copyVersion": {
+                "const": "wealth-plain-v3.18"
+              }
+            },
+            "required": [
+              "copyVersion"
+            ]
+          },
+          "then": {
+            "required": [
+              "headlinePlannerVersion"
+            ],
+            "properties": {
+              "years": {
+                "type": "array",
+                "items": {
+                  "allOf": [
+                    {
+                      "$ref": "#/definitions/Year"
+                    },
+                    {
+                      "required": [
+                        "headlineMeta",
+                        "actionGuide"
                       ]
                     }
                   ]

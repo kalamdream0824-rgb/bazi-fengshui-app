@@ -2,6 +2,10 @@ package com.bazi.app.report.wealth.v3;
 
 import com.bazi.app.report.NarrativeTimeline;
 import com.bazi.app.report.NarrativeTimelineValidator;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -99,9 +103,61 @@ public final class WealthTimelinePlanner {
       String styleSeed) {
     String first = new WealthSemanticClaimWriter()
         .check(claim, styleSeed + "\u0000priority");
+    String lead = priorityLead(priorityVariant(claim, styleSeed, 16));
+    int tailVariant = priorityVariant(claim, styleSeed + "\u0000tail", 4);
     return retention.limitationWeight() > 0
-        ? "先" + first + "，然后从已到账的钱里预留日常开销，避免临时支出压低实际结余。"
-        : "先" + first + "，月底再核对实际留下多少钱。";
+        ? lead + first + limitedPriorityTail(tailVariant)
+        : lead + first + openPriorityTail(tailVariant);
+  }
+
+  private String priorityLead(int variant) {
+    return switch (variant) {
+      case 0 -> "先";
+      case 1 -> "当前先";
+      case 2 -> "安排支出前，先";
+      case 3 -> "这一阶段先";
+      case 4 -> "眼下先";
+      case 5 -> "决定新增花费前，先";
+      case 6 -> "处理今年收支时，先";
+      case 7 -> "开始安排资金前，先";
+      case 8 -> "今年首先";
+      case 9 -> "先把基础情况弄清：";
+      case 10 -> "先从实际记录入手：";
+      case 11 -> "现在要先";
+      case 12 -> "目前先";
+      case 13 -> "眼下要先";
+      case 14 -> "做判断前，先";
+      default -> "决定下一步前，先";
+    };
+  }
+
+  private String limitedPriorityTail(int variant) {
+    return switch (variant) {
+      case 0 -> "，然后从已到账的钱里预留日常开销，避免临时支出压低实际结余。";
+      case 1 -> "；核对完成后，再从实收金额中留出日常开销，避免临时支出减少结余。";
+      case 2 -> "，随后按实际到账金额先留出日常开销，防止临时花费压低结余。";
+      default -> "；确认真实进账后，先预留日常开销，再决定其余的钱如何使用。";
+    };
+  }
+
+  private String openPriorityTail(int variant) {
+    return switch (variant) {
+      case 0 -> "，月底再核对实际留下多少钱。";
+      case 1 -> "；到月底再查看真正留下了多少钱。";
+      case 2 -> "，月末再按真实记录计算结余。";
+      default -> "；月底要再对照进账和支出，确认实际结余。";
+    };
+  }
+
+  private int priorityVariant(WealthSemanticClaim claim, String styleSeed, int bound) {
+    try {
+      byte[] digest = MessageDigest.getInstance("SHA-256").digest(
+          (claim.semanticKey() + "\u0000" + styleSeed + "\u0000priority-copy")
+              .getBytes(StandardCharsets.UTF_8));
+      return Math.floorMod(ByteBuffer.wrap(digest, 8, Integer.BYTES).getInt(), bound);
+    } catch (NoSuchAlgorithmException error) {
+      throw new IllegalStateException(error);
+    }
   }
 
   private WealthNarrativeV3.Block selectAction(

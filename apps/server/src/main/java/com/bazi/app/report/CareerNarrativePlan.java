@@ -1,5 +1,6 @@
 package com.bazi.app.report;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,7 +39,26 @@ public record CareerNarrativePlan(
       List<String> evidenceKeys,
       List<ReportEvidence> evidence,
       List<ReportEvidence> counterEvidence,
-      String confidence) {
+      String confidence,
+      @JsonInclude(JsonInclude.Include.NON_NULL) AnnualActionGuide actionGuide) {
+
+    public YearNarrative(
+        int year,
+        String ganZhi,
+        String stage,
+        String headline,
+        String verdict,
+        List<String> reasons,
+        String obstacle,
+        List<String> actions,
+        String changeCondition,
+        List<String> evidenceKeys,
+        List<ReportEvidence> evidence,
+        List<ReportEvidence> counterEvidence,
+        String confidence) {
+      this(year, ganZhi, stage, headline, verdict, reasons, obstacle, actions,
+          changeCondition, evidenceKeys, evidence, counterEvidence, confidence, null);
+    }
 
     public YearNarrative {
       Objects.requireNonNull(ganZhi, "ganZhi");

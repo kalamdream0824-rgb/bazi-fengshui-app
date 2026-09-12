@@ -26,6 +26,9 @@ public final class CareerNarrativePlanner {
     for (int index = 0; index < assessment.years().size(); index++) {
       years.add(year(assessment.years().get(index), context, index));
     }
+    AnnualActionGuidePolicy.validate(years.stream()
+        .map(CareerNarrativePlan.YearNarrative::actionGuide)
+        .toList());
     LinkedHashSet<String> route = new LinkedHashSet<>();
     years.forEach(year -> route.addAll(year.actions()));
     NarrativeTimeline timeline = previous == null ? null : new CareerTimelinePlanner().plan(
@@ -47,9 +50,16 @@ public final class CareerNarrativePlanner {
       CareerContext context,
       int index) {
     String ruleKey = year.ruleKeys().isEmpty() ? "" : year.ruleKeys().get(0);
+    String obstacle = obstacle(context, index);
     List<String> actions = List.of(
         goalAction(context.goal(), index),
         supportingAction(context.status(), index));
+    String changeCondition = changeCondition(context, index);
+    List<String> evidenceKeys = year.evidence().stream()
+        .map(ReportEvidence::key).distinct().toList();
+    AnnualActionGuide actionGuide = new CareerActionGuideWriter().write(
+        context, index, ruleKey, year.stage(), obstacle, actions.get(0), changeCondition,
+        actions.get(1), evidenceKeys);
 
     return new CareerNarrativePlan.YearNarrative(
         year.year(),
@@ -58,13 +68,14 @@ public final class CareerNarrativePlanner {
         plainHeadline(ruleKey, year.stage(), context.status()),
         verdict(year.stage(), context.status()),
         List.of(astrologyReason(ruleKey, year.stage(), context.status()), contextReason(context, index)),
-        obstacle(context, index),
+        obstacle,
         actions,
-        changeCondition(context, index),
-        year.evidence().stream().map(ReportEvidence::key).distinct().toList(),
+        changeCondition,
+        evidenceKeys,
         year.evidence(),
         year.counterEvidence(),
-        confidence(year.confidence()));
+        confidence(year.confidence()),
+        actionGuide);
   }
 
   private String contextSummary(CareerContext context) {

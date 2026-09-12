@@ -1,6 +1,7 @@
 package com.bazi.app.report.relationship;
 
 import com.bazi.app.report.NarrativeTimeline;
+import com.bazi.app.report.AnnualActionGuide;
 import com.bazi.app.report.ReportContent;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
@@ -20,6 +21,7 @@ public record RelationshipSingleNarrativePlan(
     String readingNote,
     List<RelationshipYearEvaluation> evaluations,
     List<String> evidenceKeys,
+    @JsonInclude(JsonInclude.Include.NON_NULL) AnnualActionGuide actionGuide,
     @JsonInclude(JsonInclude.Include.NON_NULL) NarrativeTimeline timeline) implements ReportContent {
 
   public RelationshipSingleNarrativePlan(
@@ -46,6 +48,7 @@ public record RelationshipSingleNarrativePlan(
         readingNote,
         evaluations,
         evidenceKeys,
+        null,
         null);
   }
 

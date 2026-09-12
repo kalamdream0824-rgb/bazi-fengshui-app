@@ -69,7 +69,7 @@ export interface WealthComparisonV3 {
 }
 
 export interface WealthHeadlineMetaV3 {
-  plannerVersion: 'wealth-headline-v1'
+  plannerVersion: 'wealth-headline-v1' | 'wealth-headline-v2' | 'wealth-headline-v3' | 'wealth-headline-v4'
   themeKey: string
   pathKey: WealthPathV3
   subjectKey: string
@@ -77,6 +77,17 @@ export interface WealthHeadlineMetaV3 {
   objectKey: string
   corePhraseKeys: string[]
   selectionReasonCodes: string[]
+}
+
+export interface WealthActionGuideV3 {
+  path: WealthPathV3
+  problem: WealthBlockV3
+  action: WealthBlockV3
+  expectedChange: WealthBlockV3
+  checkTiming: WealthBlockV3
+  successSignal: WealthBlockV3
+  adjustmentCondition: WealthBlockV3
+  fallbackAction: WealthBlockV3
 }
 
 export interface WealthYearV3 {
@@ -93,6 +104,7 @@ export interface WealthYearV3 {
   risk: WealthRiskV3 | null
   observations: WealthBlockV3[]
   actions: WealthBlockV3[]
+  actionGuide?: WealthActionGuideV3
   comparison: WealthComparisonV3 | null
 }
 
@@ -103,7 +115,11 @@ export interface WealthContentV3 {
   calculationVersion: 'wealth-path-v2'
   policyVersion: 'wealth-expression-v1'
   copyVersion: 'wealth-plain-v3' | 'wealth-plain-v3.1' | 'wealth-plain-v3.2' | 'wealth-plain-v3.3'
-  headlinePlannerVersion?: 'wealth-headline-v1'
+    | 'wealth-plain-v3.4' | 'wealth-plain-v3.5' | 'wealth-plain-v3.6' | 'wealth-plain-v3.7'
+    | 'wealth-plain-v3.8' | 'wealth-plain-v3.9' | 'wealth-plain-v3.10' | 'wealth-plain-v3.11'
+    | 'wealth-plain-v3.12' | 'wealth-plain-v3.13' | 'wealth-plain-v3.14' | 'wealth-plain-v3.15'
+    | 'wealth-plain-v3.16' | 'wealth-plain-v3.17' | 'wealth-plain-v3.18'
+  headlinePlannerVersion?: 'wealth-headline-v1' | 'wealth-headline-v2' | 'wealth-headline-v3' | 'wealth-headline-v4'
   thesis: WealthBlockV3
   summary: WealthBlockV3
   pathSummaries: Array<{ path: WealthPathV3; reading: WealthBlockV3; yearDecisionIds: string[] }>
@@ -119,7 +135,7 @@ export interface WealthReportV3 {
   topic: 'wealth'
   edition: 'plain'
   status: 'ready'
-  contentVersion: 'wealth-narrative-v3'
+  contentVersion: 'wealth-narrative-v3' | 'wealth-narrative-v4'
   content: WealthContentV3
   createdAt: string
   generatedAt: string

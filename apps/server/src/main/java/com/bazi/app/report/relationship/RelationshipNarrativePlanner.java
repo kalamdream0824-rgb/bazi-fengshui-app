@@ -2,6 +2,7 @@ package com.bazi.app.report.relationship;
 
 import com.bazi.app.report.NarrativeTimeline;
 import com.bazi.app.report.NarrativeTimelinePlanner;
+import com.bazi.app.report.AnnualActionGuidePolicy;
 import com.bazi.app.report.ReportTopic;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -48,8 +49,11 @@ public final class RelationshipNarrativePlanner {
         prefix, period.mainRisk());
     List<RelationshipNarrativePlan.YearNarrative> years = new ArrayList<>();
     for (int index = 0; index < period.years().size(); index++) {
-      years.add(year(prefix, period, index));
+      years.add(year(prefix, relationshipStatus, period, index));
     }
+    AnnualActionGuidePolicy.validate(years.stream()
+        .map(RelationshipNarrativePlan.YearNarrative::actionGuide)
+        .toList());
 
     Map<String, String> summaryVariables = Map.of(
         "primary", period.focus().primaryDimension().label(),
@@ -83,6 +87,7 @@ public final class RelationshipNarrativePlanner {
 
   private RelationshipNarrativePlan.YearNarrative year(
       String prefix,
+      RelationshipStatus relationshipStatus,
       RelationshipPeriodEvaluation period,
       int index) {
     RelationshipPeriodEvaluation.Year year = period.years().get(index);
@@ -93,6 +98,14 @@ public final class RelationshipNarrativePlanner {
     evidenceKeys.addAll(year.focus().primaryEvidenceKeys());
     evidenceKeys.addAll(year.focus().secondaryEvidenceKeys());
     if (risk != null) evidenceKeys.addAll(risk.evidenceKeys());
+    List<String> actions = annualNarrator.actions(prefix, year);
+    var actionGuide = new RelationshipActionGuideWriter().write(
+        relationshipStatus,
+        year,
+        index,
+        actions.get(0),
+        actions.get(1),
+        List.copyOf(evidenceKeys));
 
     RelationshipPeriodEvaluation.Year previous = index > 0 ? period.years().get(index - 1) : null;
     RelationshipPeriodEvaluation.Year next = index + 1 < period.years().size()
@@ -106,12 +119,13 @@ public final class RelationshipNarrativePlanner {
         risk == null ? null : RelationshipPlainCopy.get(
             prefix + ".risk." + risk.dimension().code()),
         annualNarrator.signals(prefix, year),
-        annualNarrator.actions(prefix, year),
+        actions,
         annualNarrator.transition(prefix, year, next),
         primary.code(),
         secondary.code(),
         risk == null ? null : risk.dimension().code(),
-        List.copyOf(evidenceKeys));
+        List.copyOf(evidenceKeys),
+        actionGuide);
   }
 
   private RelationshipNarrativePlan.RiskSummary riskSummary(

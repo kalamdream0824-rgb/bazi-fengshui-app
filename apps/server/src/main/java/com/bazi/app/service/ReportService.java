@@ -50,7 +50,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReportService {
 
   private static final ZoneId WEALTH_ZONE = ZoneId.of("Asia/Shanghai");
-  public static final String CAREER_CONTENT_VERSION = "career-narrative-v4";
+  public static final String CAREER_CONTENT_VERSION = "career-narrative-v5";
+  public static final String CAREER_V4_CONTENT_VERSION = "career-narrative-v4";
   public static final String CAREER_V3_CONTENT_VERSION = "career-narrative-v3";
   public static final String OVERALL_CONTENT_VERSION = "overall-narrative-v2";
   public static final String OVERALL_V11_CONTENT_VERSION = "overall-narrative-v1.1";
@@ -58,9 +59,11 @@ public class ReportService {
   public static final String WEALTH_CONTENT_VERSION = "wealth-narrative-v4";
   public static final String WEALTH_V3_CONTENT_VERSION = "wealth-narrative-v3";
   public static final String WEALTH_V2_CONTENT_VERSION = "wealth-narrative-v2";
-  public static final String RELATIONSHIP_CONTENT_VERSION = "relationship-narrative-v2";
+  public static final String RELATIONSHIP_CONTENT_VERSION = "relationship-narrative-v3";
+  public static final String RELATIONSHIP_V2_CONTENT_VERSION = "relationship-narrative-v2";
   public static final String RELATIONSHIP_V1_CONTENT_VERSION = "relationship-narrative-v1";
-  public static final String RELATIONSHIP_SINGLE_CONTENT_VERSION = "relationship-single-v2";
+  public static final String RELATIONSHIP_SINGLE_CONTENT_VERSION = "relationship-single-v3";
+  public static final String RELATIONSHIP_SINGLE_V2_CONTENT_VERSION = "relationship-single-v2";
   public static final String RELATIONSHIP_SINGLE_V1_CONTENT_VERSION = "relationship-single-v1";
 
   private final BaziService baziService;
@@ -254,14 +257,16 @@ public class ReportService {
       content = objectMapper.readValue(report.getContentJson(), WealthNarrativeV3.class);
     } else if (WEALTH_V2_CONTENT_VERSION.equals(report.getContentVersion())) {
       content = objectMapper.readValue(report.getContentJson(), WealthNarrativePlan.class);
-    } else if (Set.of(RELATIONSHIP_SINGLE_CONTENT_VERSION, RELATIONSHIP_SINGLE_V1_CONTENT_VERSION)
+    } else if (Set.of(RELATIONSHIP_SINGLE_CONTENT_VERSION, RELATIONSHIP_SINGLE_V2_CONTENT_VERSION,
+        RELATIONSHIP_SINGLE_V1_CONTENT_VERSION)
         .contains(report.getContentVersion())) {
       content = objectMapper.readValue(report.getContentJson(), RelationshipSingleNarrativePlan.class);
-    } else if (Set.of(RELATIONSHIP_CONTENT_VERSION, RELATIONSHIP_V1_CONTENT_VERSION)
+    } else if (Set.of(RELATIONSHIP_CONTENT_VERSION, RELATIONSHIP_V2_CONTENT_VERSION,
+        RELATIONSHIP_V1_CONTENT_VERSION)
         .contains(report.getContentVersion())) {
       content = objectMapper.readValue(report.getContentJson(), RelationshipNarrativePlan.class);
     } else if (Set.of("career-narrative-v1", "career-narrative-v2", CAREER_V3_CONTENT_VERSION,
-        CAREER_CONTENT_VERSION,
+        CAREER_V4_CONTENT_VERSION, CAREER_CONTENT_VERSION,
         "wealth-narrative-v1").contains(report.getContentVersion())) {
       content = objectMapper.readValue(report.getContentJson(), CareerNarrativePlan.class);
     } else {

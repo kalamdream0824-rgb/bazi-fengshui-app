@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { WealthPathV3, WealthV3SavedReport, WealthYearV3 } from '@/services/reportApi'
+import { AnnualActionGuideCard } from './AnnualActionGuide'
 import { NarrativeTimeline } from './NarrativeTimeline'
 
 type AnnualCopy = { text: string; appliesToYears: number[] }
@@ -27,10 +28,10 @@ const MONEY_STATE_LABELS: Record<WealthPathV3, string> = {
   retention: '收支结余',
 }
 
-const ANNUAL_COPY_GROUPING_VERSIONS = new Set(['wealth-plain-v3.6', 'wealth-plain-v3.7', 'wealth-plain-v3.8', 'wealth-plain-v3.9', 'wealth-plain-v3.10', 'wealth-plain-v3.11', 'wealth-plain-v3.12', 'wealth-plain-v3.13', 'wealth-plain-v3.14', 'wealth-plain-v3.15', 'wealth-plain-v3.16'])
+const ANNUAL_COPY_GROUPING_VERSIONS = new Set(['wealth-plain-v3.6', 'wealth-plain-v3.7', 'wealth-plain-v3.8', 'wealth-plain-v3.9', 'wealth-plain-v3.10', 'wealth-plain-v3.11', 'wealth-plain-v3.12', 'wealth-plain-v3.13', 'wealth-plain-v3.14', 'wealth-plain-v3.15', 'wealth-plain-v3.16', 'wealth-plain-v3.17', 'wealth-plain-v3.18'])
 
 export function WealthV3ReportReader({ report }: { report: WealthV3SavedReport }) {
-  const usesMoneyStateCopy = ['wealth-plain-v3.4', 'wealth-plain-v3.5', 'wealth-plain-v3.6', 'wealth-plain-v3.7', 'wealth-plain-v3.8', 'wealth-plain-v3.9', 'wealth-plain-v3.10', 'wealth-plain-v3.11', 'wealth-plain-v3.12', 'wealth-plain-v3.13', 'wealth-plain-v3.14', 'wealth-plain-v3.15', 'wealth-plain-v3.16'].includes(report.content.copyVersion)
+  const usesMoneyStateCopy = ['wealth-plain-v3.4', 'wealth-plain-v3.5', 'wealth-plain-v3.6', 'wealth-plain-v3.7', 'wealth-plain-v3.8', 'wealth-plain-v3.9', 'wealth-plain-v3.10', 'wealth-plain-v3.11', 'wealth-plain-v3.12', 'wealth-plain-v3.13', 'wealth-plain-v3.14', 'wealth-plain-v3.15', 'wealth-plain-v3.16', 'wealth-plain-v3.17', 'wealth-plain-v3.18'].includes(report.content.copyVersion)
   const pathLabels = usesMoneyStateCopy ? MONEY_STATE_LABELS : LEGACY_PATH_LABELS
   const annualCopy = groupRepeatedAnnualCopy(
     report.content.years,
@@ -119,13 +120,21 @@ export function WealthV3ReportReader({ report }: { report: WealthV3SavedReport }
                   {copy.risk.map((item) => <AnnualParagraph item={item} key={item.text} />)}
                 </section>
               ) : null}
-              {copy.observations.length > 0 ? (
+              {year.actionGuide ? <AnnualActionGuideCard guide={{
+                problem: year.actionGuide.problem.text,
+                action: year.actionGuide.action.text,
+                expectedChange: year.actionGuide.expectedChange.text,
+                checkTiming: year.actionGuide.checkTiming.text,
+                successSignal: year.actionGuide.successSignal.text,
+                adjustmentCondition: year.actionGuide.adjustmentCondition.text,
+                fallbackAction: year.actionGuide.fallbackAction.text,
+              }} /> : copy.observations.length > 0 ? (
                 <section className="wealth-v3-year__observations">
                   <h3>可以留意的现实情况</h3>
                   <ul>{copy.observations.map((item) => <AnnualListItem item={item} key={item.text} />)}</ul>
                 </section>
               ) : null}
-              {copy.actions.length > 0 ? (
+              {!year.actionGuide && copy.actions.length > 0 ? (
                 <section className="wealth-v3-year__actions">
                   <h3>可以先做这些事</h3>
                   <ol>{copy.actions.map((item) => <AnnualListItem item={item} key={item.text} />)}</ol>

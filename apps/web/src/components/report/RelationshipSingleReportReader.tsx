@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { RelationshipSingleSavedReport } from '@/services/reportApi'
 import { NarrativeTimeline } from './NarrativeTimeline'
+import { AnnualActionGuideCard } from './AnnualActionGuide'
 import './RelationshipReportReader.css'
 import './RelationshipSingleReportReader.css'
 
@@ -38,6 +39,8 @@ export function RelationshipSingleReportReader({ report }: { report: Relationshi
           </section>
         ))}
       </div>
+
+      {content.actionGuide && <AnnualActionGuideCard guide={content.actionGuide} />}
 
       <aside className="relationship-single-reader__outlook" aria-labelledby="single-outlook">
         <span>明年参考</span>

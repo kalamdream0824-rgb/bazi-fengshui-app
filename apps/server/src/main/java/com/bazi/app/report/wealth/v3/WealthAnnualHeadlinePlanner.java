@@ -38,6 +38,7 @@ public final class WealthAnnualHeadlinePlanner {
 
   private List<Candidate> candidates(List<ComparedYear> period, int index) {
     WealthAssessment assessment = period.get(index).assessment();
+    String copyStyleSeed = copyStyleSeed(assessment);
     Map<String, Evidence> evidenceById = assessment.evidence().stream()
         .collect(Collectors.toMap(Evidence::id, evidence -> evidence));
     Map<String, Fact> factById = assessment.facts().stream()
@@ -70,10 +71,12 @@ public final class WealthAnnualHeadlinePlanner {
       if (seed.annualRooted()) reasons.add("annual_root");
       if (seed.changeMagnitude() > 0) reasons.add("annual_change");
       reasons.add("catalog." + seed.entry().catalogOrder());
+      String headlineText = new WealthHeadlineSentenceWriter().write(seed.entry().sentenceSpec(),
+          copyStyleSeed + "|" + seed.entry().themeKey(), Math.floorMod(assessment.year(), 5));
       var headline = new Headline(assessment.year(), WealthHeadlineVocabulary.VERSION,
           seed.entry().themeKey(), seed.entry().pathKey(), seed.entry().subjectKey(),
           seed.entry().angleKey(), seed.entry().objectKey(), seed.entry().corePhraseKeys(),
-          seed.entry().text(), List.of(seed.decision().id()), List.copyOf(reasons),
+          headlineText, List.of(seed.decision().id()), List.copyOf(reasons),
           qualityRank, i + 1, seeds.size());
       result.add(new Candidate(headline, seed.annualRooted(), seed.changeMagnitude(), seed.salience(),
           seed.entry().catalogOrder(), seed.evidenceSignature()));
@@ -86,6 +89,19 @@ public final class WealthAnnualHeadlinePlanner {
     List<String> ids = new ArrayList<>(decision.supportingEvidenceIds());
     ids.addAll(decision.limitingEvidenceIds());
     return ids.stream().map(evidenceById::get).filter(java.util.Objects::nonNull).toList();
+  }
+
+  private String copyStyleSeed(WealthAssessment assessment) {
+    String facts = assessment.facts().stream()
+        .sorted(Comparator.comparing(Fact::id))
+        .map(fact -> fact.kind() + ":" + fact.code() + ":" + fact.value())
+        .collect(Collectors.joining("|"));
+    String decisions = assessment.decisions().stream()
+        .sorted(Comparator.comparing(Decision::path))
+        .map(decision -> decision.path() + ":" + decision.stance() + ":" + decision.strength()
+            + ":" + decision.supportWeight() + ":" + decision.limitationWeight())
+        .collect(Collectors.joining("|"));
+    return assessment.year() + "|" + facts + "|" + decisions;
   }
 
   private int changeMagnitude(List<ComparedYear> period, int index, String path) {

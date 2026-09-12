@@ -30,6 +30,33 @@ const addV33Metadata = report => {
   return report
 }
 
+const addV318ActionGuides = report => {
+  addV33Metadata(report)
+  report.content.copyVersion = 'wealth-plain-v3.18'
+  report.content.headlinePlannerVersion = 'wealth-headline-v4'
+  report.content.years.forEach((year, index) => {
+    year.headlineMeta.plannerVersion = 'wealth-headline-v4'
+    const selected = year.overview
+    const guideBlock = (field, kind) => ({
+      ...selected,
+      id: `${year.year}.guide.${field}`,
+      kind,
+      templateId: `action_guide.${year.headlineMeta.themeKey}.${field}`,
+    })
+    year.actionGuide = {
+      path: year.headlineMeta.pathKey,
+      problem: guideBlock('problem', 'interpretation'),
+      action: guideBlock('action', 'general_advice'),
+      expectedChange: guideBlock('expected', 'observation'),
+      checkTiming: guideBlock('timing', 'method_note'),
+      successSignal: guideBlock('success', 'observation'),
+      adjustmentCondition: guideBlock('condition', 'observation'),
+      fallbackAction: guideBlock('fallback', 'general_advice'),
+    }
+  })
+  return report
+}
+
 test('wealth v3 keeps an explicit versioned schema', () => {
   assert.ok(existsSync(resolve(__dirname, '../drafts/wealth-v3.schema.json')),
     'Missing wealth v3 draft schema: task 2 must define the contract first')
@@ -63,6 +90,13 @@ test('v3.3 rejects a missing report-level planner version', () => {
 test('v3.3 rejects an annual item without headline metadata', () => {
   const report = addV33Metadata(clone(examples[0].report))
   delete report.content.years[1].headlineMeta
+  assert.equal(validate(report), false)
+})
+
+test('v3.18 requires a complete annual action guide', () => {
+  const report = addV318ActionGuides(clone(examples[0].report))
+  assert.ok(validate(report), JSON.stringify(validate.errors))
+  delete report.content.years[1].actionGuide
   assert.equal(validate(report), false)
 })
 

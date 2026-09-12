@@ -2,6 +2,7 @@ package com.bazi.app.report.relationship;
 
 import com.bazi.app.report.NarrativeTimeline;
 import com.bazi.app.report.NarrativeTimelineValidator;
+import com.bazi.app.report.AnnualActionGuidePolicy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -50,6 +51,15 @@ public final class RelationshipSingleNarrativePlanner {
     }
 
     NarrativeTimeline timeline = previous == null ? null : timeline(previous, current, next);
+    List<String> guideEvidence = actionGuideEvidence(current);
+    var actionGuide = new RelationshipActionGuideWriter().write(
+        RelationshipStatus.SINGLE,
+        current,
+        0,
+        singleAction(primary),
+        singleFallback(primary),
+        guideEvidence);
+    AnnualActionGuidePolicy.validate(List.of(actionGuide));
     return new RelationshipSingleNarrativePlan(
         "single", 2, dimensionCopy("thesis", current, primary),
         copy("summary." + (current.mainRisk() == null ? "clear" : current.mainRisk().dimension().code())),
@@ -57,7 +67,35 @@ public final class RelationshipSingleNarrativePlanner {
         period.years().stream().map(RelationshipPeriodEvaluation.Year::evaluation).toList(),
         period.years().stream().flatMap(year -> evidence(year, RelationshipDimension.values()).stream())
             .distinct().sorted().toList(),
+        actionGuide,
         timeline);
+  }
+
+  private List<String> actionGuideEvidence(RelationshipPeriodEvaluation.Year current) {
+    LinkedHashSet<String> keys = new LinkedHashSet<>(current.focus().primaryEvidenceKeys());
+    keys.addAll(current.focus().secondaryEvidenceKeys());
+    if (current.mainRisk() != null) keys.addAll(current.mainRisk().evidenceKeys());
+    return requiredEvidence(List.copyOf(keys));
+  }
+
+  private String singleAction(RelationshipDimension dimension) {
+    return switch (dimension) {
+      case CONNECTION -> "本周参加一次自己真正感兴趣的活动，或接受可信朋友的一次介绍。";
+      case RESPONSE -> "出现新的联系时，提出一个具体问题，再看对方是否认真回答。";
+      case DAILY_COOPERATION -> "聊得来时，提出一次时间明确的见面，再看双方能否配合。";
+      case BOUNDARIES -> "开始了解一个人时，先说清一件自己不能接受的事。";
+      case STABILITY -> "有了新的联系后，先观察一个具体约定能否持续做到。";
+    };
+  }
+
+  private String singleFallback(RelationshipDimension dimension) {
+    return switch (dimension) {
+      case CONNECTION -> "暂时没有合适机会时，只保留一种自己愿意长期参加的社交。";
+      case RESPONSE -> "对方一直不给清楚回答时，先停止主动联系。";
+      case DAILY_COOPERATION -> "两次约见都无法落实时，不再继续增加线上投入。";
+      case BOUNDARIES -> "边界再次被忽视时，结束这次了解并拉开距离。";
+      case STABILITY -> "约定反复落空时，把联系降回普通朋友的程度。";
+    };
   }
 
   private NarrativeTimeline timeline(

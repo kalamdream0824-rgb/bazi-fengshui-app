@@ -34,6 +34,9 @@ class RelationshipSingleNarrativePlannerTest {
       assertEquals(2027, plan.outlookYear());
       assertEquals(three.subList(0, 2), plan.evaluations());
       assertEquals(3, plan.sections().size());
+      assertNotNull(plan.actionGuide());
+      assertTrue(plan.actionGuide().focusKey().startsWith("relationship.single."));
+      assertFalse(plan.actionGuide().evidenceKeys().isEmpty());
       assertTrue(plan.sections().get(0).paragraphs().stream().anyMatch(s -> s.contains("如果你目前没有")));
       assertTrue(plan.sections().get(0).paragraphs().stream().anyMatch(s -> s.contains("如果已经有")));
       assertFalse(text(plan).contains("2028"));
@@ -41,6 +44,20 @@ class RelationshipSingleNarrativePlannerTest {
       var mapper = new ObjectMapper();
       assertEquals(plan, mapper.readValue(mapper.writeValueAsString(plan), RelationshipSingleNarrativePlan.class));
     }
+  }
+
+  @Test
+  void everySingleDimensionOwnsADifferentCurrentYearActionLoop() {
+    Set<String> decisions = new HashSet<>();
+    for (var dimension : RelationshipDimension.values()) {
+      var plan = planner.plan(period(List.of(
+          year(2026, dimension, 8, 0),
+          year(2027, dimension, 8, 0))));
+      var guide = plan.actionGuide();
+      assertEquals("relationship.single." + dimension.code() + ".supportive", guide.focusKey());
+      decisions.add(guide.action() + guide.expectedChange() + guide.successSignal());
+    }
+    assertEquals(RelationshipDimension.values().length, decisions.size());
   }
 
   @Test
@@ -136,10 +153,12 @@ class RelationshipSingleNarrativePlannerTest {
     var mapper = new ObjectMapper();
     var json = mapper.valueToTree(legacy);
     ((com.fasterxml.jackson.databind.node.ObjectNode) json).remove("timeline");
+    ((com.fasterxml.jackson.databind.node.ObjectNode) json).remove("actionGuide");
 
     var restored = mapper.treeToValue(json, RelationshipSingleNarrativePlan.class);
 
     assertNull(restored.timeline());
+    assertNull(restored.actionGuide());
     assertEquals(legacy.evaluations(), restored.evaluations());
   }
 
@@ -169,6 +188,7 @@ class RelationshipSingleNarrativePlannerTest {
     assertEquals(a.thesis(), b.thesis());
     assertEquals(a.summary(), b.summary());
     assertEquals(a.sections(), b.sections());
+    assertEquals(a.actionGuide(), b.actionGuide());
     assertTrue(a.thesis().contains("主动认识人"));
     assertNotEquals(a.outlook(), b.outlook());
   }

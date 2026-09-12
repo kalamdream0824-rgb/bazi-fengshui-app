@@ -481,18 +481,21 @@ components:
             - career-narrative-v2
             - career-narrative-v3
             - career-narrative-v4
+            - career-narrative-v5
             - wealth-narrative-v1
             - wealth-narrative-v2
             - wealth-narrative-v3
             - wealth-narrative-v4
             - relationship-narrative-v1
             - relationship-narrative-v2
+            - relationship-narrative-v3
             - relationship-single-v1
             - relationship-single-v2
+            - relationship-single-v3
             - overall-narrative-v1
             - overall-narrative-v1.1
             - overall-narrative-v2
-          description: v4/v2 为带统一过去—当下—未来时间线的新快照；旧版本继续按原结构读取，timeline 缺失时不得补写或报错。
+          description: career v5、relationship v3 在统一时间线基础上增加年度行动闭环；旧版本继续按原结构读取，新增字段缺失时不得补写或报错。
         content:
           oneOf:
             - $ref: '#/components/schemas/CareerNarrativePlan'
@@ -562,6 +565,32 @@ components:
           minItems: 1
           uniqueItems: true
           items: { type: string }
+    AnnualActionGuide:
+      type: object
+      required:
+        - focusKey
+        - problem
+        - action
+        - expectedChange
+        - checkTiming
+        - successSignal
+        - adjustmentCondition
+        - fallbackAction
+        - evidenceKeys
+      properties:
+        focusKey: { type: string, minLength: 1 }
+        problem: { type: string, minLength: 1 }
+        action: { type: string, minLength: 1 }
+        expectedChange: { type: string, minLength: 1 }
+        checkTiming: { type: string, minLength: 1 }
+        successSignal: { type: string, minLength: 1 }
+        adjustmentCondition: { type: string, minLength: 1 }
+        fallbackAction: { type: string, minLength: 1 }
+        evidenceKeys:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: { type: string, minLength: 1 }
     CareerNarrativePlan:
       type: object
       required: [thesis, contextSummary, years, route]
@@ -602,6 +631,8 @@ components:
           type: array
           items: { $ref: '#/components/schemas/ReportEvidence' }
         confidence: { type: string }
+        actionGuide:
+          $ref: '#/components/schemas/AnnualActionGuide'
     WealthPathCode:
       type: string
       enum:
@@ -722,7 +753,7 @@ components:
       enum: [connection, response, daily_cooperation, boundaries, stability]
     RelationshipNarrativePlan:
       type: object
-      description: relationship-narrative-v1 的三年通俗版快照。规则权重只表示规则在本报告中的方向与显著程度，不是统计概率，也不保证现实事件发生。
+      description: 感情主题三年通俗版快照；v3 增加逐年行动闭环，v1/v2 缺少该字段时仍可读取。规则权重只表示报告内方向与显著程度，不是统计概率。
       required:
         - relationshipStatus
         - relationshipStatusLabel
@@ -844,9 +875,11 @@ components:
           minItems: 1
           uniqueItems: true
           items: { type: string }
+        actionGuide:
+          $ref: '#/components/schemas/AnnualActionGuide'
     RelationshipSingleNarrativePlan:
       type: object
-      description: 单身感情两年快照；v2 新增 timeline，v1 缺少该字段时仍可读取。
+      description: 单身感情两年快照；v3 增加当前年行动闭环，v2 增加 timeline，旧版本缺少新增字段时仍可读取。
       required:
         - relationshipStatus
         - horizonYears
@@ -878,6 +911,8 @@ components:
           minItems: 1
           uniqueItems: true
           items: { type: string }
+        actionGuide:
+          $ref: '#/components/schemas/AnnualActionGuide'
         timeline:
           $ref: '#/components/schemas/NarrativeTimeline'
     OverallNarrativePlan:

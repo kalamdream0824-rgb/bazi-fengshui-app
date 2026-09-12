@@ -69,7 +69,7 @@ class WealthWeakSupportCopyTest {
     var report = new DefaultWealthReportGenerator().generate(
         chart, factory.createYear(request, chart, 2025), contexts, AS_OF);
 
-    assertEquals("wealth-plain-v3.16", report.copyVersion());
+    assertEquals("wealth-plain-v3.18", report.copyVersion());
     assertTrue(report.readingNote().text().contains(expectedNote), report.readingNote().text());
     for (var year : report.years()) {
       assertTrue(year.facts().stream().anyMatch(fact ->

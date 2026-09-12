@@ -2702,6 +2702,142 @@ select.input-box {
   font-weight: 600;
 }
 
+.wealth-action-guide {
+  margin-top: 16px;
+  border: 1px solid rgba(159, 119, 60, 0.48);
+  border-top: 3px solid #a63c32;
+  background:
+    linear-gradient(90deg, rgba(166, 60, 50, 0.035) 1px, transparent 1px),
+    rgba(255, 252, 244, 0.9);
+  background-size: 30px 100%;
+  box-shadow: 0 8px 22px rgba(78, 57, 28, 0.07);
+}
+
+.wealth-action-guide__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(177, 143, 88, 0.42);
+}
+
+.wealth-action-guide__header span {
+  color: #a13b31;
+  font-family: var(--font-glyph);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  white-space: nowrap;
+}
+
+.wealth-action-guide__header h3 {
+  margin: 0;
+  color: #302820;
+  font-family: var(--font-display);
+  font-size: 14px;
+  text-align: right;
+}
+
+.wealth-action-guide__problem {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  gap: 12px;
+  padding: 13px 14px;
+  background: rgba(238, 224, 198, 0.44);
+}
+
+.wealth-action-guide__problem b {
+  color: #8f332b;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.wealth-action-guide__problem p,
+.wealth-action-guide__steps p,
+.wealth-action-guide__fallback p,
+.wealth-action-guide__fallback strong {
+  color: #51463a;
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.wealth-action-guide__steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.wealth-action-guide__steps article {
+  position: relative;
+  min-width: 0;
+  padding: 15px 14px 14px 48px;
+  border-bottom: 1px dashed rgba(177, 143, 88, 0.42);
+}
+
+.wealth-action-guide__steps article:nth-child(odd) {
+  border-right: 1px dashed rgba(177, 143, 88, 0.42);
+}
+
+.wealth-action-guide__steps article::before {
+  position: absolute;
+  top: 16px;
+  left: 14px;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border: 1px solid rgba(166, 60, 50, 0.56);
+  color: #a13b31;
+  content: attr(data-step);
+  font-family: var(--font-glyph);
+  font-size: 11px;
+  transform: rotate(-2deg);
+}
+
+.wealth-action-guide__steps h3,
+.wealth-action-guide__fallback h3 {
+  margin: 0 0 6px;
+  color: #302820;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.wealth-action-guide__fallback {
+  padding: 14px;
+  border-left: 3px solid #a63c32;
+  background: rgba(166, 60, 50, 0.055);
+}
+
+.wealth-action-guide__fallback strong {
+  display: block;
+  margin-top: 7px;
+  color: #7f302a;
+  font-weight: 650;
+}
+
+@media (max-width: 620px) {
+  .wealth-action-guide__header,
+  .wealth-action-guide__problem {
+    display: block;
+  }
+
+  .wealth-action-guide__header h3 {
+    margin-top: 5px;
+    text-align: left;
+  }
+
+  .wealth-action-guide__problem p {
+    margin-top: 5px;
+  }
+
+  .wealth-action-guide__steps {
+    grid-template-columns: 1fr;
+  }
+
+  .wealth-action-guide__steps article:nth-child(odd) {
+    border-right: 0;
+  }
+}
+
 .wealth-year__applies {
   display: block;
   width: fit-content;
@@ -2979,6 +3115,10 @@ select.input-box {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(110px, 0.8fr);
   gap: 10px;
+}
+
+.report-year__grid.is-action-guide {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .report-year__grid > div,

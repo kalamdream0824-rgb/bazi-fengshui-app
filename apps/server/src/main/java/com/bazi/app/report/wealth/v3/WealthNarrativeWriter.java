@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import com.bazi.app.report.wealth.WealthPath;
 import com.bazi.app.report.wealth.v3.WealthAssessment.Decision;
 import com.bazi.app.report.wealth.v3.WealthNarrativeV3.Block;
+import com.bazi.app.report.wealth.v3.WealthNarrativeV3.ActionGuide;
 import com.bazi.app.report.wealth.v3.WealthNarrativeV3.HeadlineMeta;
 import com.bazi.app.report.wealth.v3.WealthNarrativeV3.PathSummary;
 import com.bazi.app.report.wealth.v3.WealthNarrativeV3.Year;
@@ -102,12 +103,30 @@ public final class WealthNarrativeWriter {
       HeadlineMeta headlineMeta = new HeadlineMeta(headline.plannerVersion(), headline.themeKey(),
           headline.pathKey(), headline.subjectKey(), headline.angleKey(), headline.objectKey(),
           headline.corePhraseKeys(), headline.selectionReasonCodes());
+      Decision guideDecision = decision(a, headline.pathKey());
+      var guideCopy = new WealthActionGuideWriter().write(guideDecision, headline);
+      String guideTemplate = "action_guide." + headline.themeKey() + ".";
+      ActionGuide actionGuide = new ActionGuide(headline.pathKey(),
+          judgment(a.year() + ".guide.problem", guideTemplate + "problem",
+              guideCopy.problem(), List.of(a.year()), List.of(guideDecision)),
+          block(a.year() + ".guide.action", "general_advice", guideTemplate + "action",
+              guideCopy.action(), List.of(a.year()), List.of(guideDecision)),
+          block(a.year() + ".guide.expected", "observation", guideTemplate + "expected_change",
+              guideCopy.expectedChange(), List.of(a.year()), List.of(guideDecision)),
+          block(a.year() + ".guide.timing", "method_note", guideTemplate + "check_timing",
+              guideCopy.checkTiming(), List.of(a.year()), List.of(guideDecision)),
+          block(a.year() + ".guide.success", "observation", guideTemplate + "success_signal",
+              guideCopy.successSignal(), List.of(a.year()), List.of(guideDecision)),
+          block(a.year() + ".guide.condition", "observation", guideTemplate + "adjustment_condition",
+              guideCopy.adjustmentCondition(), List.of(a.year()), List.of(guideDecision)),
+          block(a.year() + ".guide.fallback", "general_advice", guideTemplate + "fallback_action",
+              guideCopy.fallbackAction(), List.of(a.year()), List.of(guideDecision)));
       result.add(new Year(a.year(), a.ganZhi(), a.facts(), a.evidence(), a.decisions(), a.focus(),
           headlineMeta, overview,
           incomeBlocks, judgment(a.year() + ".retention", "retention." + headline.themeKey() + "."
               + retention.stance() + "." + retention.strength(),
               annualBodyWriter.retention(a, retention, headline), List.of(a.year()), List.of(retention)),
-          risk, observations, actions, comparison));
+          risk, observations, actions, actionGuide, comparison));
     }
     List<Integer> yearNumbers = years.stream().map(WealthAssessment::year).toList();
     List<PathSummary> paths = new ArrayList<>();

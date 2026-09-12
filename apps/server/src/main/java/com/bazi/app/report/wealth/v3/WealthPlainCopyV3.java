@@ -8,7 +8,7 @@ import java.util.Set;
 
 /** Closed, versioned plain-language vocabulary. No user data, random wording or report-position branches. */
 final class WealthPlainCopyV3 {
-  static final String VERSION = "wealth-plain-v3.16";
+  static final String VERSION = "wealth-plain-v3.18";
 
   record Words(String object, String meaning, String limitation, String observation, String action) {}
   record RetrospectiveWords(

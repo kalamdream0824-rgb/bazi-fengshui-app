@@ -1,9 +1,6 @@
-server:
-  port: 8080
-
 spring:
   datasource:
-    url: jdbc:h2:file:./data/bazi-dev;MODE=MySQL
+    url: jdbc:h2:mem:bazi-test;MODE=MySQL;DB_CLOSE_DELAY=-1
     driver-class-name: org.h2.Driver
     username: sa
     password: ""
@@ -13,4 +10,4 @@ spring:
       schema-locations: classpath:schema.sql
   h2:
     console:
-      enabled: true
+      enabled: false

@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bazi.app.dto.PaipanRequest;
 import com.bazi.app.dto.PaipanResultDto;
+import com.bazi.app.report.AnnualActionGuide;
 import com.bazi.app.report.AnnualContextFactory;
 import com.bazi.app.report.ReportHorizon;
 import com.bazi.app.service.BaziService;
@@ -70,7 +71,37 @@ class RelationshipNarrativePlannerTest {
         assertEquals(2, year.actions().stream().distinct().count());
         assertFalse(year.transition().isBlank());
         assertFalse(year.evidenceKeys().isEmpty());
+        assertNotNull(year.actionGuide());
+        assertTrue(year.actionGuide().focusKey().startsWith(
+            "relationship." + plan.relationshipStatus() + "." + year.primaryDimensionCode()));
+        assertEquals(year.evidenceKeys(), year.actionGuide().evidenceKeys());
       }
+    }
+  }
+
+  @Test
+  void datingAndMarriageUseDifferentActionLoopsForTheSameCalculation() {
+    AnnualActionGuide datingGuide = dating.firstYear().actionGuide();
+    AnnualActionGuide marriedGuide = married.firstYear().actionGuide();
+
+    assertNotEquals(datingGuide.problem(), marriedGuide.problem());
+    assertNotEquals(datingGuide.expectedChange(), marriedGuide.expectedChange());
+    assertNotEquals(datingGuide.successSignal(), marriedGuide.successSignal());
+    assertTrue(datingGuide.lines().stream().anyMatch(text -> text.contains("两个人")));
+    assertTrue(marriedGuide.lines().stream()
+        .anyMatch(text -> text.contains("共同生活") || text.contains("夫妻")));
+  }
+
+  @Test
+  void actionLoopsDoNotRepeatVisibleSentencesAcrossRelationshipYears() {
+    for (RelationshipNarrativePlan plan : List.of(dating, married)) {
+      List<String> sentences = plan.years().stream()
+          .flatMap(year -> year.actionGuide().lines().stream())
+          .flatMap(line -> java.util.Arrays.stream(line.split("(?<=[。！？])")))
+          .map(String::trim)
+          .filter(line -> !line.isBlank())
+          .toList();
+      assertEquals(sentences.size(), sentences.stream().distinct().count(), sentences.toString());
     }
   }
 
@@ -96,12 +127,14 @@ class RelationshipNarrativePlannerTest {
     ObjectMapper json = new ObjectMapper().findAndRegisterModules();
     var legacyJson = json.valueToTree(dating);
     ((com.fasterxml.jackson.databind.node.ObjectNode) legacyJson).remove("timeline");
+    legacyJson.withArray("years").forEach(year ->
+        ((com.fasterxml.jackson.databind.node.ObjectNode) year).remove("actionGuide"));
 
     RelationshipNarrativePlan restored = json.treeToValue(
         legacyJson, RelationshipNarrativePlan.class);
 
     assertNull(restored.timeline());
-    assertEquals(dating.years(), restored.years());
+    assertTrue(restored.years().stream().allMatch(year -> year.actionGuide() == null));
   }
 
   @Test

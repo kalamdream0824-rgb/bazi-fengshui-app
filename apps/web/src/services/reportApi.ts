@@ -75,6 +75,19 @@ export interface NarrativeTimeline {
   future: NarrativeTimelineFutureStep[]
 }
 
+export interface AnnualActionGuide {
+  /** Present on newly generated reports; omitted by historical v5 snapshots. */
+  focusKey?: string
+  problem: string
+  action: string
+  expectedChange: string
+  checkTiming: string
+  successSignal: string
+  adjustmentCondition: string
+  fallbackAction: string
+  evidenceKeys: string[]
+}
+
 export interface CareerYearNarrative {
   year: number
   ganZhi: string
@@ -89,6 +102,7 @@ export interface CareerYearNarrative {
   evidence: ReportEvidence[]
   counterEvidence: ReportEvidence[]
   confidence: string
+  actionGuide?: AnnualActionGuide
 }
 
 export interface CareerNarrativePlan {
@@ -219,7 +233,7 @@ export interface WealthComparisonV3 {
 }
 
 export interface WealthHeadlineMetaV3 {
-  plannerVersion: 'wealth-headline-v1' | 'wealth-headline-v2' | 'wealth-headline-v3'
+  plannerVersion: 'wealth-headline-v1' | 'wealth-headline-v2' | 'wealth-headline-v3' | 'wealth-headline-v4'
   themeKey: string
   pathKey: WealthPathV3
   subjectKey: string
@@ -227,6 +241,17 @@ export interface WealthHeadlineMetaV3 {
   objectKey: string
   corePhraseKeys: string[]
   selectionReasonCodes: string[]
+}
+
+export interface WealthActionGuideV3 {
+  path: WealthPathV3
+  problem: WealthBlockV3
+  action: WealthBlockV3
+  expectedChange: WealthBlockV3
+  checkTiming: WealthBlockV3
+  successSignal: WealthBlockV3
+  adjustmentCondition: WealthBlockV3
+  fallbackAction: WealthBlockV3
 }
 
 export interface WealthYearV3 {
@@ -243,6 +268,7 @@ export interface WealthYearV3 {
   risk: WealthRiskV3 | null
   observations: WealthBlockV3[]
   actions: WealthBlockV3[]
+  actionGuide?: WealthActionGuideV3
   comparison: WealthComparisonV3 | null
 }
 
@@ -252,8 +278,8 @@ export interface WealthContentV3 {
   horizonYears: 3
   calculationVersion: 'wealth-path-v2'
   policyVersion: 'wealth-expression-v1'
-  copyVersion: 'wealth-plain-v3' | 'wealth-plain-v3.1' | 'wealth-plain-v3.2' | 'wealth-plain-v3.3' | 'wealth-plain-v3.4' | 'wealth-plain-v3.5' | 'wealth-plain-v3.6' | 'wealth-plain-v3.7' | 'wealth-plain-v3.8' | 'wealth-plain-v3.9' | 'wealth-plain-v3.10' | 'wealth-plain-v3.11' | 'wealth-plain-v3.12' | 'wealth-plain-v3.13' | 'wealth-plain-v3.14' | 'wealth-plain-v3.15' | 'wealth-plain-v3.16'
-  headlinePlannerVersion?: 'wealth-headline-v1' | 'wealth-headline-v2' | 'wealth-headline-v3'
+  copyVersion: 'wealth-plain-v3' | 'wealth-plain-v3.1' | 'wealth-plain-v3.2' | 'wealth-plain-v3.3' | 'wealth-plain-v3.4' | 'wealth-plain-v3.5' | 'wealth-plain-v3.6' | 'wealth-plain-v3.7' | 'wealth-plain-v3.8' | 'wealth-plain-v3.9' | 'wealth-plain-v3.10' | 'wealth-plain-v3.11' | 'wealth-plain-v3.12' | 'wealth-plain-v3.13' | 'wealth-plain-v3.14' | 'wealth-plain-v3.15' | 'wealth-plain-v3.16' | 'wealth-plain-v3.17' | 'wealth-plain-v3.18'
+  headlinePlannerVersion?: 'wealth-headline-v1' | 'wealth-headline-v2' | 'wealth-headline-v3' | 'wealth-headline-v4'
   thesis: WealthBlockV3
   summary: WealthBlockV3
   pathSummaries: Array<{
@@ -298,6 +324,7 @@ export interface RelationshipYearNarrative {
   secondaryDimensionCode: string
   riskDimensionCode: string | null
   evidenceKeys: string[]
+  actionGuide?: AnnualActionGuide
 }
 
 export interface RelationshipNarrativePlan {
@@ -370,7 +397,7 @@ export interface LegacySavedReport extends SavedReportBase {
 
 export interface CareerV4SavedReport extends SavedReportBase {
   topic: 'career'
-  contentVersion: 'career-narrative-v4'
+  contentVersion: 'career-narrative-v4' | 'career-narrative-v5'
   content: CareerNarrativePlan
 }
 
@@ -399,7 +426,7 @@ export interface WealthV3SavedReport extends SavedReportBase {
 export interface RelationshipV1SavedReport extends SavedReportBase {
   topic: 'relationship'
   edition: 'plain'
-  contentVersion: 'relationship-narrative-v1' | 'relationship-narrative-v2'
+  contentVersion: 'relationship-narrative-v1' | 'relationship-narrative-v2' | 'relationship-narrative-v3'
   content: RelationshipNarrativePlan
 }
 
@@ -420,13 +447,14 @@ export interface RelationshipSingleNarrativePlan {
   outlook: string[]
   readingNote: string
   evidenceKeys: string[]
+  actionGuide?: AnnualActionGuide
   timeline?: NarrativeTimeline
 }
 
 export interface RelationshipSingleSavedReport extends SavedReportBase {
   topic: 'relationship'
   edition: 'plain'
-  contentVersion: 'relationship-single-v1' | 'relationship-single-v2'
+  contentVersion: 'relationship-single-v1' | 'relationship-single-v2' | 'relationship-single-v3'
   content: RelationshipSingleNarrativePlan
 }
 
@@ -442,6 +470,7 @@ export type SavedReport =
 export function isRelationshipSingleReport(report: SavedReport): report is RelationshipSingleSavedReport {
   return report.contentVersion === 'relationship-single-v1'
     || report.contentVersion === 'relationship-single-v2'
+    || report.contentVersion === 'relationship-single-v3'
 }
 
 export function isOverallReport(report: SavedReport): report is OverallSavedReport {
@@ -462,10 +491,12 @@ export function isWealthDetailedReport(report: SavedReport): report is WealthV3S
 export function isRelationshipReport(report: SavedReport): report is RelationshipV1SavedReport {
   return report.contentVersion === 'relationship-narrative-v1'
     || report.contentVersion === 'relationship-narrative-v2'
+    || report.contentVersion === 'relationship-narrative-v3'
 }
 
 export function isCareerV4Report(report: SavedReport): report is CareerV4SavedReport {
   return report.contentVersion === 'career-narrative-v4'
+    || report.contentVersion === 'career-narrative-v5'
 }
 
 export function isLegacyReport(report: SavedReport): report is LegacySavedReport {

@@ -11,6 +11,7 @@ import com.bazi.app.report.wealth.v3.WealthNarrativeWriter;
 import com.bazi.app.report.wealth.v3.WealthV3Analyzer;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -100,8 +101,8 @@ class WealthNarrativeV3Test {
   @Test
   void identicalAnnualConditionsKeepTheSameJudgmentButUseDistinctPlannedHeadlines() throws Exception {
     var content = content(scoredCase("S07"));
-    assertEquals("wealth-plain-v3.16", content.copyVersion());
-    assertEquals("wealth-headline-v3", content.headlinePlannerVersion());
+    assertEquals("wealth-plain-v3.18", content.copyVersion());
+    assertEquals("wealth-headline-v4", content.headlinePlannerVersion());
     assertEquals(3, content.years().stream().map(y -> y.overview().text()).distinct().count());
     assertEquals(3, content.years().stream().map(y -> y.headlineMeta().themeKey()).distinct().count());
     assertEquals(3, content.years().stream().map(y -> y.retention().text()).distinct().count());
@@ -150,11 +151,63 @@ class WealthNarrativeV3Test {
   }
 
   @Test
+  void annualActionGuideDoesNotRepeatAnyStepWhenTheMoneyPathStaysTheSame() throws Exception {
+    var guides = content(scoredCase("S07")).years().stream()
+        .map(WealthNarrativeV3.Year::actionGuide)
+        .toList();
+
+    assertEquals(3, guides.stream().map(guide -> guide.problem().text()).distinct().count());
+    assertEquals(3, guides.stream().map(guide -> guide.action().text()).distinct().count());
+    assertEquals(3, guides.stream().map(guide -> guide.expectedChange().text()).distinct().count());
+    assertEquals(3, guides.stream().map(guide -> guide.checkTiming().text()).distinct().count());
+    assertEquals(3, guides.stream().map(guide -> guide.successSignal().text()).distinct().count());
+    assertEquals(3, guides.stream().map(guide -> guide.adjustmentCondition().text()).distinct().count());
+    assertEquals(3, guides.stream().map(guide -> guide.fallbackAction().text()).distinct().count());
+  }
+
+  @Test
+  void annualActionGuideAvoidsKnownMechanicalChineseJoins() throws Exception {
+    var texts = content(scoredCase("S07")).years().stream()
+        .flatMap(year -> {
+          var guide = year.actionGuide();
+          return List.of(guide.problem(), guide.action(), guide.expectedChange(),
+              guide.checkTiming(), guide.successSignal(), guide.adjustmentCondition(),
+              guide.fallbackAction()).stream();
+        })
+        .map(Block::text)
+        .toList();
+
+    for (String text : texts) {
+      assertFalse(text.contains("日期有改善条件"), text);
+      assertFalse(text.contains("每周检查一次每"), text);
+      assertFalse(text.contains("开销仍不稳定"), text);
+    }
+  }
+
+  @Test
+  void annualActionGuideDoesNotRepeatSentencesAcrossYears() throws Exception {
+    var sentences = content(scoredCase("S07")).years().stream()
+        .flatMap(year -> {
+          var guide = year.actionGuide();
+          return List.of(guide.problem(), guide.action(), guide.expectedChange(),
+              guide.checkTiming(), guide.successSignal(), guide.adjustmentCondition(),
+              guide.fallbackAction()).stream();
+        })
+        .map(Block::text)
+        .flatMap(text -> Arrays.stream(text.split("(?<=[。！？])")))
+        .map(String::trim)
+        .filter(text -> !text.isEmpty())
+        .toList();
+
+    assertEquals(sentences.size(), sentences.stream().distinct().count(), sentences.toString());
+  }
+
+  @Test
   void annualHeadlineMetadataAndReferencesComeFromTheReportLevelPlan() throws Exception {
     var content = content(scoredCase("S07"));
     for (var year : content.years()) {
       assertNotNull(year.headlineMeta());
-      assertEquals("wealth-headline-v3", year.headlineMeta().plannerVersion());
+      assertEquals("wealth-headline-v4", year.headlineMeta().plannerVersion());
       assertEquals(1, year.overview().decisionIds().size());
       assertTrue(year.overview().decisionIds().stream().allMatch(id -> id.startsWith(year.year() + ".decision.")));
       assertEquals(year.headlineMeta().pathKey(), year.overview().decisionIds().get(0)

@@ -39,7 +39,7 @@ class WealthHeadlineSentenceSpecTest {
 
   @Test
   void everyHeadlineUsesTwoCompleteSentencesWithoutAbstractGlue() {
-    assertEquals("wealth-headline-v3", WealthHeadlineVocabulary.VERSION);
+    assertEquals("wealth-headline-v4", WealthHeadlineVocabulary.VERSION);
     List<String> forbidden = List.of(
         "有利条件", "好坏条件", "改善空间", "存在变数", "有变数",
         "值得重点留意", "同时记录", "这方面");
