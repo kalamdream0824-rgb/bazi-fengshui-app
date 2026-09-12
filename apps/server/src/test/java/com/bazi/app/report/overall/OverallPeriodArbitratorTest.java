@@ -46,7 +46,7 @@ class OverallPeriodArbitratorTest {
   }
 
   @Test
-  void changesARepeatedFocusOnlyWhenAnotherDirectAnnualSignalIsClose() {
+  void keepsTheRealStrongestFocusInsteadOfRotatingForVariety() {
     OverallDimensionEvaluation career = evaluation(
         OverallDimension.CAREER, OverallStance.SUPPORTIVE, 5, 0, "annual.stem.group.output");
     OverallDimensionEvaluation closeWealth = evaluation(
@@ -54,7 +54,7 @@ class OverallPeriodArbitratorTest {
     OverallDimensionEvaluation weakRelationship = evaluation(
         OverallDimension.RELATIONSHIP, OverallStance.BALANCED, 1, 0, "natal.balance.middle");
 
-    assertEquals(OverallDimension.WEALTH, OverallPeriodArbitrator.selectPrimary(
+    assertEquals(OverallDimension.CAREER, OverallPeriodArbitrator.selectPrimary(
         List.of(career, closeWealth, weakRelationship), OverallDimension.CAREER));
     assertEquals(OverallDimension.CAREER, OverallPeriodArbitrator.selectPrimary(
         List.of(career, weakRelationship), OverallDimension.CAREER));

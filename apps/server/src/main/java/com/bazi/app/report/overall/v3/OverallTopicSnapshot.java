@@ -13,6 +13,7 @@ public record OverallTopicSnapshot(
     Stance stance,
     Urgency urgency,
     ConfidenceLevel confidence,
+    int directEvidenceCount,
     String opportunityKey,
     String riskKey,
     List<String> actionCandidateKeys,
@@ -29,6 +30,9 @@ public record OverallTopicSnapshot(
     riskKey = optional(riskKey);
     actionCandidateKeys = distinctRequired(actionCandidateKeys, "action candidate keys", 1);
     evidenceKeys = distinctRequired(evidenceKeys, "snapshot evidence keys", 2);
+    if (directEvidenceCount < 0 || directEvidenceCount > evidenceKeys.size()) {
+      throw new IllegalArgumentException("direct evidence count must fit the evidence set");
+    }
   }
 
   public enum Topic {

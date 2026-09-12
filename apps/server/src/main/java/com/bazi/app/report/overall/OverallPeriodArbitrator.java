@@ -8,7 +8,6 @@ import java.util.Objects;
 
 public final class OverallPeriodArbitrator {
 
-  private static final int CLOSE_ALTERNATIVE_GAP = 3;
   private static final Comparator<OverallDimensionEvaluation> RANKING =
       Comparator.comparingInt(OverallDimensionEvaluation::salience)
           .reversed()
@@ -56,16 +55,7 @@ public final class OverallPeriodArbitrator {
       List<OverallDimensionEvaluation> dimensions,
       OverallDimension previous) {
     List<OverallDimensionEvaluation> ranked = ranked(dimensions);
-    OverallDimensionEvaluation strongest = ranked.get(0);
-    if (previous == null || strongest.dimension() != previous) return strongest.dimension();
-
-    return ranked.stream()
-        .filter(item -> item.dimension() != previous)
-        .filter(item -> !item.directAnnualEvidenceKeys().isEmpty())
-        .filter(item -> strongest.salience() - item.salience() <= CLOSE_ALTERNATIVE_GAP)
-        .findFirst()
-        .map(OverallDimensionEvaluation::dimension)
-        .orElse(previous);
+    return ranked.get(0).dimension();
   }
 
   private static List<OverallDimensionEvaluation> ranked(

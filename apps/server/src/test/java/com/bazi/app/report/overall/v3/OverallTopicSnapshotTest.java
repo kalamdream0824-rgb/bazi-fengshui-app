@@ -28,6 +28,7 @@ class OverallTopicSnapshotTest {
         OverallTopicSnapshot.Stance.PRESSURED,
         OverallTopicSnapshot.Urgency.HIGH,
         ConfidenceLevel.HIGH,
+        1,
         null,
         "wealth.expense_limit",
         List.of("wealth.reserve"),
@@ -39,6 +40,7 @@ class OverallTopicSnapshotTest {
         OverallTopicSnapshot.Stance.PRESSURED,
         OverallTopicSnapshot.Urgency.HIGH,
         ConfidenceLevel.HIGH,
+        1,
         null,
         "wealth.expense_limit",
         List.of(),
@@ -50,6 +52,7 @@ class OverallTopicSnapshotTest {
         OverallTopicSnapshot.Stance.PRESSURED,
         OverallTopicSnapshot.Urgency.HIGH,
         ConfidenceLevel.HIGH,
+        1,
         null,
         "wealth.expense_limit",
         List.of("wealth.reserve"),
@@ -65,6 +68,7 @@ class OverallTopicSnapshotTest {
         OverallTopicSnapshot.Stance.SUPPORTIVE,
         OverallTopicSnapshot.Urgency.MEDIUM,
         ConfidenceLevel.MEDIUM,
+        1,
         "career.visible_result",
         null,
         List.of("career.finish", "career.finish"),
@@ -96,6 +100,22 @@ class OverallTopicSnapshotTest {
         "wealth.reserve", List.of("not.from.either.snapshot")));
   }
 
+  @Test
+  void rejectsADirectEvidenceCountOutsideTheEvidenceSet() {
+    assertThrows(IllegalArgumentException.class, () -> new OverallTopicSnapshot(
+        2026,
+        OverallTopicSnapshot.Topic.CAREER,
+        "career.output.visible_result",
+        OverallTopicSnapshot.Stance.SUPPORTIVE,
+        OverallTopicSnapshot.Urgency.MEDIUM,
+        ConfidenceLevel.HIGH,
+        3,
+        "career.visible_result",
+        null,
+        List.of("career.finish"),
+        List.of("annual.stem.group.output", "natal.balance.middle")));
+  }
+
   private OverallTopicSnapshot snapshot(
       OverallTopicSnapshot.Topic topic, String focusKey) {
     String topicKey = topic.name().toLowerCase();
@@ -110,6 +130,7 @@ class OverallTopicSnapshotTest {
             ? OverallTopicSnapshot.Urgency.HIGH
             : OverallTopicSnapshot.Urgency.MEDIUM,
         ConfidenceLevel.HIGH,
+        1,
         topicKey + ".opportunity",
         topicKey + ".risk",
         topic == OverallTopicSnapshot.Topic.WEALTH
