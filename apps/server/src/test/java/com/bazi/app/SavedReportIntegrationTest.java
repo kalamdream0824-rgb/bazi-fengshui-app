@@ -15,6 +15,9 @@ import com.bazi.app.mapper.UserMapper;
 import com.bazi.app.dto.PaipanRequest;
 import com.bazi.app.report.AnnualContextFactory;
 import com.bazi.app.report.ReportHorizon;
+import com.bazi.app.report.overall.OverallNarrativePlan;
+import com.bazi.app.report.overall.OverallNarrativePlanner;
+import com.bazi.app.report.overall.OverallPeriodArbitrator;
 import com.bazi.app.report.relationship.*;
 import com.bazi.app.service.BaziService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -141,15 +144,26 @@ class SavedReportIntegrationTest {
         .andExpect(jsonPath("$.subject").value("林先生"))
         .andExpect(jsonPath("$.topic").value("overall"))
         .andExpect(jsonPath("$.edition").value("plain"))
-        .andExpect(jsonPath("$.contentVersion").value("overall-narrative-v2"))
+        .andExpect(jsonPath("$.contentVersion").value("overall-narrative-v3"))
         .andExpect(jsonPath("$.content.horizonYears").value(3))
         .andExpect(jsonPath("$.content.timeline.past.year").value(2025))
         .andExpect(jsonPath("$.content.timeline.present.year").value(2026))
         .andExpect(jsonPath("$.content.timeline.future.length()").value(2))
         .andExpect(jsonPath("$.content.years.length()").value(3))
-        .andExpect(jsonPath("$.content.years[0].dimensions.length()").value(4))
-        .andExpect(jsonPath("$.content.years[0].actions.length()").value(2))
+        .andExpect(jsonPath("$.content.years[0].observations.length()").value(2))
+        .andExpect(jsonPath("$.content.years[0].actionGuide.focusKey")
+            .value(org.hamcrest.Matchers.startsWith("overall.")))
+        .andExpect(jsonPath("$.content.years[0].actionGuide.expectedChange").isNotEmpty())
+        .andExpect(jsonPath("$.content.years[0].actionGuide.checkTiming").isNotEmpty())
+        .andExpect(jsonPath("$.content.years[0].actionGuide.successSignal").isNotEmpty())
+        .andExpect(jsonPath("$.content.years[0].actionGuide.fallbackAction").isNotEmpty())
+        .andExpect(jsonPath("$.content.years[0].dimensions").doesNotExist())
+        .andExpect(jsonPath("$.content.years[0].actions").doesNotExist())
+        .andExpect(jsonPath("$.content.years[0].priorityIssue").doesNotExist())
         .andExpect(jsonPath("$.content.years[0].primaryCode").isString())
+        .andExpect(jsonPath("$.content.years[0].secondaryCode").isString())
+        .andExpect(jsonPath("$.content.years[0].decisionKey").isString())
+        .andExpect(jsonPath("$.content.years[0].conflictKey").isString())
         .andExpect(jsonPath("$.content.years[0].linkage").isNotEmpty())
         .andExpect(jsonPath("$.content.years[0].evidenceKeys").isNotEmpty())
         .andReturn();
@@ -164,11 +178,9 @@ class SavedReportIntegrationTest {
     MvcResult read = mvc.perform(get("/api/v1/reports/{id}", id)
             .header("Authorization", "Bearer " + token))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.contentVersion").value("overall-narrative-v2"))
+        .andExpect(jsonPath("$.contentVersion").value("overall-narrative-v3"))
         .andReturn();
     assertEquals(snapshot, objectMapper.readTree(read.getResponse().getContentAsString()));
-
-    assertLegacyCloneReadable(token, id, "overall-narrative-v1.1");
   }
 
   @Test
@@ -176,14 +188,7 @@ class SavedReportIntegrationTest {
     String username = "saved-overall-v1-fixture";
     String token = register(username);
     User user = userMapper.selectOne(new QueryWrapper<User>().eq("username", username));
-    MvcResult current = mvc.perform(post("/api/v1/reports")
-            .header("Authorization", "Bearer " + token)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(overallPayload("plain")))
-        .andExpect(status().isOk())
-        .andReturn();
-    ObjectNode legacyContent = (ObjectNode) objectMapper.readTree(
-        current.getResponse().getContentAsString()).get("content");
+    ObjectNode legacyContent = objectMapper.valueToTree(legacyOverallContent());
     legacyContent.withArray("years").forEach(year -> ((ObjectNode) year).remove("linkage"));
     BaziReport legacy = storedReport(
         user.getId(), "旧版综合命主", "overall", "overall-narrative-v1",
@@ -195,6 +200,42 @@ class SavedReportIntegrationTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.contentVersion").value("overall-narrative-v1"))
         .andExpect(jsonPath("$.content.years[0].linkage").value(""));
+  }
+
+  @Test
+  void readsStoredOverallV2AndV11SnapshotsWithoutRecalculatingThem() throws Exception {
+    String username = "saved-overall-history-fixture";
+    String token = register(username);
+    User user = userMapper.selectOne(new QueryWrapper<User>().eq("username", username));
+    ObjectNode v2Content = objectMapper.valueToTree(legacyOverallContent());
+
+    BaziReport v2 = storedReport(
+        user.getId(), "旧版综合命主", "overall", "overall-narrative-v2",
+        objectMapper.writeValueAsString(v2Content));
+    reportMapper.insert(v2);
+    ObjectNode v11Content = v2Content.deepCopy();
+    v11Content.remove("timeline");
+    BaziReport v11 = storedReport(
+        user.getId(), "旧版综合命主", "overall", "overall-narrative-v1.1",
+        objectMapper.writeValueAsString(v11Content));
+    reportMapper.insert(v11);
+
+    mvc.perform(get("/api/v1/reports/{id}", v2.getId())
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.contentVersion").value("overall-narrative-v2"))
+        .andExpect(jsonPath("$.content.years[0].dimensions.length()").value(4))
+        .andExpect(jsonPath("$.content.timeline.present.year").value(2026));
+    mvc.perform(get("/api/v1/reports/{id}", v11.getId())
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.contentVersion").value("overall-narrative-v1.1"))
+        .andExpect(jsonPath("$.content.timeline").doesNotExist())
+        .andExpect(jsonPath("$.content.years[0].dimensions.length()").value(4));
+
+    assertEquals(v2Content, objectMapper.readTree(reportMapper.selectById(v2.getId()).getContentJson()));
+    assertEquals(v11Content,
+        objectMapper.readTree(reportMapper.selectById(v11.getId()).getContentJson()));
   }
 
   @Test
@@ -789,6 +830,23 @@ class SavedReportIntegrationTest {
     result.set("years", years);
     result.set("evidenceKeys", content.get("evidenceKeys"));
     return result;
+  }
+
+  private OverallNarrativePlan legacyOverallContent() {
+    PaipanRequest request = new PaipanRequest(
+        "旧版综合命主", "male", "1995-10-08T14:30:00", "上海", false);
+    var chart = new BaziService().paipan(request);
+    Clock clock = Clock.fixed(
+        Instant.parse("2026-08-23T00:00:00Z"), ZoneId.of("Asia/Shanghai"));
+    AnnualContextFactory factory = new AnnualContextFactory(clock);
+    var productContexts = factory.create(request, chart, ReportHorizon.of(3));
+    var previousContext = factory.createYear(request, chart, productContexts.get(0).year() - 1);
+    OverallPeriodArbitrator arbitrator = new OverallPeriodArbitrator();
+    var product = arbitrator.arbitrate(productContexts);
+    var fullWindow = new ArrayList<>(productContexts);
+    fullWindow.add(0, previousContext);
+    var previous = arbitrator.arbitrate(fullWindow).years().get(0);
+    return new OverallNarrativePlanner().plan(product, previous);
   }
 
   private String legacyWealthV1Fixture() {

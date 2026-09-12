@@ -20,8 +20,8 @@ import com.bazi.app.report.ReportTopic;
 import com.bazi.app.report.ThreeYearAssessment;
 import com.bazi.app.report.rules.AnnualRuleCatalog;
 import com.bazi.app.report.overall.OverallNarrativePlan;
-import com.bazi.app.report.overall.OverallNarrativePlanner;
-import com.bazi.app.report.overall.OverallPeriodArbitrator;
+import com.bazi.app.report.overall.v3.OverallV3NarrativePlan;
+import com.bazi.app.report.overall.v3.OverallV3ReportGenerator;
 import com.bazi.app.report.relationship.RelationshipDimensionEvaluator;
 import com.bazi.app.report.relationship.RelationshipFactExtractor;
 import com.bazi.app.report.relationship.RelationshipNarrativePlan;
@@ -53,7 +53,8 @@ public class ReportService {
   public static final String CAREER_CONTENT_VERSION = "career-narrative-v5";
   public static final String CAREER_V4_CONTENT_VERSION = "career-narrative-v4";
   public static final String CAREER_V3_CONTENT_VERSION = "career-narrative-v3";
-  public static final String OVERALL_CONTENT_VERSION = "overall-narrative-v2";
+  public static final String OVERALL_CONTENT_VERSION = "overall-narrative-v3";
+  public static final String OVERALL_V2_CONTENT_VERSION = "overall-narrative-v2";
   public static final String OVERALL_V11_CONTENT_VERSION = "overall-narrative-v1.1";
   public static final String OVERALL_V1_CONTENT_VERSION = "overall-narrative-v1";
   public static final String WEALTH_CONTENT_VERSION = "wealth-narrative-v4";
@@ -72,6 +73,7 @@ public class ReportService {
   private final Clock clock;
   private final AnnualPeriodAssessor assessor;
   private final WealthReportGenerator wealthReportGenerator;
+  private final OverallV3ReportGenerator overallV3ReportGenerator;
   private final ReportEntitlementService reportEntitlementService;
   private final CareerNarrativePlanner careerPlanner = new CareerNarrativePlanner();
   private final RelationshipFactExtractor relationshipFactExtractor = new RelationshipFactExtractor();
@@ -83,13 +85,16 @@ public class ReportService {
       new RelationshipNarrativePlanner();
 
   public ReportService(BaziService baziService, BaziReportMapper mapper, ObjectMapper objectMapper,
-      WealthReportGenerator wealthReportGenerator, ReportEntitlementService reportEntitlementService) {
+      WealthReportGenerator wealthReportGenerator,
+      OverallV3ReportGenerator overallV3ReportGenerator,
+      ReportEntitlementService reportEntitlementService) {
     this.baziService = baziService;
     this.mapper = mapper;
     this.objectMapper = objectMapper;
     this.clock = Clock.systemDefaultZone();
     this.assessor = new AnnualPeriodAssessor(clock, new AnnualRuleCatalog());
     this.wealthReportGenerator = wealthReportGenerator;
+    this.overallV3ReportGenerator = overallV3ReportGenerator;
     this.reportEntitlementService = reportEntitlementService;
   }
 
@@ -148,12 +153,14 @@ public class ReportService {
     String contentVersion;
     Object contextRequest;
     if (topic == ReportTopic.OVERALL) {
-      OverallPeriodArbitrator arbitrator = new OverallPeriodArbitrator();
-      var product = arbitrator.arbitrate(analysisWindow.productYears());
-      var analysis = new ArrayList<>(analysisWindow.productYears());
-      analysis.add(0, analysisWindow.previous());
-      var previous = arbitrator.arbitrate(analysis).years().get(0);
-      content = new OverallNarrativePlanner().plan(product, previous);
+      try {
+        content = overallV3ReportGenerator.generate(
+            request.request(), chart, analysisWindow.previous(), analysisWindow.productYears(),
+            clock.withZone(WEALTH_ZONE));
+      } catch (IllegalArgumentException error) {
+        throw new BusinessException("REPORT_GENERATION_UNAVAILABLE",
+            "本次命书暂未生成成功，未扣除费用或使用次数，请稍后再试");
+      }
       contentVersion = OVERALL_CONTENT_VERSION;
       contextRequest = Map.of("source", "system", "horizonYears", 3);
     } else if (topic == ReportTopic.CAREER) {
@@ -249,8 +256,10 @@ public class ReportService {
 
   private ReportDto toDto(BaziReport report) throws Exception {
     ReportContent content;
-    if (Set.of(OVERALL_CONTENT_VERSION, OVERALL_V11_CONTENT_VERSION, OVERALL_V1_CONTENT_VERSION)
-        .contains(report.getContentVersion())) {
+    if (OVERALL_CONTENT_VERSION.equals(report.getContentVersion())) {
+      content = objectMapper.readValue(report.getContentJson(), OverallV3NarrativePlan.class);
+    } else if (Set.of(OVERALL_V2_CONTENT_VERSION, OVERALL_V11_CONTENT_VERSION,
+        OVERALL_V1_CONTENT_VERSION).contains(report.getContentVersion())) {
       content = objectMapper.readValue(report.getContentJson(), OverallNarrativePlan.class);
     } else if (Set.of(WEALTH_CONTENT_VERSION, WEALTH_V3_CONTENT_VERSION)
         .contains(report.getContentVersion())) {

@@ -36,10 +36,17 @@ public final class OverallV3NarrativePlanner {
 
     List<OverallV3NarrativePlan.YearNarrative> years = new ArrayList<>();
     List<AnnualActionGuide> guides = new ArrayList<>();
+    String previousDecisionKey = null;
+    int continuationRound = 0;
     for (int index = 0; index < productDecisions.size(); index++) {
       OverallAnnualDecision decision = productDecisions.get(index);
       List<OverallTopicSnapshot> annualSnapshots = snapshotsByYear.get(decision.year());
-      AnnualActionGuide guide = actionWriter.write(decision);
+      continuationRound = decision.decisionKey().equals(previousDecisionKey)
+          ? continuationRound + 1 : 0;
+      AnnualActionGuide guide = continuationRound == 0
+          ? actionWriter.write(decision)
+          : continuationGuide(decision, continuationRound);
+      previousDecisionKey = decision.decisionKey();
       guides.add(guide);
       years.add(new OverallV3NarrativePlan.YearNarrative(
           decision.year(),
@@ -125,6 +132,36 @@ public final class OverallV3NarrativePlanner {
             observation(snapshot),
             snapshot.evidenceKeys()))
         .toList();
+  }
+
+  private AnnualActionGuide continuationGuide(
+      OverallAnnualDecision decision, int continuationRound) {
+    String primary = copy.focusObject(decision.primary());
+    String secondary = copy.focusObject(decision.secondary());
+    String focusKey = actionWriter.write(decision).focusKey();
+    if (continuationRound == 1) {
+      return new AnnualActionGuide(
+          focusKey,
+          "前一阶段已经围绕" + primary + "开始行动，本阶段要确认结果能否持续，并查看"
+              + secondary + "是否受影响。",
+          "先核对前一阶段留下的记录，再保留有效做法；只修改一项没有结果的安排。",
+          "这样能分清" + primary + "的改善是短暂还是持续，同时守住" + secondary + "。",
+          "接下来每两周核对一次两项记录；累计四周后再统一判断。",
+          "有效的信号是：原有改善连续四周存在，而且" + secondary + "没有变差。",
+          "如果两次核对都发现原有改善消失，就停止增加新的安排。",
+          "回到上一阶段最有效的一步，把其余新增做法全部暂停。",
+          decision.evidenceKeys());
+    }
+    return new AnnualActionGuide(
+        focusKey,
+        "连续两轮都在处理" + primary + "，现在要确认哪些做法真正值得保留。",
+        "把前两轮的记录放在一起，只留下效果最稳定的一步，并停止重复增加动作。",
+        "这样能把" + primary + "变成稳定做法，也能为" + secondary + "留出余量。",
+        "保留做法后每月核对一次；连续两个月有效才算稳定。",
+        "有效的信号是：减少动作后结果没有下降，" + secondary + "反而更稳定。",
+        "如果连续两个月结果下降，就说明保留的做法并非真正有效。",
+        "撤回最近一次调整，改用前两轮中记录最清楚的做法。",
+        decision.evidenceKeys());
   }
 
   private String headline(List<OverallAnnualDecision> decisions, int index) {

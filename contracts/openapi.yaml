@@ -495,7 +495,8 @@ components:
             - overall-narrative-v1
             - overall-narrative-v1.1
             - overall-narrative-v2
-          description: career v5、relationship v3 在统一时间线基础上增加年度行动闭环；旧版本继续按原结构读取，新增字段缺失时不得补写或报错。
+            - overall-narrative-v3
+          description: overall v3 每年只保留一个跨主题行动闭环；旧版本继续按原结构读取，新增字段缺失时不得补写或报错。
         content:
           oneOf:
             - $ref: '#/components/schemas/CareerNarrativePlan'
@@ -503,6 +504,7 @@ components:
             - $ref: '#/components/schemas/RelationshipNarrativePlan'
             - $ref: '#/components/schemas/RelationshipSingleNarrativePlan'
             - $ref: '#/components/schemas/OverallNarrativePlan'
+            - $ref: '#/components/schemas/OverallV3NarrativePlan'
             - $ref: './drafts/wealth-v3.schema.json#/definitions/Content'
           description: 由 contentVersion 判别；新版本包含 timeline，历史版本允许缺少 timeline。
         createdAt: { type: string, format: date-time }
@@ -940,6 +942,86 @@ components:
           items: { type: string }
         timeline:
           $ref: '#/components/schemas/NarrativeTimeline'
+    OverallV3NarrativePlan:
+      type: object
+      additionalProperties: false
+      description: overall-narrative-v3 的三年跨主题决策快照；每年恰好一个行动闭环和两个观察项。
+      required: [horizonYears, thesis, summary, years, readingNote, evidenceKeys, timeline]
+      properties:
+        horizonYears: { type: integer, enum: [3], readOnly: true }
+        thesis: { type: string, minLength: 1 }
+        summary: { type: string, minLength: 1 }
+        years:
+          type: array
+          minItems: 3
+          maxItems: 3
+          items: { $ref: '#/components/schemas/OverallV3YearNarrative' }
+        readingNote: { type: string, minLength: 1 }
+        evidenceKeys:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: { type: string, minLength: 1 }
+        timeline:
+          $ref: '#/components/schemas/NarrativeTimeline'
+    OverallV3YearNarrative:
+      type: object
+      additionalProperties: false
+      required:
+        - year
+        - primaryCode
+        - primaryLabel
+        - secondaryCode
+        - secondaryLabel
+        - decisionKey
+        - conflictKey
+        - headline
+        - linkage
+        - actionGuide
+        - observations
+        - transition
+        - evidenceKeys
+      properties:
+        year: { type: integer }
+        primaryCode: { $ref: '#/components/schemas/OverallV3TopicCode' }
+        primaryLabel: { type: string, minLength: 1 }
+        secondaryCode: { $ref: '#/components/schemas/OverallV3TopicCode' }
+        secondaryLabel: { type: string, minLength: 1 }
+        decisionKey: { type: string, minLength: 1 }
+        conflictKey: { type: string, minLength: 1 }
+        headline: { type: string, minLength: 1 }
+        linkage: { type: string, minLength: 1 }
+        actionGuide: { $ref: '#/components/schemas/AnnualActionGuide' }
+        observations:
+          type: array
+          minItems: 2
+          maxItems: 2
+          items: { $ref: '#/components/schemas/OverallV3Observation' }
+        transition: { type: string, minLength: 1 }
+        evidenceKeys:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: { type: string, minLength: 1 }
+    OverallV3Observation:
+      type: object
+      additionalProperties: false
+      required: [topicCode, topicLabel, stance, note, evidenceKeys]
+      properties:
+        topicCode: { $ref: '#/components/schemas/OverallV3TopicCode' }
+        topicLabel: { type: string, minLength: 1 }
+        stance:
+          type: string
+          enum: [可以推进, 相对平稳, 机会与牵制并存, 压力偏重]
+        note: { type: string, minLength: 1 }
+        evidenceKeys:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: { type: string, minLength: 1 }
+    OverallV3TopicCode:
+      type: string
+      enum: [rhythm, career, wealth, relationship]
     ReportEvidence:
       type: object
       properties:

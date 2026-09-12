@@ -131,6 +131,28 @@ class OverallV3NarrativePlannerTest {
   }
 
   @Test
+  void anUnchangedRealDecisionUsesContinuationPhasesInsteadOfFailingForDiversity() {
+    List<OverallTopicSnapshot> snapshots = new ArrayList<>();
+    List<OverallAnnualDecision> decisions = new ArrayList<>();
+    for (int offset = 0; offset < 3; offset++) {
+      List<OverallTopicSnapshot> annual = annualSnapshots(2026 + offset, "career.visibility");
+      snapshots.addAll(annual);
+      decisions.add(new OverallDecisionArbitrator().arbitrate(annual));
+    }
+
+    OverallV3NarrativePlan plan = assertDoesNotThrow(
+        () -> new OverallV3NarrativePlanner().plan(snapshots, decisions));
+    List<AnnualActionGuide> guides = plan.years().stream()
+        .map(OverallV3NarrativePlan.YearNarrative::actionGuide)
+        .toList();
+
+    assertDoesNotThrow(() -> AnnualActionGuidePolicy.validate(guides));
+    assertEquals(3, guides.stream().map(this::tuple).distinct().count());
+    assertTrue(guides.get(1).problem().contains("前一阶段"), guides.get(1).problem());
+    assertTrue(guides.get(2).problem().contains("连续两轮"), guides.get(2).problem());
+  }
+
+  @Test
   void previousYearAddsAnEvidenceOwnedTimelineWithoutCopyingAnnualActionLines() {
     OverallV3NarrativePlan plan = new OverallV3NarrativePlanner().plan(
         productSnapshots, productDecisions, previousSnapshots, previousDecision);
