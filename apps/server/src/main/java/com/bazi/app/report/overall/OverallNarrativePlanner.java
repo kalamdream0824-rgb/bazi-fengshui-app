@@ -25,9 +25,19 @@ public final class OverallNarrativePlanner {
     List<OverallNarrativePlan.YearNarrative> years = new ArrayList<>();
     for (int index = 0; index < period.years().size(); index++) {
       OverallYearEvaluation year = period.years().get(index);
+      OverallTransition incoming = incomingTransition(period, index, year);
       List<OverallNarrativePlan.DimensionReading> dimensions = year.dimensions().stream()
           .map(this::reading)
           .toList();
+      String priorityIssue = copy.priorityIssue(
+          year.primaryDimension(), year.primary().stance(), angleResolver.resolve(year.primary()));
+      String changeCondition = copy.changeCondition(
+          year.primaryDimension(), year.primary().stance(), angleResolver.resolve(year.primary()));
+      if (incoming != null) {
+        priorityIssue = copy.continuedPriorityIssue(
+            year.primaryDimension(), angleResolver.resolve(year.primary()), incoming);
+        changeCondition = copy.continuedChangeCondition(year.primaryDimension(), incoming);
+      }
       years.add(new OverallNarrativePlan.YearNarrative(
           year.year(),
           year.ganZhi(),
@@ -40,13 +50,11 @@ public final class OverallNarrativePlanner {
           copy.linkage(
               year.primaryDimension(), year.secondaryDimension(), year.primary().stance()),
           dimensions,
-          copy.priorityIssue(
-              year.primaryDimension(), year.primary().stance(), angleResolver.resolve(year.primary())),
+          priorityIssue,
           List.of(
               copy.action(year.primaryDimension(), year.primary().stance(), index),
               copy.action(year.secondaryDimension(), year.secondary().stance(), index)),
-          copy.changeCondition(
-              year.primaryDimension(), year.primary().stance(), angleResolver.resolve(year.primary())),
+          changeCondition,
           transition(period, index),
           evidenceKeys(year)));
     }
@@ -66,6 +74,15 @@ public final class OverallNarrativePlanner {
         "这份综合命书用于比较三年的生活重点和处理顺序。它不代替具体的工作、财务、关系或健康决定。",
         years.stream().flatMap(year -> year.evidenceKeys().stream()).distinct().toList(),
         timeline);
+  }
+
+  private OverallTransition incomingTransition(
+      OverallPeriodEvaluation period, int index, OverallYearEvaluation year) {
+    if (index == 0
+        || period.years().get(index - 1).primaryDimension() != year.primaryDimension()) {
+      return null;
+    }
+    return period.transitions().get(index - 1);
   }
 
   private OverallNarrativePlan.DimensionReading reading(OverallDimensionEvaluation evaluation) {

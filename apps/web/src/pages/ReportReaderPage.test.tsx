@@ -435,6 +435,81 @@ const overallV2Report: SavedReport = {
   content: { ...overallV11Report.content, timeline: timelineFor([2027, 2028]) },
 }
 
+const overallV3Report = {
+  ...overallReport,
+  id: 68,
+  contentVersion: 'overall-narrative-v3',
+  content: {
+    horizonYears: 3,
+    thesis: '这三年先稳住生活节奏，再把有限精力放到真正能留下结果的事情上。',
+    summary: '每年只设一个优先行动，同时看清它会牵动的另一个方面。',
+    readingNote: '这份综合命书只回答每年先处理什么，以及怎样确认行动是否有效。',
+    evidenceKeys: ['overall.v3.2026', 'overall.v3.2027', 'overall.v3.2028'],
+    timeline: timelineFor([2027, 2028]),
+    years: [2026, 2027, 2028].map((year, index) => {
+      const primary = [
+        ['rhythm', '生活节奏'],
+        ['wealth', '钱财安排'],
+        ['relationship', '关系支持'],
+      ][index]
+      const secondary = [
+        ['career', '事业责任'],
+        ['career', '事业责任'],
+        ['rhythm', '生活节奏'],
+      ][index]
+      const observations = [
+        [
+          ['wealth', '钱财安排', '需要留意', '实际进账仍要逐笔核对。'],
+          ['relationship', '关系支持', '相对平稳', '重要问题仍能得到回应。'],
+        ],
+        [
+          ['rhythm', '生活节奏', '需要留意', '固定休息时间不能继续减少。'],
+          ['relationship', '关系支持', '有支持也有分歧', '共同安排要先说清边界。'],
+        ],
+        [
+          ['career', '事业责任', '相对平稳', '最重要的事情仍能按时完成。'],
+          ['wealth', '钱财安排', '需要留意', '必要开销后的余钱不能减少。'],
+        ],
+      ][index]
+      return {
+        year,
+        primaryCode: primary[0],
+        primaryLabel: primary[1],
+        secondaryCode: secondary[0],
+        secondaryLabel: secondary[1],
+        decisionKey: `${primary[0]}.primary__${secondary[0]}.secondary`,
+        conflictKey: index === 0 ? 'capacity_before_career_expansion' : 'balanced_priority',
+        headline: [
+          '先腾出能稳定使用的时间，再推进一项成果',
+          '先算清实际余钱，再决定继续投入多少',
+          '先把重要问题说清，再安排共同计划',
+        ][index],
+        linkage: [
+          '先看生活节奏，因为可用时间会直接决定事业责任能否完成。',
+          '先看钱财安排，因为实际余钱会限制事业责任的投入范围。',
+          '先看关系支持，因为真实回应会影响生活节奏能否稳定。',
+        ][index],
+        actionGuide: {
+          focusKey: `overall.${primary[0]}.${secondary[0]}`,
+          problem: `第${index + 1}年先处理${primary[1]}。`,
+          action: `第${index + 1}年只推进一项可以核对的行动。`,
+          expectedChange: `这样能改善${primary[1]}，同时守住${secondary[1]}。`,
+          checkTiming: '开始后每周核对一次，四周后统一判断。',
+          successSignal: `连续四周能看到${primary[1]}的实际变化。`,
+          adjustmentCondition: '如果连续两次没有改善，就缩小当前安排。',
+          fallbackAction: '保留最有效的一步，其余安排暂时延后。',
+          evidenceKeys: [`overall.v3.${year}`],
+        },
+        observations: observations.map(([topicCode, topicLabel, stance, note]) => ({
+          topicCode, topicLabel, stance, note, evidenceKeys: [`overall.v3.${year}.${topicCode}`],
+        })),
+        transition: index < 2 ? '下一年会根据实际变化重新安排优先顺序。' : '这是本次三年判断的最后一年。',
+        evidenceKeys: [`overall.v3.${year}`],
+      }
+    }),
+  },
+} as unknown as SavedReport
+
 function renderReader() {
   return render(
     <MemoryRouter initialEntries={['/reports/18']}>
@@ -541,6 +616,31 @@ describe('ReportReaderPage', () => {
 
     await screen.findByRole('region', { name: '命书时间线' })
     expectTimelineBeforeDetails('.report-reader__years', 2)
+  })
+
+  it('综合v3每年只展示一个行动闭环，三年共三张', async () => {
+    vi.mocked(getReport).mockResolvedValue(overallV3Report)
+    renderReader()
+
+    expect(await screen.findAllByRole('region', { name: '年度行动闭环' })).toHaveLength(3)
+    expect(document.querySelectorAll('.overall-v3-year')).toHaveLength(3)
+    expect(document.querySelectorAll('.annual-action-guide')).toHaveLength(3)
+  })
+
+  it('综合v3展示主次联动和两条观察，不再渲染旧四方面与行动列表', async () => {
+    vi.mocked(getReport).mockResolvedValue(overallV3Report)
+    renderReader()
+
+    expect(await screen.findByText('先腾出能稳定使用的时间，再推进一项成果')).toBeInTheDocument()
+    expect(screen.getAllByText('主主题')).toHaveLength(3)
+    expect(screen.getAllByText('次主题')).toHaveLength(3)
+    expect(screen.getAllByRole('list', { name: /年另外两个方面/ })).toHaveLength(3)
+    expect(screen.getByText('实际进账仍要逐笔核对。')).toBeInTheDocument()
+    expect(screen.getByText('先看生活节奏，因为可用时间会直接决定事业责任能否完成。')).toBeInTheDocument()
+    expect(document.querySelector('.overall-year__dimensions')).toBeNull()
+    expect(document.querySelector('.overall-year__priority')).toBeNull()
+    expect(document.querySelector('.report-year__actions')).toBeNull()
+    expect(document.querySelector('.report-year__boundary')).toBeNull()
   })
 
   it('历史命书没有时间线时不显示空标题或占位区', async () => {

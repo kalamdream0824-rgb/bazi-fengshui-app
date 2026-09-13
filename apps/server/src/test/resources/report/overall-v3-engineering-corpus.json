@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "zoneId": "Asia/Shanghai",
+  "asOf": "2026-09-12",
+  "notice": "固定工程预演语料，只验证综合 v3 的确定性、语义碰撞与中文质量，不代表真人经历或预测准确率。",
+  "fixedBirthResource": "/report/wealth-v2-baseline-inputs.json",
+  "fixedBirthCaseIds": [
+    "R01", "R02", "R03", "R04", "R05", "R06",
+    "R07", "R08", "R09", "R10", "R11", "R12"
+  ],
+  "classicResources": [
+    "/report-golden/classic-bazi-compatibility-v1.json",
+    "/report-golden/classic-bazi-calibration-v2.json",
+    "/report-golden/classic-bazi-holdout-v2.json"
+  ],
+  "boundaryCases": [
+    {
+      "id": "B01",
+      "tags": ["节气附近", "上午时刻"],
+      "request": {"name": "边界样本B01", "gender": "male", "solarDateTime": "1988-02-04T09:55:00", "birthPlace": "北京", "trueSolarTime": false}
+    },
+    {
+      "id": "B02",
+      "tags": ["节气附近", "相邻时刻"],
+      "request": {"name": "边界样本B02", "gender": "female", "solarDateTime": "1988-02-04T10:05:00", "birthPlace": "北京", "trueSolarTime": false}
+    },
+    {
+      "id": "B03",
+      "tags": ["子时", "日期切换前"],
+      "request": {"name": "边界样本B03", "gender": "male", "solarDateTime": "2001-01-01T23:50:00", "birthPlace": "南京", "trueSolarTime": false}
+    },
+    {
+      "id": "B04",
+      "tags": ["子时", "日期切换后"],
+      "request": {"name": "边界样本B04", "gender": "female", "solarDateTime": "2001-01-02T00:10:00", "birthPlace": "南京", "trueSolarTime": false}
+    },
+    {
+      "id": "B05",
+      "tags": ["闰日"],
+      "request": {"name": "边界样本B05", "gender": "male", "solarDateTime": "2000-02-29T12:00:00", "birthPlace": "上海", "trueSolarTime": false}
+    },
+    {
+      "id": "B06",
+      "tags": ["真太阳时", "西部经度"],
+      "request": {"name": "边界样本B06", "gender": "female", "solarDateTime": "1990-06-01T00:05:00", "birthPlace": "新疆维吾尔自治区 乌鲁木齐市", "trueSolarTime": true}
+    },
+    {
+      "id": "B07",
+      "tags": ["真太阳时", "东部经度"],
+      "request": {"name": "边界样本B07", "gender": "male", "solarDateTime": "1990-06-01T00:05:00", "birthPlace": "上海市 上海市", "trueSolarTime": true}
+    },
+    {
+      "id": "B08",
+      "tags": ["公历年切换前", "晚子时"],
+      "request": {"name": "边界样本B08", "gender": "female", "solarDateTime": "1975-12-31T23:55:00", "birthPlace": "广州", "trueSolarTime": false}
+    },
+    {
+      "id": "B09",
+      "tags": ["公历年切换后", "早子时"],
+      "request": {"name": "边界样本B09", "gender": "male", "solarDateTime": "1976-01-01T00:05:00", "birthPlace": "广州", "trueSolarTime": false}
+    },
+    {
+      "id": "B10",
+      "tags": ["时辰切换前", "真太阳时"],
+      "request": {"name": "边界样本B10", "gender": "female", "solarDateTime": "1999-09-09T22:59:00", "birthPlace": "四川省 成都市", "trueSolarTime": true}
+    },
+    {
+      "id": "B11",
+      "tags": ["时辰切换后", "真太阳时"],
+      "request": {"name": "边界样本B11", "gender": "male", "solarDateTime": "1999-09-09T23:01:00", "birthPlace": "四川省 成都市", "trueSolarTime": true}
+    },
+    {
+      "id": "B12",
+      "tags": ["立春月份", "真太阳时"],
+      "request": {"name": "边界样本B12", "gender": "female", "solarDateTime": "1984-02-04T00:30:00", "birthPlace": "陕西省 西安市", "trueSolarTime": true}
+    }
+  ],
+  "manualReviewCaseIds": ["R01", "R05", "R09", "ditiansui-killing-print-rooted-seat", "B06", "B11"]
+}

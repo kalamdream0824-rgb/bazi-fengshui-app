@@ -14,3 +14,23 @@ describe('财富命书移动端摘要布局', () => {
     )
   })
 })
+
+describe('综合v3命书移动布局', () => {
+  it('430px下收紧主次联动线，避免三列内容撑出纸面', () => {
+    expect(appCss).toMatch(
+      /@media \(max-width: 430px\)[\s\S]*?\.overall-v3-year__decision\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) 28px minmax\(0, 1fr\)/,
+    )
+    expect(appCss).toMatch(
+      /@media \(max-width: 430px\)[\s\S]*?\.overall-v3-year__decision > div\s*\{[^}]*padding-inline:\s*9px/,
+    )
+  })
+
+  it('360px下观察项改为单列，纸面继续与页面等宽对齐', () => {
+    expect(appCss).toMatch(
+      /@media \(max-width: 390px\)[\s\S]*?\.overall-v3-year__observations ul\s*\{[^}]*grid-template-columns:\s*1fr/,
+    )
+    expect(appCss).toMatch(
+      /\.report-reader__paper,\s*\.report-library > main\s*\{[^}]*width:\s*100%;[^}]*margin:\s*8px 0 0/,
+    )
+  })
+})

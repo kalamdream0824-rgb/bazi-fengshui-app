@@ -145,6 +145,25 @@ class OverallNarrativePlannerTest {
   }
 
   @Test
+  void repeatedPrimaryWithTheSameCopyInputsExplainsThatTheIssueContinues() {
+    OverallNarrativePlan content = content(new PaipanRequest(
+        "测试命盘R06", "male", "1980-12-25T18:45:00", "成都", false));
+    OverallNarrativePlan.YearNarrative first = content.years().get(0);
+    OverallNarrativePlan.YearNarrative second = content.years().get(1);
+
+    assertEquals("wealth", first.primaryCode());
+    assertEquals("wealth", second.primaryCode());
+    assertFalse(first.priorityIssue().equals(second.priorityIssue()),
+        "continued wealth focus must not repeat the same priority issue");
+    assertFalse(first.changeCondition().equals(second.changeCondition()),
+        "continued wealth focus must not repeat the same adjustment condition");
+    assertContainsAny(second.priorityIssue(), "延续", "加强", "缓和");
+    assertContainsAny(second.changeCondition(), "延续", "加强", "缓和");
+    assertTrue(second.priorityIssue().contains("备用金是否真正留下"), second.priorityIssue());
+    assertTrue(second.changeCondition().contains("暂停新增支出"), second.changeCondition());
+  }
+
+  @Test
   void easingTransitionSaysWhatGetsEasierInsteadOfOnlyReturningTheLabel() {
     OverallYearEvaluation pressured = syntheticYear(
         2026, OverallStance.PRESSURED, "annual.branch.clash.day");

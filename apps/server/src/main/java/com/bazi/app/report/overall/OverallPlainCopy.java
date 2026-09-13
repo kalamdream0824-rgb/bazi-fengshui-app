@@ -71,6 +71,49 @@ final class OverallPlainCopy {
     };
   }
 
+  String continuedPriorityIssue(
+      OverallDimension dimension, OverallEvidenceAngle angle, OverallTransition transition) {
+    String reason = shortReason(angle.primaryKey());
+    return switch (dimension) {
+      case RHYTHM -> switch (transition.relation()) {
+        case "延续" -> "生活节奏的问题延续到" + transition.toYear() + "年：" + reason
+            + "，今年要确认固定休息是否真正保留下来。";
+        case "加强" -> "生活节奏受到的影响正在加强：" + reason
+            + "，先删减安排，再考虑增加目标。";
+        case "缓和" -> "生活节奏受到的影响有所缓和：" + reason
+            + "，先恢复稳定作息，再逐步增加安排。";
+        default -> throw unsupportedTransition(transition);
+      };
+      case CAREER -> switch (transition.relation()) {
+        case "延续" -> "事业责任延续到" + transition.toYear() + "年：" + reason
+            + "，今年要确认已有投入是否形成可核对的成果和条件。";
+        case "加强" -> "事业责任带来的影响正在加强：" + reason
+            + "，先明确责任、期限和对应条件。";
+        case "缓和" -> "事业责任带来的压力有所缓和：" + reason
+            + "，先把已经完成的成果落实下来。";
+        default -> throw unsupportedTransition(transition);
+      };
+      case WEALTH -> switch (transition.relation()) {
+        case "延续" -> "钱财安排延续到" + transition.toYear() + "年：" + reason
+            + "，今年要核对备用金是否真正留下。";
+        case "加强" -> "钱财压力正在加强：" + reason
+            + "，先保住必要开支和现金余量。";
+        case "缓和" -> "钱财压力有所缓和：" + reason
+            + "，先确认实际余钱增加，再考虑新增支出。";
+        default -> throw unsupportedTransition(transition);
+      };
+      case RELATIONSHIP -> switch (transition.relation()) {
+        case "延续" -> "关系里的同一问题延续到" + transition.toYear() + "年：" + reason
+            + "，今年要核对沟通是否变成实际行动。";
+        case "加强" -> "关系问题带来的影响正在加强：" + reason
+            + "，先把分歧和彼此边界说清楚。";
+        case "缓和" -> "关系问题带来的影响有所缓和：" + reason
+            + "，先确认沟通和实际配合能否稳定。";
+        default -> throw unsupportedTransition(transition);
+      };
+    };
+  }
+
   String action(OverallDimension dimension, OverallStance stance, int index) {
     boolean pressured = stance == OverallStance.PRESSURED;
     List<String> variants = switch (dimension) {
@@ -131,6 +174,44 @@ final class OverallPlainCopy {
           ? "如果" + reason + "，同一分歧多次沟通仍没有变化，就要重新确认双方边界。"
           : "如果" + reason + "，口头承诺仍没有变成实际行动，就要放慢关系推进。";
     };
+  }
+
+  String continuedChangeCondition(OverallDimension dimension, OverallTransition transition) {
+    return switch (dimension) {
+      case RHYTHM -> switch (transition.relation()) {
+        case "延续" -> "如果生活节奏的问题延续到" + transition.toYear()
+            + "年，固定休息仍不能保留，就要继续减少安排。";
+        case "加强" -> "如果生活节奏受到的影响继续加强，睡眠或办事效率也在变差，就要减少目标。";
+        case "缓和" -> "即使生活节奏有所缓和，如果固定休息仍不能保留，也不要马上增加安排。";
+        default -> throw unsupportedTransition(transition);
+      };
+      case CAREER -> switch (transition.relation()) {
+        case "延续" -> "如果事业责任延续到" + transition.toYear()
+            + "年，投入仍没有形成成果或明确条件，就要调整推进方向。";
+        case "加强" -> "如果事业责任带来的影响继续加强，却没有相应支持和结果，就要缩小承担范围。";
+        case "缓和" -> "即使事业压力有所缓和，如果成果仍没有落实，也不要马上增加新的责任。";
+        default -> throw unsupportedTransition(transition);
+      };
+      case WEALTH -> switch (transition.relation()) {
+        case "延续" -> "如果钱财安排延续到" + transition.toYear()
+            + "年，备用金仍没有真正留下，就要暂停新增支出并重新核对固定开支和回款。";
+        case "加强" -> "如果钱财压力继续加强，实际余钱还在减少，就要暂停大额支出并重新核对回款。";
+        case "缓和" -> "即使钱财压力有所缓和，如果实际余钱没有增加，也不要马上扩大支出。";
+        default -> throw unsupportedTransition(transition);
+      };
+      case RELATIONSHIP -> switch (transition.relation()) {
+        case "延续" -> "如果关系问题延续到" + transition.toYear()
+            + "年，沟通仍没有变成实际行动，就要重新确认彼此边界。";
+        case "加强" -> "如果关系问题带来的影响继续加强，多次沟通仍没有变化，就要减少单方面投入。";
+        case "缓和" -> "即使关系问题有所缓和，如果实际配合仍不稳定，也不要急着增加共同安排。";
+        default -> throw unsupportedTransition(transition);
+      };
+    };
+  }
+
+  private IllegalArgumentException unsupportedTransition(OverallTransition transition) {
+    return new IllegalArgumentException("unsupported continued overall transition: "
+        + transition.relation());
   }
 
   String evidenceChange(String key) {

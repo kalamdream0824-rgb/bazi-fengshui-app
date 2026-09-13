@@ -6,11 +6,13 @@ import { WealthV3ReportReader } from '@/components/report/WealthV3ReportReader'
 import { RelationshipReportReader } from '@/components/report/RelationshipReportReader'
 import { RelationshipSingleReportReader } from '@/components/report/RelationshipSingleReportReader'
 import { OverallReportReader } from '@/components/report/OverallReportReader'
+import { OverallV3ReportReader } from '@/components/report/OverallV3ReportReader'
 import { TopBar } from '@/components/TopBar'
 import {
   getReport,
   isCareerV4Report,
   isOverallReport,
+  isOverallV3Report,
   isLegacyReport,
   isRelationshipReport,
   isRelationshipSingleReport,
@@ -43,6 +45,8 @@ export function ReportReaderPage() {
         </main>
       ) : !report ? (
         <main className="report-reader__state">正在展开命书…</main>
+      ) : isOverallV3Report(report) ? (
+        <OverallV3ReportReader report={report} />
       ) : isOverallReport(report) ? (
         <OverallReportReader report={report} />
       ) : isRelationshipSingleReport(report) ? (

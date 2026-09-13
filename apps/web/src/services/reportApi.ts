@@ -376,6 +376,42 @@ export interface OverallNarrativePlan {
   timeline?: NarrativeTimeline
 }
 
+export type OverallV3TopicCode = 'rhythm' | 'career' | 'wealth' | 'relationship'
+
+export interface OverallV3Observation {
+  topicCode: OverallV3TopicCode
+  topicLabel: string
+  stance: string
+  note: string
+  evidenceKeys: string[]
+}
+
+export interface OverallV3YearNarrative {
+  year: number
+  primaryCode: OverallV3TopicCode
+  primaryLabel: string
+  secondaryCode: OverallV3TopicCode
+  secondaryLabel: string
+  decisionKey: string
+  conflictKey: string
+  headline: string
+  linkage: string
+  actionGuide: AnnualActionGuide
+  observations: [OverallV3Observation, OverallV3Observation]
+  transition: string
+  evidenceKeys: string[]
+}
+
+export interface OverallV3NarrativePlan {
+  horizonYears: 2 | 3 | 4 | 5
+  thesis: string
+  summary: string
+  years: OverallV3YearNarrative[]
+  readingNote: string
+  evidenceKeys: string[]
+  timeline?: NarrativeTimeline
+}
+
 interface SavedReportBase {
   id: number
   subject: string
@@ -413,6 +449,14 @@ export interface OverallSavedReport extends SavedReportBase {
   edition: 'plain'
   contentVersion: 'overall-narrative-v1' | 'overall-narrative-v1.1' | 'overall-narrative-v2'
   content: OverallNarrativePlan
+}
+
+export interface OverallV3SavedReport extends SavedReportBase {
+  topic: 'overall'
+  edition: 'plain'
+  status: 'ready'
+  contentVersion: 'overall-narrative-v3'
+  content: OverallV3NarrativePlan
 }
 
 export interface WealthV3SavedReport extends SavedReportBase {
@@ -460,6 +504,7 @@ export interface RelationshipSingleSavedReport extends SavedReportBase {
 
 export type SavedReport =
   | OverallSavedReport
+  | OverallV3SavedReport
   | LegacySavedReport
   | CareerV4SavedReport
   | WealthV2SavedReport
@@ -477,6 +522,10 @@ export function isOverallReport(report: SavedReport): report is OverallSavedRepo
   return report.contentVersion === 'overall-narrative-v1'
     || report.contentVersion === 'overall-narrative-v1.1'
     || report.contentVersion === 'overall-narrative-v2'
+}
+
+export function isOverallV3Report(report: SavedReport): report is OverallV3SavedReport {
+  return report.contentVersion === 'overall-narrative-v3'
 }
 
 export function isWealthV2Report(report: SavedReport): report is WealthV2SavedReport {

@@ -20,6 +20,8 @@ import com.bazi.app.report.ReportTopic;
 import com.bazi.app.report.ThreeYearAssessment;
 import com.bazi.app.report.rules.AnnualRuleCatalog;
 import com.bazi.app.report.overall.OverallNarrativePlan;
+import com.bazi.app.report.overall.OverallNarrativePlanner;
+import com.bazi.app.report.overall.OverallPeriodArbitrator;
 import com.bazi.app.report.overall.v3.OverallV3NarrativePlan;
 import com.bazi.app.report.overall.v3.OverallV3ReportGenerator;
 import com.bazi.app.report.relationship.RelationshipDimensionEvaluator;
@@ -43,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,7 +56,8 @@ public class ReportService {
   public static final String CAREER_CONTENT_VERSION = "career-narrative-v5";
   public static final String CAREER_V4_CONTENT_VERSION = "career-narrative-v4";
   public static final String CAREER_V3_CONTENT_VERSION = "career-narrative-v3";
-  public static final String OVERALL_CONTENT_VERSION = "overall-narrative-v3";
+  public static final String OVERALL_V3_CONTENT_VERSION = "overall-narrative-v3";
+  public static final String OVERALL_CONTENT_VERSION = OVERALL_V3_CONTENT_VERSION;
   public static final String OVERALL_V2_CONTENT_VERSION = "overall-narrative-v2";
   public static final String OVERALL_V11_CONTENT_VERSION = "overall-narrative-v1.1";
   public static final String OVERALL_V1_CONTENT_VERSION = "overall-narrative-v1";
@@ -75,6 +79,7 @@ public class ReportService {
   private final WealthReportGenerator wealthReportGenerator;
   private final OverallV3ReportGenerator overallV3ReportGenerator;
   private final ReportEntitlementService reportEntitlementService;
+  private final String overallContentVersion;
   private final CareerNarrativePlanner careerPlanner = new CareerNarrativePlanner();
   private final RelationshipFactExtractor relationshipFactExtractor = new RelationshipFactExtractor();
   private final RelationshipDimensionEvaluator relationshipDimensionEvaluator =
@@ -87,7 +92,9 @@ public class ReportService {
   public ReportService(BaziService baziService, BaziReportMapper mapper, ObjectMapper objectMapper,
       WealthReportGenerator wealthReportGenerator,
       OverallV3ReportGenerator overallV3ReportGenerator,
-      ReportEntitlementService reportEntitlementService) {
+      ReportEntitlementService reportEntitlementService,
+      @Value("${app.report.overall-content-version:" + OVERALL_CONTENT_VERSION + "}")
+      String overallContentVersion) {
     this.baziService = baziService;
     this.mapper = mapper;
     this.objectMapper = objectMapper;
@@ -96,6 +103,12 @@ public class ReportService {
     this.wealthReportGenerator = wealthReportGenerator;
     this.overallV3ReportGenerator = overallV3ReportGenerator;
     this.reportEntitlementService = reportEntitlementService;
+    if (!Set.of(OVERALL_V3_CONTENT_VERSION, OVERALL_V2_CONTENT_VERSION)
+        .contains(overallContentVersion)) {
+      throw new IllegalArgumentException(
+          "unsupported active overall content version: " + overallContentVersion);
+    }
+    this.overallContentVersion = overallContentVersion;
   }
 
   @Transactional
@@ -154,14 +167,12 @@ public class ReportService {
     Object contextRequest;
     if (topic == ReportTopic.OVERALL) {
       try {
-        content = overallV3ReportGenerator.generate(
-            request.request(), chart, analysisWindow.previous(), analysisWindow.productYears(),
-            clock.withZone(WEALTH_ZONE));
+        content = generateOverall(request, chart, analysisWindow);
       } catch (IllegalArgumentException error) {
         throw new BusinessException("REPORT_GENERATION_UNAVAILABLE",
             "本次命书暂未生成成功，未扣除费用或使用次数，请稍后再试");
       }
-      contentVersion = OVERALL_CONTENT_VERSION;
+      contentVersion = overallContentVersion;
       contextRequest = Map.of("source", "system", "horizonYears", 3);
     } else if (topic == ReportTopic.CAREER) {
       CareerContext context = request.careerContext().toDomain();
@@ -256,7 +267,7 @@ public class ReportService {
 
   private ReportDto toDto(BaziReport report) throws Exception {
     ReportContent content;
-    if (OVERALL_CONTENT_VERSION.equals(report.getContentVersion())) {
+    if (OVERALL_V3_CONTENT_VERSION.equals(report.getContentVersion())) {
       content = objectMapper.readValue(report.getContentJson(), OverallV3NarrativePlan.class);
     } else if (Set.of(OVERALL_V2_CONTENT_VERSION, OVERALL_V11_CONTENT_VERSION,
         OVERALL_V1_CONTENT_VERSION).contains(report.getContentVersion())) {
@@ -310,6 +321,24 @@ public class ReportService {
     var previous = factory.createYear(
         request.request(), chart, productYears.get(0).year() - 1);
     return new ReportAnalysisWindow(previous, productYears);
+  }
+
+  private ReportContent generateOverall(
+      ReportPreviewRequest request,
+      PaipanResultDto chart,
+      ReportAnalysisWindow analysisWindow) {
+    if (OVERALL_V3_CONTENT_VERSION.equals(overallContentVersion)) {
+      return overallV3ReportGenerator.generate(
+          request.request(), chart, analysisWindow.previous(), analysisWindow.productYears(),
+          clock.withZone(WEALTH_ZONE));
+    }
+
+    OverallPeriodArbitrator arbitrator = new OverallPeriodArbitrator();
+    var product = arbitrator.arbitrate(analysisWindow.productYears());
+    var fullWindow = new ArrayList<>(analysisWindow.productYears());
+    fullWindow.add(0, analysisWindow.previous());
+    var previous = arbitrator.arbitrate(fullWindow).years().get(0);
+    return new OverallNarrativePlanner().plan(product, previous);
   }
 
   private ReportHorizon productHorizon(

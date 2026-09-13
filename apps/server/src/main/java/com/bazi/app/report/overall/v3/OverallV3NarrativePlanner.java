@@ -10,6 +10,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /** Builds a compact report around one calculated cross-topic decision per year. */
 public final class OverallV3NarrativePlanner {
@@ -36,6 +37,7 @@ public final class OverallV3NarrativePlanner {
 
     List<OverallV3NarrativePlan.YearNarrative> years = new ArrayList<>();
     List<AnnualActionGuide> guides = new ArrayList<>();
+    Map<String, Integer> decisionOccurrences = new LinkedHashMap<>();
     String previousDecisionKey = null;
     int continuationRound = 0;
     for (int index = 0; index < productDecisions.size(); index++) {
@@ -43,9 +45,16 @@ public final class OverallV3NarrativePlanner {
       List<OverallTopicSnapshot> annualSnapshots = snapshotsByYear.get(decision.year());
       continuationRound = decision.decisionKey().equals(previousDecisionKey)
           ? continuationRound + 1 : 0;
-      AnnualActionGuide guide = continuationRound == 0
-          ? actionWriter.write(decision)
-          : continuationGuide(decision, continuationRound);
+      int priorOccurrences = decisionOccurrences.getOrDefault(decision.decisionKey(), 0);
+      AnnualActionGuide guide = continuationRound > 0
+          ? continuationGuide(decision, continuationRound)
+          : priorOccurrences > 0
+              ? revisitGuide(decision)
+              : actionWriter.write(decision);
+      if (sharesVisibleSentence(guide, guides)) {
+        guide = changedStateGuide(decision);
+      }
+      decisionOccurrences.put(decision.decisionKey(), priorOccurrences + 1);
       previousDecisionKey = decision.decisionKey();
       guides.add(guide);
       years.add(new OverallV3NarrativePlan.YearNarrative(
@@ -57,7 +66,7 @@ public final class OverallV3NarrativePlanner {
           decision.decisionKey(),
           decision.conflictKey(),
           headline(productDecisions, index),
-          linkage(decision),
+          linkage(productDecisions, index),
           guide,
           observations(annualSnapshots, decision),
           transition(productDecisions, index),
@@ -164,6 +173,70 @@ public final class OverallV3NarrativePlanner {
         decision.evidenceKeys());
   }
 
+  private AnnualActionGuide revisitGuide(OverallAnnualDecision decision) {
+    String primary = copy.focusObject(decision.primary());
+    String secondary = copy.focusObject(decision.secondary());
+    String focusKey = actionWriter.write(decision).focusKey();
+    return new AnnualActionGuide(
+        focusKey,
+        "这项重点在间隔后再次出现，需要重新处理" + primary + "，并确认" + secondary + "是否受影响。",
+        "先对照上次处理" + primary + "的记录，只补一项仍未改善的安排。",
+        "这样能检验" + primary + "是否真正改善，同时继续守住" + secondary + "。",
+        "重新开始后每两周核对一次；满四周再比较前后记录。",
+        "有效的信号是：" + primary + "的实际变化比上次更清楚，" + secondary + "也没有变差。",
+        "如果两次核对都没有改善，就不要重复增加原来的做法。",
+        "保留上次最有效的一步，其余安排缩小后再试。",
+        decision.evidenceKeys());
+  }
+
+  private AnnualActionGuide changedStateGuide(OverallAnnualDecision decision) {
+    String primary = copy.focusObject(decision.primary());
+    String secondary = copy.focusObject(decision.secondary());
+    String focusKey = actionWriter.write(decision).focusKey();
+    String action = switch (decision.primary().stance()) {
+      case PRESSURED -> "先减少与" + primary + "有关的额外安排，只改一项，并同步记录" + secondary + "。";
+      case MIXED -> "先只处理与" + primary + "有关的最明确一项，并同步记录" + secondary + "。";
+      case BALANCED -> "先维持" + primary + "当前状态，并同步记录" + secondary + "。";
+      case SUPPORTIVE -> "先做一件能改善" + primary + "的小事，并同步记录" + secondary + "。";
+    };
+    String expected = switch (decision.primary().stance()) {
+      case PRESSURED -> "这样能确认" + primary + "的负担是否下降，也能防止" + secondary + "继续受影响。";
+      case MIXED -> "这样能确认处理这件事是否有效，也能防止" + secondary + "受损。";
+      case BALANCED -> "这样能确认" + primary + "是否保持稳定，也能及时发现" + secondary + "的变化。";
+      case SUPPORTIVE -> "这样能确认" + primary + "是否出现改善，也能防止" + secondary + "被连带影响。";
+    };
+    String signal = switch (decision.primary().stance()) {
+      case PRESSURED -> "有效的信号是：与前一阶段相比，" + primary + "负担下降，" + secondary + "没有变差。";
+      case MIXED -> "有效的信号是：与前一阶段相比，处理过的事项有结果，" + secondary + "仍然稳定。";
+      case BALANCED -> "有效的信号是：与前一阶段相比，" + primary + "保持稳定，" + secondary + "没有变差。";
+      case SUPPORTIVE -> "有效的信号是：与前一阶段相比，" + primary + "出现改善，" + secondary + "仍然稳定。";
+    };
+    return new AnnualActionGuide(
+        focusKey,
+        "主次重点与前一阶段相近，但计算状态已经变化；本轮先处理" + primary + "，再守住" + secondary + "。",
+        action,
+        expected,
+        "调整后每两周分别核对" + primary + "、" + secondary + "；四周后比较。",
+        signal,
+        "如果两次核对" + primary + "都未改善，或" + secondary + "变差，就撤回本轮调整。",
+        "改回上一轮有效做法，再缩小" + primary + "的范围并先守住" + secondary + "。",
+        decision.evidenceKeys());
+  }
+
+  private boolean sharesVisibleSentence(
+      AnnualActionGuide candidate, List<AnnualActionGuide> existing) {
+    Set<String> seen = existing.stream()
+        .flatMap(guide -> guide.lines().stream())
+        .flatMap(line -> List.of(line.split("(?<=[。！？])")).stream())
+        .map(String::strip)
+        .filter(value -> !value.isBlank())
+        .collect(java.util.stream.Collectors.toSet());
+    return candidate.lines().stream()
+        .flatMap(line -> List.of(line.split("(?<=[。！？])")).stream())
+        .map(String::strip)
+        .anyMatch(seen::contains);
+  }
+
   private String headline(List<OverallAnnualDecision> decisions, int index) {
     OverallAnnualDecision current = decisions.get(index);
     String focus = copy.focusObject(current.primary());
@@ -175,6 +248,10 @@ public final class OverallV3NarrativePlanner {
       return current.year() + "年重点转到" + focus;
     }
     if (!previous.primary().focusKey().equals(current.primary().focusKey())) {
+      if (copy.focusObject(previous.primary()).equals(focus)) {
+        return current.year() + "年继续关注" + focus + "，但状态变为"
+            + stance(current.primary().stance());
+      }
       return current.year() + "年同一主题改看" + focus;
     }
     long run = decisions.subList(0, index).stream()
@@ -184,7 +261,26 @@ public final class OverallV3NarrativePlanner {
     return current.year() + "年继续处理" + focus + "，这是连续第" + chinese(run + 1) + "年";
   }
 
-  private String linkage(OverallAnnualDecision decision) {
+  private String linkage(List<OverallAnnualDecision> decisions, int index) {
+    OverallAnnualDecision decision = decisions.get(index);
+    String base = baseLinkage(decision);
+    if (index == 0) return base;
+    OverallAnnualDecision previous = decisions.get(index - 1);
+    if (previous.decisionKey().equals(decision.decisionKey())) {
+      long consecutive = decisions.subList(0, index).stream()
+          .map(OverallAnnualDecision::decisionKey)
+          .filter(decision.decisionKey()::equals)
+          .count();
+      return consecutive == 1
+          ? "这项联动连续存在：" + base
+          : "这项联动已经连续两轮出现：" + base;
+    }
+    boolean appearedBefore = decisions.subList(0, index).stream()
+        .anyMatch(item -> baseLinkage(item).equals(base));
+    return appearedBefore ? "同一联动在计算中再次出现：" + base : base;
+  }
+
+  private String baseLinkage(OverallAnnualDecision decision) {
     String primary = copy.focusObject(decision.primary());
     String secondary = copy.focusObject(decision.secondary());
     return switch (decision.conflictKey()) {
@@ -194,16 +290,16 @@ public final class OverallV3NarrativePlanner {
           "先算清" + primary + "，再判断为" + secondary + "增加投入是否承受得住。";
       case "relationship_stability_before_growth" ->
           "先让" + primary + "得到回应，避免它持续影响" + secondary + "。";
-      default -> "先把" + primary + "处理清楚，因为它会直接影响" + secondary + "能否稳定。";
+      default -> "先把" + primary + "处理清楚，因为它会直接牵动" + secondary + "。";
     };
   }
 
   private String observation(OverallTopicSnapshot snapshot) {
     String tail = switch (snapshot.stance()) {
-      case SUPPORTIVE -> "有向前推进的条件，但只核对真实结果。";
+      case SUPPORTIVE -> "条件较好，但仍以实际记录为准。";
       case BALANCED -> "变化不突出，维持现有边界即可。";
-      case MIXED -> "有帮助也有牵制，每月核对一次实际变化。";
-      case PRESSURED -> "容易增加负担，不要让它占用主行动所需资源。";
+      case MIXED -> "同时有有利条件和牵制，每月核对一次实际变化。";
+      case PRESSURED -> "带来的负担偏重，不要让它占用主行动所需资源。";
     };
     return "关于“" + copy.focusObject(snapshot) + "”，当前" + tail;
   }
@@ -219,6 +315,10 @@ public final class OverallV3NarrativePlanner {
           + label(next.primary().topic()) + "。";
     }
     if (!current.primary().focusKey().equals(next.primary().focusKey())) {
+      if (copy.focusObject(current.primary()).equals(copy.focusObject(next.primary()))) {
+        return "下一年仍关注" + copy.focusObject(next.primary()) + "，但状态会从"
+            + stance(current.primary().stance()) + "变为" + stance(next.primary().stance()) + "。";
+      }
       return "下一年仍以" + label(current.primary().topic()) + "为主，但具体要改看"
           + copy.focusObject(next.primary()) + "。";
     }
@@ -264,13 +364,19 @@ public final class OverallV3NarrativePlanner {
     String pastSecondary = copy.focusObject(previous.secondary());
     OverallV3NarrativePlan.YearNarrative present = years.get(0);
     List<NarrativeTimeline.FutureStep> future = new ArrayList<>();
+    Set<String> futureActions = new LinkedHashSet<>();
     for (int index = 1; index < years.size(); index++) {
       OverallV3NarrativePlan.YearNarrative year = years.get(index);
+      String action = futureAction(product, index);
+      if (!futureActions.add(action)) {
+        action = "届时汇总" + copy.focusObject(product.get(index).primary())
+            + "的前后记录，只保留持续有效的做法。";
+        futureActions.add(action);
+      }
       future.add(new NarrativeTimeline.FutureStep(
           year.year(),
           "到" + year.year() + "年，优先顺序落在" + year.primaryLabel() + "。",
-          "届时先核对" + copy.focusObject(product.get(index).primary())
-              + "的真实变化，再决定是否扩大行动。",
+          action,
           product.get(index).evidenceKeys()));
     }
     return new NarrativeTimeline(
@@ -290,6 +396,24 @@ public final class OverallV3NarrativePlanner {
             "本月先做一件四周内能核对结果的事。",
             product.get(0).evidenceKeys()),
         future);
+  }
+
+  private String futureAction(List<OverallAnnualDecision> decisions, int index) {
+    OverallAnnualDecision current = decisions.get(index);
+    OverallAnnualDecision previous = decisions.get(index - 1);
+    String primary = copy.focusObject(current.primary());
+    String secondary = copy.focusObject(current.secondary());
+    if (current.decisionKey().equals(previous.decisionKey())) {
+      boolean thirdConsecutive = index > 1
+          && current.decisionKey().equals(decisions.get(index - 2).decisionKey());
+      return thirdConsecutive
+          ? "届时汇总" + primary + "的前后记录，只保留持续有效的做法。"
+          : "届时继续核对" + primary + "能否保持，并确认" + secondary + "没有受影响。";
+    }
+    if (copy.focusObject(current.primary()).equals(copy.focusObject(previous.primary()))) {
+      return "届时仍以" + primary + "为主，同时核对" + secondary + "的变化再决定下一步。";
+    }
+    return "届时先核对" + primary + "的真实变化，再决定是否扩大行动。";
   }
 
   private List<String> evidence(List<OverallTopicSnapshot> snapshots) {

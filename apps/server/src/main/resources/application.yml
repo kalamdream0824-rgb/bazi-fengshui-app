@@ -18,3 +18,5 @@ app:
     allowed-origins: ${APP_CORS_ORIGINS:http://localhost:5173}
   pay:
     mock-enabled: ${APP_PAY_MOCK_ENABLED:true}
+  report:
+    overall-content-version: ${APP_OVERALL_CONTENT_VERSION:overall-narrative-v3}
